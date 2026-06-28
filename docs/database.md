@@ -26,6 +26,47 @@ The migration enables:
 - document chunks for RAG grounding
 - HNSW cosine indexes for node, documentation, snippet, and chunk embeddings
 
+## Ingestion Pipeline
+
+Run the full local pipeline:
+
+```bash
+PYTHONPATH=src python3 -m ckg.pipeline
+```
+
+This refreshes:
+
+```text
+data/chunks.json
+data/citations.json
+data/exports/nodes.jsonl
+data/exports/edges.jsonl
+data/exports/code_snippets.jsonl
+data/exports/document_chunks.jsonl
+```
+
+Fetch registered sources before chunking:
+
+```bash
+PYTHONPATH=src python3 -m ckg.pipeline --fetch
+```
+
+Export rows only through the CLI:
+
+```bash
+PYTHONPATH=src python3 -m ckg.cli export-db
+```
+
+By default, vector columns are exported as `null`. That is the correct production default until a real embedding provider fills them.
+
+For local smoke tests only, deterministic non-semantic vectors can be emitted:
+
+```bash
+PYTHONPATH=src python3 -m ckg.pipeline --embedding-mode hash
+```
+
+Do not use hash vectors for retrieval quality; they only verify that import and vector-column plumbing works.
+
 ## Node Types
 
 `nodes.kind` is intentionally strict:

@@ -1,4 +1,5 @@
 from ckg.search import search_chunks, search_nodes
+from ckg.pipeline import build_exports, strict_node_kind
 from ckg.store import GraphStore
 
 
@@ -49,3 +50,23 @@ def test_network_conditions_attach_to_staking_nodes():
     assert conditions
     assert conditions[0]["freshness_status"] in {"cached", "live", "stale"}
     assert any(param["key"] == "active_validator_set_size" for param in conditions[0]["parameters"])
+
+
+def test_pipeline_maps_legacy_types_to_strict_node_kinds():
+    store = GraphStore()
+    assert strict_node_kind(store.nodes["hashing"]) == "Primitive"
+    assert strict_node_kind(store.nodes["ethereum"]) == "Protocol"
+    assert strict_node_kind(store.nodes["offline-transaction-signer"]) == "Action"
+    assert strict_node_kind(store.nodes["replay-domain-guardrail"]) == "Vulnerability"
+
+
+def test_pipeline_exports_database_rows(tmp_path):
+    stats = build_exports(export_dir=tmp_path)
+    assert stats["nodes"] == len(GraphStore().nodes)
+    assert stats["edges"] == len(GraphStore().edges)
+    assert stats["code_snippets"] > 0
+    assert stats["document_chunks"] > 0
+    assert (tmp_path / "nodes.jsonl").exists()
+    assert (tmp_path / "edges.jsonl").exists()
+    assert (tmp_path / "code_snippets.jsonl").exists()
+    assert (tmp_path / "document_chunks.jsonl").exists()

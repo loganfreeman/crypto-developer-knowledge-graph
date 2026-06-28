@@ -125,7 +125,7 @@ create table if not exists document_chunks (
   embedding vector(1536),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  constraint document_chunks_id_format check (id ~ '^[a-z0-9][a-z0-9-]*$'),
+  constraint document_chunks_id_format check (id ~ '^[a-z0-9][a-z0-9#-]*$'),
   constraint document_chunks_metadata_is_object check (jsonb_typeof(metadata) = 'object')
 );
 

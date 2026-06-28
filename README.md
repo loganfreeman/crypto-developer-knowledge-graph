@@ -109,6 +109,16 @@ curl "http://127.0.0.1:8000/trust"
 curl "http://127.0.0.1:8000/goals/build-defi-app"
 ```
 
+Run the database ingestion/export pipeline:
+
+```bash
+PYTHONPATH=src python3 -m ckg.pipeline
+PYTHONPATH=src python3 -m ckg.cli export-db
+PYTHONPATH=src python3 -m ckg.pipeline --fetch
+```
+
+The pipeline refreshes citation chunks and writes Supabase-ready JSONL exports to `data/exports/`.
+
 Use the GraphQL-style endpoint:
 
 ```bash

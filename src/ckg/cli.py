@@ -3,8 +3,9 @@ from __future__ import annotations
 import argparse
 import json
 
+from .pipeline import build_exports
 from .search import search_chunks, search_nodes
-from .store import GraphStore
+from .store import GraphStore, ROOT
 
 
 def main() -> None:
@@ -39,6 +40,10 @@ def main() -> None:
     network_parser = subparsers.add_parser("network")
     network_parser.add_argument("id", nargs="?")
 
+    export_parser = subparsers.add_parser("export-db")
+    export_parser.add_argument("--export-dir", default="data/exports")
+    export_parser.add_argument("--embedding-mode", choices=["none", "hash"], default="none")
+
     args = parser.parse_args()
     store = GraphStore()
 
@@ -58,6 +63,8 @@ def main() -> None:
         payload = store.trust_report
     elif args.command == "network":
         payload = store.node_network_conditions(args.id) if args.id else store.network_conditions
+    elif args.command == "export-db":
+        payload = build_exports(export_dir=ROOT / args.export_dir, embedding_mode=args.embedding_mode)
     else:
         payload = store.neighbors(args.id)
 
