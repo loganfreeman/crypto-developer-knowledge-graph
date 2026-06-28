@@ -35,3 +35,9 @@ def test_focused_horizon_includes_implementation_edges():
     horizon = GraphStore().horizon("cross-chain-state-verification")
     assert any(edge["type"] == "IMPLEMENTED_BY" for edge in horizon["relationships"])
     assert any(node["id"] == "merkle-proof-verification-pattern" for node in horizon["nodes"])
+
+
+def test_trust_report_surfaces_uncited_production_nodes():
+    report = GraphStore().trust_report
+    assert report["summary"]["uncited_production_nodes"] > 0
+    assert "bls12-381" in report["uncited_nodes"]

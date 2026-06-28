@@ -5,6 +5,7 @@ const state = {
   citations: [],
   chunks: [],
   sources: [],
+  trust: { nodes: [], sources: [], summary: {} },
   selectedGoalId: "build-wallet",
   selectedNodeId: null,
   activeEdgeTypes: [],
@@ -37,6 +38,20 @@ function nodeLabel(nodeId) {
   return node ? node.label : nodeId;
 }
 
+function trustForNode(nodeId) {
+  return state.trust.nodes.find((item) => item.id === nodeId) || { status: "unknown", staleness_risk: "unknown", citation_count: 0 };
+}
+
+function trustLabel(status) {
+  return {
+    verified: "Verified",
+    seeded: "Seeded",
+    needs_citation: "Needs citation",
+    source_attention: "Source attention",
+    unknown: "Unknown",
+  }[status] || status;
+}
+
 function selectNode(nodeId) {
   state.selectedNodeId = nodeId;
   render();
@@ -65,6 +80,11 @@ function renderSummary(goal, nodeMap) {
   document.querySelector("#summary").innerHTML = `
     <h3>${task.label}</h3>
     <p>${task.summary}</p>
+    <div class="trust-summary">
+      <span>${state.trust.summary.uncited_production_nodes || 0} uncited production nodes</span>
+      <span>${state.trust.summary.stale_sources || 0} stale sources</span>
+      <span>${state.trust.summary.changed_sources || 0} changed sources</span>
+    </div>
     <div class="recipe">
       <div>
         <h4>Example Flow</h4>
@@ -232,6 +252,7 @@ function renderGraph(goal, nodeMap) {
           ${groupNodes.map((node) => `
             <button class="node" type="button" data-node-id="${node.id}" aria-pressed="${String(state.selectedNodeId === node.id)}">
               <span class="type">${node.type}</span>
+              <span class="trust-badge ${trustForNode(node.id).status}">${trustLabel(trustForNode(node.id).status)}</span>
               <strong>${escapeHtml(node.label)}</strong>
               <p>${escapeHtml(node.summary)}</p>
               <div class="relationships">${relatedText(node.id, relationships)}</div>
@@ -273,6 +294,7 @@ function renderSearch(query, nodeMap) {
           ${groupNodes.map((node) => `
             <button class="node" type="button" data-node-id="${node.id}" aria-pressed="${String(state.selectedNodeId === node.id)}">
               <span class="type">${node.type}</span>
+              <span class="trust-badge ${trustForNode(node.id).status}">${trustLabel(trustForNode(node.id).status)}</span>
               <strong>${escapeHtml(node.label)}</strong>
               <p>${escapeHtml(node.summary)}</p>
               <div class="relationships">${relatedText(node.id, state.relationships.filter(edgeAllowed))}</div>
@@ -355,11 +377,19 @@ function renderDetail() {
       <ul class="note-list">${node.implementation_notes.map((note) => `<li>${escapeHtml(note)}</li>`).join("")}</ul>
     </section>
   ` : "";
+  const trust = trustForNode(node.id);
   detail.innerHTML = `
     <div class="detail-head">
       <span class="type">${escapeHtml(node.type)}</span>
+      <span class="trust-badge ${trust.status}">${trustLabel(trust.status)}</span>
       <h2>${escapeHtml(node.label)}</h2>
       <p>${escapeHtml(node.summary)}</p>
+      <div class="trust-panel">
+        <strong>Trust</strong>
+        <span>Status: ${escapeHtml(trustLabel(trust.status))}</span>
+        <span>Citations: ${escapeHtml(trust.citation_count)}</span>
+        <span>Staleness risk: ${escapeHtml(trust.staleness_risk)}</span>
+      </div>
       <div class="meta-grid">
         <div>
           <h3>Layers</h3>
@@ -402,13 +432,14 @@ function render() {
 }
 
 async function init() {
-  const [nodes, relationships, goals, citations, chunks, sources] = await Promise.all([
+  const [nodes, relationships, goals, citations, chunks, sources, trust] = await Promise.all([
     loadJson("../data/nodes.json"),
     loadJson("../data/relationships.json"),
     loadJson("../data/goal_paths.json"),
     loadJson("../data/citations.json"),
     loadJson("../data/chunks.json"),
     loadJson("../data/sources.json"),
+    loadJson("../data/trust_report.json"),
   ]);
   state.nodes = nodes;
   state.relationships = relationships;
@@ -416,6 +447,7 @@ async function init() {
   state.citations = citations;
   state.chunks = chunks;
   state.sources = sources;
+  state.trust = trust;
   document.querySelector("#search").addEventListener("input", (event) => renderSearch(event.target.value, byId(state.nodes)));
   document.querySelector("#reset").addEventListener("click", () => {
     document.querySelector("#search").value = "";

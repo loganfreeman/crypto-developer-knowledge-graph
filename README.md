@@ -67,6 +67,7 @@ PYTHONPATH=src python3 -m ckg.cli chunks "signed transaction"
 PYTHONPATH=src python3 -m ckg.cli citations ethereum
 PYTHONPATH=src python3 -m ckg.cli horizon cross-chain-state-verification
 PYTHONPATH=src python3 -m ckg.cli horizon wallet-building --edge-type REQUIRES --layer infrastructure
+PYTHONPATH=src python3 -m ckg.cli trust
 PYTHONPATH=src python3 -m ckg.cli path build-wallet
 PYTHONPATH=src python3 -m ckg.cli node ethereum
 ```
@@ -79,6 +80,7 @@ curl "http://127.0.0.1:8000/chunks/search?q=signed%20transaction"
 curl "http://127.0.0.1:8000/nodes/ethereum/citations"
 curl "http://127.0.0.1:8000/nodes/ethereum/neighbors"
 curl "http://127.0.0.1:8000/nodes/cross-chain-state-verification/horizon"
+curl "http://127.0.0.1:8000/trust"
 curl "http://127.0.0.1:8000/goals/build-defi-app"
 ```
 
@@ -127,6 +129,31 @@ The validator now checks:
 - citation references against registered source ids or URLs
 - source local document presence
 - generated citation links against known nodes, sources, and chunks
+
+## Trust And Freshness
+
+Trust reports make reliability visible. They hash local source documents, find stale or missing sources, map changed sources to impacted nodes, and flag production-grade nodes that still need citations.
+
+Generate the report:
+
+```bash
+PYTHONPATH=src python3 -m ckg.trust
+```
+
+The command updates:
+
+```text
+data/trust_report.json
+```
+
+The frontend reads this report and shows trust badges in node cards and the sidecar:
+
+- `Verified`
+- `Seeded`
+- `Needs citation`
+- `Source attention`
+
+The report is intentionally strict about production node types such as cryptographic primitives, proof systems, runtimes, payload templates, signing integrations, implementation patterns, and security guardrails.
 
 ## Data Model
 

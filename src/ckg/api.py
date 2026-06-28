@@ -63,6 +63,8 @@ class KnowledgeGraphHandler(BaseHTTPRequestHandler):
                 self.json_response(node) if node else self.not_found(node_id)
             elif path == "relationships":
                 self.json_response({"relationships": [edge.as_dict() for edge in STORE.edges]})
+            elif path == "trust":
+                self.json_response(STORE.trust_report)
             elif path == "sources":
                 self.json_response({"sources": list(STORE.sources.values())})
             elif path == "citations":

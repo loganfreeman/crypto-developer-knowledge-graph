@@ -55,6 +55,7 @@ class GraphStore:
         self.sources = {source["id"]: source for source in self._load_optional_json(data_dir / "sources.json", [])}
         self.chunks = {chunk["id"]: chunk for chunk in self._load_optional_json(data_dir / "chunks.json", [])}
         self.citations = {citation["id"]: citation for citation in self._load_optional_json(data_dir / "citations.json", [])}
+        self.trust_report = self._load_optional_json(data_dir / "trust_report.json", {"summary": {}, "nodes": [], "sources": []})
         self.outgoing = self._group_edges("source")
         self.incoming = self._group_edges("target")
 
@@ -157,6 +158,12 @@ class GraphStore:
         keys.update(self.citations)
         keys.update(citation["source_url"] for citation in self.citations.values())
         return keys
+
+    def node_trust(self, node_id: str) -> dict[str, Any] | None:
+        for item in self.trust_report.get("nodes", []):
+            if item["id"] == node_id:
+                return item
+        return None
 
     def validate(self) -> list[str]:
         errors: list[str] = []

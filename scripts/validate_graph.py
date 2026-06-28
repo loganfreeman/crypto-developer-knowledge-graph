@@ -25,7 +25,8 @@ def main() -> int:
         f"{len(store.goal_paths)} goal paths, "
         f"{len(store.sources)} sources, "
         f"{len(store.chunks)} chunks, "
-        f"{len(store.citations)} citations"
+        f"{len(store.citations)} citations, "
+        f"{store.trust_report.get('summary', {}).get('uncited_production_nodes', 0)} uncited production nodes"
     )
     return 0
 

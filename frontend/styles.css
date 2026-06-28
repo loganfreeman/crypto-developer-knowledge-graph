@@ -162,6 +162,61 @@ h3 {
   line-height: 1.55;
 }
 
+.trust-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.trust-summary span,
+.trust-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: #eef3f7;
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.trust-badge {
+  margin-left: 8px;
+}
+
+.trust-badge.verified {
+  background: #e8f4f1;
+  color: #0f766e;
+}
+
+.trust-badge.needs_citation {
+  background: #fff1e8;
+  color: #9a3412;
+}
+
+.trust-badge.source_attention {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.trust-panel {
+  display: grid;
+  gap: 4px;
+  margin-top: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: #fbfcfe;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.trust-panel strong {
+  color: var(--ink);
+}
+
 .recipe {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(180px, 0.8fr) minmax(220px, 1fr);

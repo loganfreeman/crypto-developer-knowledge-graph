@@ -1,0 +1,609 @@
+{
+  "generated_at": "2026-06-28T03:10:59.790104+00:00",
+  "summary": {
+    "nodes": 51,
+    "sources": 11,
+    "citations": 12,
+    "uncited_production_nodes": 18,
+    "fast_moving_uncited_nodes": 3,
+    "stale_sources": 0,
+    "changed_sources": 0,
+    "missing_sources": 0,
+    "impacted_nodes": 0
+  },
+  "sources": [
+    {
+      "id": "bitcoin-core-rpc",
+      "title": "Bitcoin Core RPC API Reference",
+      "url": "https://developer.bitcoin.org/reference/rpc/",
+      "local_path": "docs/sources/bitcoin-core-rpc.md",
+      "status": "healthy",
+      "authority": "official",
+      "freshness_days": 90,
+      "last_verified_at": "2026-06-27",
+      "age_days": 1,
+      "current_hash": "4a07e25056e8116fe3631672c50252a653a7ae21715837a2a1f0f46263b1e2b5",
+      "stored_hash": null,
+      "changed": false
+    },
+    {
+      "id": "bitcoin-sendrawtransaction",
+      "title": "Bitcoin Core sendrawtransaction RPC",
+      "url": "https://developer.bitcoin.org/reference/rpc/sendrawtransaction.html",
+      "local_path": "docs/sources/bitcoin-sendrawtransaction.md",
+      "status": "healthy",
+      "authority": "official",
+      "freshness_days": 90,
+      "last_verified_at": "2026-06-27",
+      "age_days": 1,
+      "current_hash": "65668f46e8a198e0ee75bb30366fc5a5f07ccd2041861f4f40ec0f62c675704b",
+      "stored_hash": null,
+      "changed": false
+    },
+    {
+      "id": "ethereum-json-rpc",
+      "title": "Ethereum JSON-RPC API",
+      "url": "https://ethereum.org/en/developers/docs/apis/json-rpc/",
+      "local_path": "docs/sources/ethereum-json-rpc.md",
+      "status": "healthy",
+      "authority": "official",
+      "freshness_days": 90,
+      "last_verified_at": "2026-06-27",
+      "age_days": 1,
+      "current_hash": "77c4f050237809cb805676928581fb323c95e50b47ab7bee674ea7ba940899aa",
+      "stored_hash": null,
+      "changed": false
+    },
+    {
+      "id": "ethereum-json-rpc-eth-getbalance",
+      "title": "Ethereum JSON-RPC eth_getBalance",
+      "url": "https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_getbalance",
+      "local_path": "docs/sources/ethereum-json-rpc.md",
+      "status": "healthy",
+      "authority": "official",
+      "freshness_days": 90,
+      "last_verified_at": "2026-06-27",
+      "age_days": 1,
+      "current_hash": "77c4f050237809cb805676928581fb323c95e50b47ab7bee674ea7ba940899aa",
+      "stored_hash": null,
+      "changed": false
+    },
+    {
+      "id": "ethereum-json-rpc-eth-sendrawtransaction",
+      "title": "Ethereum JSON-RPC eth_sendRawTransaction",
+      "url": "https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_sendrawtransaction",
+      "local_path": "docs/sources/ethereum-json-rpc.md",
+      "status": "healthy",
+      "authority": "official",
+      "freshness_days": 90,
+      "last_verified_at": "2026-06-27",
+      "age_days": 1,
+      "current_hash": "77c4f050237809cb805676928581fb323c95e50b47ab7bee674ea7ba940899aa",
+      "stored_hash": null,
+      "changed": false
+    },
+    {
+      "id": "json-rpc-spec",
+      "title": "JSON-RPC 2.0 Specification",
+      "url": "https://www.jsonrpc.org/specification",
+      "local_path": "docs/sources/json-rpc-spec.md",
+      "status": "healthy",
+      "authority": "standard",
+      "freshness_days": 90,
+      "last_verified_at": "2026-06-27",
+      "age_days": 1,
+      "current_hash": "65e3ad49c5cf08016dfa76692dbae82d339019973c608ed5c41d14afa08cfce8",
+      "stored_hash": null,
+      "changed": false
+    },
+    {
+      "id": "eip-20",
+      "title": "ERC-20 Token Standard",
+      "url": "https://eips.ethereum.org/EIPS/eip-20",
+      "local_path": "docs/sources/eip-20.md",
+      "status": "healthy",
+      "authority": "standard",
+      "freshness_days": 90,
+      "last_verified_at": "2026-06-27",
+      "age_days": 1,
+      "current_hash": "4313fb2250699b91a8d5a390265fdadc5ccbebf47b800426e74327a942a1ec19",
+      "stored_hash": null,
+      "changed": false
+    },
+    {
+      "id": "eip-721",
+      "title": "ERC-721 Non-Fungible Token Standard",
+      "url": "https://eips.ethereum.org/EIPS/eip-721",
+      "local_path": "docs/sources/eip-721.md",
+      "status": "healthy",
+      "authority": "standard",
+      "freshness_days": 90,
+      "last_verified_at": "2026-06-27",
+      "age_days": 1,
+      "current_hash": "2251a39b30434a9e8bf24bae80bd815bec857822dba6a662c5c4a469d3fd7a2a",
+      "stored_hash": null,
+      "changed": false
+    },
+    {
+      "id": "solidity-abi",
+      "title": "Solidity ABI Specification",
+      "url": "https://docs.soliditylang.org/en/latest/abi-spec.html",
+      "local_path": "docs/sources/solidity-abi.md",
+      "status": "healthy",
+      "authority": "official",
+      "freshness_days": 90,
+      "last_verified_at": "2026-06-27",
+      "age_days": 1,
+      "current_hash": "4e9114cc0652a7e680bd4ac97e326abb595426c3b2b38c297748cfac95577ea0",
+      "stored_hash": null,
+      "changed": false
+    },
+    {
+      "id": "solana-rpc",
+      "title": "Solana RPC Methods",
+      "url": "https://solana.com/docs/rpc",
+      "local_path": "docs/sources/solana-rpc.md",
+      "status": "healthy",
+      "authority": "official",
+      "freshness_days": 90,
+      "last_verified_at": "2026-06-27",
+      "age_days": 1,
+      "current_hash": "7d64655f27bbc4b51d83ccc42a655d3f1545fe78bab1fff2ada100498a8d77ad",
+      "stored_hash": null,
+      "changed": false
+    },
+    {
+      "id": "solana-sendtransaction",
+      "title": "Solana sendTransaction RPC",
+      "url": "https://solana.com/docs/rpc/http/sendtransaction",
+      "local_path": "docs/sources/solana-rpc.md",
+      "status": "healthy",
+      "authority": "official",
+      "freshness_days": 90,
+      "last_verified_at": "2026-06-27",
+      "age_days": 1,
+      "current_hash": "7d64655f27bbc4b51d83ccc42a655d3f1545fe78bab1fff2ada100498a8d77ad",
+      "stored_hash": null,
+      "changed": false
+    }
+  ],
+  "nodes": [
+    {
+      "id": "bitcoin",
+      "label": "Bitcoin",
+      "type": "Chain",
+      "status": "verified",
+      "citation_count": 1,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "ethereum",
+      "label": "Ethereum",
+      "type": "Chain",
+      "status": "verified",
+      "citation_count": 1,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "solana",
+      "label": "Solana",
+      "type": "Chain",
+      "status": "verified",
+      "citation_count": 1,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "json-rpc",
+      "label": "JSON-RPC",
+      "type": "Interface",
+      "status": "verified",
+      "citation_count": 1,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "rest-api",
+      "label": "REST APIs",
+      "type": "Interface",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "eth-get-balance",
+      "label": "eth_getBalance",
+      "type": "RPCMethod",
+      "status": "verified",
+      "citation_count": 1,
+      "staleness_risk": "high"
+    },
+    {
+      "id": "eth-send-raw-transaction",
+      "label": "eth_sendRawTransaction",
+      "type": "RPCMethod",
+      "status": "verified",
+      "citation_count": 1,
+      "staleness_risk": "high"
+    },
+    {
+      "id": "bitcoin-sendrawtransaction",
+      "label": "sendrawtransaction",
+      "type": "RPCMethod",
+      "status": "verified",
+      "citation_count": 1,
+      "staleness_risk": "high"
+    },
+    {
+      "id": "solana-send-transaction",
+      "label": "sendTransaction",
+      "type": "RPCMethod",
+      "status": "verified",
+      "citation_count": 1,
+      "staleness_risk": "high"
+    },
+    {
+      "id": "erc-20",
+      "label": "ERC-20",
+      "type": "TokenStandard",
+      "status": "verified",
+      "citation_count": 1,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "erc-721",
+      "label": "ERC-721",
+      "type": "TokenStandard",
+      "status": "verified",
+      "citation_count": 1,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "wallet-building",
+      "label": "Build a wallet",
+      "type": "DeveloperTask",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "defi-app-building",
+      "label": "Build a DeFi app",
+      "type": "DeveloperTask",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "analytics-indexer-building",
+      "label": "Build analytics/indexer",
+      "type": "DeveloperTask",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "key-generation",
+      "label": "Key generation",
+      "type": "WalletFeature",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "address-format",
+      "label": "Address format",
+      "type": "WalletFeature",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "transaction-creation",
+      "label": "Transaction creation",
+      "type": "WalletFeature",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "transaction-lifecycle",
+      "label": "Transaction lifecycle",
+      "type": "Concept",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "signed-transaction",
+      "label": "Signed transaction",
+      "type": "Concept",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "signatures",
+      "label": "Signatures",
+      "type": "CryptographicPrimitive",
+      "status": "needs_citation",
+      "citation_count": 0,
+      "staleness_risk": "medium"
+    },
+    {
+      "id": "ecdsa-secp256k1",
+      "label": "ECDSA/secp256k1",
+      "type": "CryptographicPrimitive",
+      "status": "needs_citation",
+      "citation_count": 0,
+      "staleness_risk": "medium"
+    },
+    {
+      "id": "ed25519",
+      "label": "Ed25519",
+      "type": "CryptographicPrimitive",
+      "status": "needs_citation",
+      "citation_count": 0,
+      "staleness_risk": "medium"
+    },
+    {
+      "id": "hashing",
+      "label": "Hashing",
+      "type": "CryptographicPrimitive",
+      "status": "needs_citation",
+      "citation_count": 0,
+      "staleness_risk": "medium"
+    },
+    {
+      "id": "merkle-trees",
+      "label": "Merkle trees",
+      "type": "CryptographicPrimitive",
+      "status": "needs_citation",
+      "citation_count": 0,
+      "staleness_risk": "medium"
+    },
+    {
+      "id": "consensus",
+      "label": "Consensus",
+      "type": "ConsensusAlgorithm",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "proof-of-work",
+      "label": "Proof of Work",
+      "type": "ConsensusAlgorithm",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "proof-of-stake",
+      "label": "Proof of Stake",
+      "type": "ConsensusAlgorithm",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "indexing",
+      "label": "Indexing",
+      "type": "Concept",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "abi",
+      "label": "ABI",
+      "type": "Interface",
+      "status": "verified",
+      "citation_count": 1,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "wallet-app",
+      "label": "Wallet app",
+      "type": "ExampleApp",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "defi-app",
+      "label": "DeFi app",
+      "type": "ExampleApp",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "replay-risk",
+      "label": "Replay risk",
+      "type": "SecurityRisk",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "private-key-loss",
+      "label": "Private key loss",
+      "type": "SecurityRisk",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "reorg-risk",
+      "label": "Reorg risk",
+      "type": "SecurityRisk",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "wallet-balance-snippet",
+      "label": "Query ETH balance snippet",
+      "type": "CodeSnippet",
+      "status": "verified",
+      "citation_count": 1,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "cross-chain-state-verification",
+      "label": "Cross-Chain State Verification",
+      "type": "Concept",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "bls12-381",
+      "label": "BLS12-381",
+      "type": "CryptographicPrimitive",
+      "status": "needs_citation",
+      "citation_count": 0,
+      "staleness_risk": "medium"
+    },
+    {
+      "id": "pairings",
+      "label": "Pairings",
+      "type": "CryptographicPrimitive",
+      "status": "needs_citation",
+      "citation_count": 0,
+      "staleness_risk": "medium"
+    },
+    {
+      "id": "zk-snarks",
+      "label": "zk-SNARKs",
+      "type": "ProofSystem",
+      "status": "needs_citation",
+      "citation_count": 0,
+      "staleness_risk": "medium"
+    },
+    {
+      "id": "kzg-commitments",
+      "label": "KZG commitments",
+      "type": "CryptographicPrimitive",
+      "status": "needs_citation",
+      "citation_count": 0,
+      "staleness_risk": "medium"
+    },
+    {
+      "id": "signature-aggregation",
+      "label": "Signature aggregation",
+      "type": "Concept",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "evm-runtime",
+      "label": "EVM Runtime",
+      "type": "Runtime",
+      "status": "needs_citation",
+      "citation_count": 0,
+      "staleness_risk": "medium"
+    },
+    {
+      "id": "svm-runtime",
+      "label": "SVM Runtime",
+      "type": "Runtime",
+      "status": "needs_citation",
+      "citation_count": 0,
+      "staleness_risk": "medium"
+    },
+    {
+      "id": "wasm-runtime",
+      "label": "WASM Runtime",
+      "type": "Runtime",
+      "status": "needs_citation",
+      "citation_count": 0,
+      "staleness_risk": "medium"
+    },
+    {
+      "id": "payload-signing",
+      "label": "Payload signing",
+      "type": "ImplementationPattern",
+      "status": "needs_citation",
+      "citation_count": 0,
+      "staleness_risk": "medium"
+    },
+    {
+      "id": "turnkey-kms-signing",
+      "label": "Turnkey-style KMS signing",
+      "type": "SigningIntegration",
+      "status": "needs_citation",
+      "citation_count": 0,
+      "staleness_risk": "high"
+    },
+    {
+      "id": "substrate-raw-extrinsic-template",
+      "label": "Substrate raw extrinsic template",
+      "type": "PayloadTemplate",
+      "status": "needs_citation",
+      "citation_count": 0,
+      "staleness_risk": "high"
+    },
+    {
+      "id": "erc20-transfer-calldata-template",
+      "label": "ERC-20 transfer calldata template",
+      "type": "PayloadTemplate",
+      "status": "needs_citation",
+      "citation_count": 0,
+      "staleness_risk": "high"
+    },
+    {
+      "id": "merkle-proof-verification-pattern",
+      "label": "Merkle proof verification pattern",
+      "type": "ImplementationPattern",
+      "status": "needs_citation",
+      "citation_count": 0,
+      "staleness_risk": "medium"
+    },
+    {
+      "id": "remix-evm-sandbox",
+      "label": "Remix EVM sandbox",
+      "type": "ExecutionSandbox",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "high"
+    },
+    {
+      "id": "replay-domain-guardrail",
+      "label": "Replay domain guardrail",
+      "type": "SecurityGuardrail",
+      "status": "needs_citation",
+      "citation_count": 0,
+      "staleness_risk": "medium"
+    }
+  ],
+  "uncited_nodes": [
+    "bls12-381",
+    "ecdsa-secp256k1",
+    "ed25519",
+    "erc20-transfer-calldata-template",
+    "evm-runtime",
+    "hashing",
+    "kzg-commitments",
+    "merkle-proof-verification-pattern",
+    "merkle-trees",
+    "pairings",
+    "payload-signing",
+    "replay-domain-guardrail",
+    "signatures",
+    "substrate-raw-extrinsic-template",
+    "svm-runtime",
+    "turnkey-kms-signing",
+    "wasm-runtime",
+    "zk-snarks"
+  ],
+  "fast_moving_uncited_nodes": [
+    "erc20-transfer-calldata-template",
+    "substrate-raw-extrinsic-template",
+    "turnkey-kms-signing"
+  ],
+  "stale_sources": [],
+  "changed_sources": [],
+  "missing_sources": [],
+  "impacted_nodes": []
+}

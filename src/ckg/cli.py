@@ -34,6 +34,8 @@ def main() -> None:
     citations_parser = subparsers.add_parser("citations")
     citations_parser.add_argument("id")
 
+    subparsers.add_parser("trust")
+
     args = parser.parse_args()
     store = GraphStore()
 
@@ -49,6 +51,8 @@ def main() -> None:
         payload = store.node_citations(args.id)
     elif args.command == "horizon":
         payload = store.horizon(args.id, edge_types=set(args.edge_type) or None, layer=args.layer)
+    elif args.command == "trust":
+        payload = store.trust_report
     else:
         payload = store.neighbors(args.id)
 
