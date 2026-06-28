@@ -49,6 +49,11 @@ class KnowledgeGraphHandler(BaseHTTPRequestHandler):
                 node_id = path.split("/")[1]
                 direction = query.get("direction", ["both"])[0]
                 self.json_response(STORE.neighbors(node_id, direction))
+            elif path.startswith("nodes/") and path.endswith("/horizon"):
+                node_id = path.split("/")[1]
+                edge_types = set(query.get("edge_type", [])) or None
+                layer = query.get("layer", [None])[0]
+                self.json_response(STORE.horizon(node_id, edge_types=edge_types, layer=layer))
             elif path.startswith("nodes/") and path.endswith("/citations"):
                 node_id = path.split("/")[1]
                 self.json_response({"citations": STORE.node_citations(node_id)})

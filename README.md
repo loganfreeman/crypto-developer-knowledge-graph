@@ -65,6 +65,8 @@ Search from the command line:
 PYTHONPATH=src python3 -m ckg.cli search "eth_getBalance"
 PYTHONPATH=src python3 -m ckg.cli chunks "signed transaction"
 PYTHONPATH=src python3 -m ckg.cli citations ethereum
+PYTHONPATH=src python3 -m ckg.cli horizon cross-chain-state-verification
+PYTHONPATH=src python3 -m ckg.cli horizon wallet-building --edge-type REQUIRES --layer infrastructure
 PYTHONPATH=src python3 -m ckg.cli path build-wallet
 PYTHONPATH=src python3 -m ckg.cli node ethereum
 ```
@@ -76,6 +78,7 @@ curl "http://127.0.0.1:8000/search?q=transaction"
 curl "http://127.0.0.1:8000/chunks/search?q=signed%20transaction"
 curl "http://127.0.0.1:8000/nodes/ethereum/citations"
 curl "http://127.0.0.1:8000/nodes/ethereum/neighbors"
+curl "http://127.0.0.1:8000/nodes/cross-chain-state-verification/horizon"
 curl "http://127.0.0.1:8000/goals/build-defi-app"
 ```
 
@@ -145,6 +148,14 @@ Nodes are typed as:
 - `CodeSnippet`
 - `Interface`
 - `Concept`
+- `Library`
+- `PayloadTemplate`
+- `SigningIntegration`
+- `ImplementationPattern`
+- `SecurityGuardrail`
+- `ExecutionSandbox`
+- `Runtime`
+- `ProofSystem`
 
 Relationships include:
 
@@ -163,6 +174,42 @@ Relationships include:
 - `BROADCASTS`
 - `INDEXES`
 - `SUPPORTS`
+- `ENABLES`
+- `IMPLEMENTED_BY`
+- `USES_TEMPLATE`
+- `CAN_USE_SIGNER`
+- `HAS_TEST_VECTOR`
+- `HAS_CLI_COMMAND`
+- `ENCODES_AS`
+- `VERIFIES_WITH`
+- `RUNS_ON`
+- `HAS_GUARDRAIL`
+
+## Semantic Web3 Intelligence Features
+
+The frontend now avoids whole-graph hairballs. It renders a focused horizon around the selected node, grouped into semantic lanes by `display_group`, `layers`, and node type. Developers can filter by layer and relationship type, then inspect the selected node in the sidecar.
+
+The sidecar is implementation-first:
+
+- overview, layers, and contexts
+- code snippets and payload templates
+- implementation notes
+- relationship metadata with context, layer, confidence, and developer notes
+- security guardrails
+- citations and source chunks
+
+Seeded production-style examples include:
+
+- Cross-Chain State Verification
+- BLS12-381
+- zk-SNARKs
+- KZG commitments
+- EVM, SVM, and WASM runtimes
+- Substrate raw extrinsic template
+- ERC-20 transfer calldata template
+- Turnkey-style KMS signing pattern
+- Replay domain guardrail
+- Remix EVM sandbox
 
 Every node should carry citations where practical. Citation values are source identifiers or URLs that ingestion can later resolve into document chunks, embeddings, and provenance metadata.
 

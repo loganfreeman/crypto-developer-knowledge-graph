@@ -26,6 +26,11 @@ def main() -> None:
     neighbors_parser = subparsers.add_parser("neighbors")
     neighbors_parser.add_argument("id")
 
+    horizon_parser = subparsers.add_parser("horizon")
+    horizon_parser.add_argument("id")
+    horizon_parser.add_argument("--edge-type", action="append", default=[])
+    horizon_parser.add_argument("--layer")
+
     citations_parser = subparsers.add_parser("citations")
     citations_parser.add_argument("id")
 
@@ -42,6 +47,8 @@ def main() -> None:
         payload = store.goal(args.id)
     elif args.command == "citations":
         payload = store.node_citations(args.id)
+    elif args.command == "horizon":
+        payload = store.horizon(args.id, edge_types=set(args.edge_type) or None, layer=args.layer)
     else:
         payload = store.neighbors(args.id)
 

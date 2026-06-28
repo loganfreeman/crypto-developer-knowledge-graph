@@ -29,3 +29,9 @@ def test_citations_resolve_to_chunks():
 def test_chunk_search_finds_rpc_docs():
     results = search_chunks(GraphStore(), "signed transaction")
     assert any(result["source_id"] == "ethereum-json-rpc" for result in results)
+
+
+def test_focused_horizon_includes_implementation_edges():
+    horizon = GraphStore().horizon("cross-chain-state-verification")
+    assert any(edge["type"] == "IMPLEMENTED_BY" for edge in horizon["relationships"])
+    assert any(node["id"] == "merkle-proof-verification-pattern" for node in horizon["nodes"])

@@ -7,9 +7,12 @@ const state = {
   sources: [],
   selectedGoalId: "build-wallet",
   selectedNodeId: null,
+  activeEdgeTypes: [],
+  activeLayer: "all",
 };
 
 const typeOrder = ["Concepts", "APIs", "Security warnings"];
+const primaryEdgeTypes = ["REQUIRES", "DEPENDS_ON", "CALLS", "USES_TEMPLATE", "CAN_USE_SIGNER", "HAS_GUARDRAIL", "VERIFIES_WITH", "ENABLES", "RUNS_ON"];
 
 async function loadJson(path) {
   const response = await fetch(path);
@@ -36,10 +39,7 @@ function nodeLabel(nodeId) {
 
 function selectNode(nodeId) {
   state.selectedNodeId = nodeId;
-  renderDetail();
-  document.querySelectorAll(".node").forEach((card) => {
-    card.setAttribute("aria-pressed", String(card.dataset.nodeId === nodeId));
-  });
+  render();
 }
 
 function renderGoals() {
@@ -102,6 +102,68 @@ function renderColumns(goal) {
   });
 }
 
+function nodeLayers(node) {
+  return node.layers || [node.type];
+}
+
+function availableLayers() {
+  const layers = new Set();
+  state.nodes.forEach((node) => nodeLayers(node).forEach((layer) => layers.add(layer)));
+  return ["all", ...[...layers].sort()];
+}
+
+function edgeAllowed(edge) {
+  return !state.activeEdgeTypes.length || state.activeEdgeTypes.includes(edge.type);
+}
+
+function nodeAllowedByLayer(node) {
+  return state.activeLayer === "all" || nodeLayers(node).includes(state.activeLayer);
+}
+
+function renderControls() {
+  const controls = document.querySelector("#graph-controls");
+  const layerButtons = availableLayers()
+    .map((layer) => `<button type="button" class="filter ${state.activeLayer === layer ? "active" : ""}" data-layer="${layer}">${escapeHtml(layer)}</button>`)
+    .join("");
+  const edgeButtons = primaryEdgeTypes
+    .map((type) => {
+      const active = !state.activeEdgeTypes.length || state.activeEdgeTypes.includes(type);
+      return `<button type="button" class="filter ${active ? "active" : ""}" data-edge-type="${type}">${escapeHtml(type)}</button>`;
+    })
+    .join("");
+
+  controls.innerHTML = `
+    <div>
+      <h4>Layer</h4>
+      <div class="filter-row">${layerButtons}</div>
+    </div>
+    <div>
+      <h4>Edge Types</h4>
+      <div class="filter-row">${edgeButtons}</div>
+    </div>
+  `;
+  controls.querySelectorAll("[data-layer]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.activeLayer = button.dataset.layer;
+      render();
+    });
+  });
+  controls.querySelectorAll("[data-edge-type]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const type = button.dataset.edgeType;
+      if (!state.activeEdgeTypes.length) {
+        state.activeEdgeTypes = primaryEdgeTypes.filter((item) => item !== type);
+      } else if (state.activeEdgeTypes.includes(type)) {
+        state.activeEdgeTypes = state.activeEdgeTypes.filter((item) => item !== type);
+      } else {
+        state.activeEdgeTypes = [...state.activeEdgeTypes, type];
+      }
+      if (state.activeEdgeTypes.length === primaryEdgeTypes.length) state.activeEdgeTypes = [];
+      render();
+    });
+  });
+}
+
 function relatedText(nodeId, relationships) {
   return relationships
     .filter((edge) => edge.source === nodeId || edge.target === nodeId)
@@ -113,8 +175,8 @@ function relatedText(nodeId, relationships) {
     .join("<br>");
 }
 
-function renderGraph(goal, nodeMap) {
-  const selected = new Set([
+function goalNodeIds(goal) {
+  return new Set([
     goal.task_node_id,
     ...goal.concepts,
     ...goal.apis,
@@ -122,23 +184,64 @@ function renderGraph(goal, nodeMap) {
     ...goal.security_warnings,
     ...goal.supported_chains,
   ]);
-  const nodes = [...selected].map((id) => nodeMap[id]).filter(Boolean);
-  const relationships = state.relationships.filter((edge) => selected.has(edge.source) && selected.has(edge.target));
+}
+
+function focusedHorizon(goal, nodeMap) {
+  const focus = state.selectedNodeId || goal.task_node_id;
+  const base = goalNodeIds(goal);
+  const edges = state.relationships.filter((edge) => {
+    if (!edgeAllowed(edge)) return false;
+    return edge.source === focus || edge.target === focus || (base.has(edge.source) && base.has(edge.target));
+  });
+  const selected = new Set([focus, ...base]);
+  edges.forEach((edge) => {
+    selected.add(edge.source);
+    selected.add(edge.target);
+  });
+  const nodes = [...selected].map((id) => nodeMap[id]).filter(Boolean).filter(nodeAllowedByLayer);
+  const visibleIds = new Set(nodes.map((node) => node.id));
+  return {
+    nodes,
+    relationships: edges.filter((edge) => visibleIds.has(edge.source) && visibleIds.has(edge.target)),
+  };
+}
+
+function groupNodes(nodes) {
+  const groups = {};
+  nodes.forEach((node) => {
+    const group = node.display_group || nodeLayers(node)[0] || node.type;
+    groups[group] = groups[group] || [];
+    groups[group].push(node);
+  });
+  return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
+}
+
+function renderGraph(goal, nodeMap) {
+  renderControls();
+  state.selectedNodeId = state.selectedNodeId || goal.task_node_id;
+  const { nodes, relationships } = focusedHorizon(goal, nodeMap);
   document.querySelector("#counts").textContent = `${nodes.length} nodes / ${relationships.length} edges`;
-  document.querySelector("#graph").innerHTML = nodes
-    .map((node) => `
-      <button class="node" type="button" data-node-id="${node.id}" aria-pressed="${String(state.selectedNodeId === node.id)}">
-        <span class="type">${node.type}</span>
-        <strong>${escapeHtml(node.label)}</strong>
-        <p>${escapeHtml(node.summary)}</p>
-        <div class="relationships">${relatedText(node.id, relationships)}</div>
-      </button>
+  document.querySelector("#graph").innerHTML = groupNodes(nodes)
+    .map(([group, groupNodes]) => `
+      <section class="lane">
+        <div class="lane-head">
+          <h4>${escapeHtml(group)}</h4>
+          <span>${groupNodes.length}</span>
+        </div>
+        <div class="lane-nodes">
+          ${groupNodes.map((node) => `
+            <button class="node" type="button" data-node-id="${node.id}" aria-pressed="${String(state.selectedNodeId === node.id)}">
+              <span class="type">${node.type}</span>
+              <strong>${escapeHtml(node.label)}</strong>
+              <p>${escapeHtml(node.summary)}</p>
+              <div class="relationships">${relatedText(node.id, relationships)}</div>
+            </button>
+          `).join("")}
+        </div>
+      </section>
     `)
     .join("");
   bindNodeCards();
-  if (!state.selectedNodeId || !nodeMap[state.selectedNodeId]) {
-    state.selectedNodeId = goal.task_node_id;
-  }
   renderDetail();
 }
 
@@ -158,14 +261,25 @@ function renderSearch(query, nodeMap) {
     .map((title) => `<article class="column"><h3>${title}</h3><ul><li><span class="pill">Use a goal path to restore workflow view</span></li></ul></article>`)
     .join("");
   document.querySelector("#counts").textContent = `${results.length} nodes`;
-  document.querySelector("#graph").innerHTML = results
-    .map((node) => `
-      <button class="node" type="button" data-node-id="${node.id}" aria-pressed="${String(state.selectedNodeId === node.id)}">
-        <span class="type">${node.type}</span>
-        <strong>${escapeHtml(node.label)}</strong>
-        <p>${escapeHtml(node.summary)}</p>
-        <div class="relationships">${relatedText(node.id, state.relationships)}</div>
-      </button>
+  renderControls();
+  document.querySelector("#graph").innerHTML = groupNodes(results.filter(nodeAllowedByLayer))
+    .map(([group, groupNodes]) => `
+      <section class="lane">
+        <div class="lane-head">
+          <h4>${escapeHtml(group)}</h4>
+          <span>${groupNodes.length}</span>
+        </div>
+        <div class="lane-nodes">
+          ${groupNodes.map((node) => `
+            <button class="node" type="button" data-node-id="${node.id}" aria-pressed="${String(state.selectedNodeId === node.id)}">
+              <span class="type">${node.type}</span>
+              <strong>${escapeHtml(node.label)}</strong>
+              <p>${escapeHtml(node.summary)}</p>
+              <div class="relationships">${relatedText(node.id, state.relationships.filter(edgeAllowed))}</div>
+            </button>
+          `).join("")}
+        </div>
+      </section>
     `)
     .join("");
   bindNodeCards();
@@ -184,6 +298,7 @@ function bindNodeCards() {
 function relationshipRows(nodeId) {
   return state.relationships
     .filter((edge) => edge.source === nodeId || edge.target === nodeId)
+    .filter(edgeAllowed)
     .map((edge) => {
       const outward = edge.source === nodeId;
       const peer = outward ? edge.target : edge.source;
@@ -191,6 +306,7 @@ function relationshipRows(nodeId) {
         <button class="edge" type="button" data-node-id="${peer}">
           <span>${outward ? edge.type : "IN_" + edge.type}</span>
           <strong>${escapeHtml(nodeLabel(peer))}</strong>
+          ${edge.context || edge.layer || edge.developer_note ? `<small>${escapeHtml([edge.context, edge.layer, edge.confidence].filter(Boolean).join(" / "))}${edge.developer_note ? `<br>${escapeHtml(edge.developer_note)}` : ""}</small>` : ""}
         </button>
       `;
     })
@@ -227,14 +343,36 @@ function renderDetail() {
     detail.innerHTML = "";
     return;
   }
-  const code = node.code ? `<pre><code>${escapeHtml(node.code)}</code></pre>` : "";
+  const code = node.code ? `
+    <section class="detail-section">
+      <h3>${node.type === "PayloadTemplate" ? "Payload Template" : "Code"}</h3>
+      <pre><code>${escapeHtml(node.code)}</code></pre>
+    </section>
+  ` : "";
+  const notes = node.implementation_notes ? `
+    <section class="detail-section">
+      <h3>Implementation Notes</h3>
+      <ul class="note-list">${node.implementation_notes.map((note) => `<li>${escapeHtml(note)}</li>`).join("")}</ul>
+    </section>
+  ` : "";
   detail.innerHTML = `
     <div class="detail-head">
       <span class="type">${escapeHtml(node.type)}</span>
       <h2>${escapeHtml(node.label)}</h2>
       <p>${escapeHtml(node.summary)}</p>
+      <div class="meta-grid">
+        <div>
+          <h3>Layers</h3>
+          <div class="tag-list">${nodeLayers(node).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>
+        </div>
+        <div>
+          <h3>Contexts</h3>
+          <div class="tag-list">${(node.contexts || []).map((item) => `<span>${escapeHtml(item)}</span>`).join("") || `<p class="muted">No contexts yet.</p>`}</div>
+        </div>
+      </div>
     </div>
     ${code}
+    ${notes}
     <section class="detail-section">
       <h3>Relationships</h3>
       <div class="edge-list">${relationshipRows(node.id) || `<p class="muted">No relationships yet.</p>`}</div>

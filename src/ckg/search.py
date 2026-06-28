@@ -28,6 +28,10 @@ def search_nodes(store: GraphStore, query: str, limit: int = 10) -> list[dict[st
                 node.get("type", ""),
                 node.get("summary", ""),
                 " ".join(node.get("tags", [])),
+                " ".join(node.get("layers", [])),
+                " ".join(node.get("contexts", [])),
+                node.get("display_group", ""),
+                " ".join(node.get("implementation_notes", [])),
             ]
         )
         terms = Counter(tokenize(haystack))

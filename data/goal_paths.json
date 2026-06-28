@@ -37,5 +37,18 @@
     "security_warnings": ["reorg-risk"],
     "supported_chains": ["bitcoin", "ethereum", "solana"],
     "suggested_database_stack": ["Postgres for canonical metadata", "Neo4j or Memgraph for graph traversals", "OpenSearch or Meilisearch for keyword search", "Vector DB for semantic doc retrieval"]
+  },
+  {
+    "id": "build-cross-chain-app",
+    "title": "Build cross-chain app",
+    "task_node_id": "cross-chain-state-verification",
+    "concepts": ["cross-chain-state-verification", "merkle-trees", "consensus", "payload-signing", "replay-domain-guardrail"],
+    "apis": ["json-rpc", "rest-api"],
+    "sdks_libraries": ["light-client libraries", "relayer SDKs", "chain-specific RPC clients"],
+    "example_flow": ["Choose a source commitment", "Wait for source finality", "Construct or request proof", "Verify commitment on destination", "Submit destination transaction", "Track relayer and replay protections"],
+    "code_examples": ["merkle-proof-verification-pattern", "substrate-raw-extrinsic-template"],
+    "security_warnings": ["reorg-risk", "replay-risk", "replay-domain-guardrail"],
+    "supported_chains": ["ethereum", "solana"],
+    "suggested_database_stack": ["Postgres for message state", "Graph DB for dependency and protocol mappings", "Queue/worker system for relayer jobs", "Vector DB for protocol docs and audits"]
   }
 ]

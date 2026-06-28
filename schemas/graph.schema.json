@@ -19,7 +19,15 @@
     "ExampleApp",
     "CodeSnippet",
     "Interface",
-    "Concept"
+    "Concept",
+    "Library",
+    "PayloadTemplate",
+    "SigningIntegration",
+    "ImplementationPattern",
+    "SecurityGuardrail",
+    "ExecutionSandbox",
+    "Runtime",
+    "ProofSystem"
   ],
   "relationship_types": [
     "USES",
@@ -36,6 +44,16 @@
     "REQUIRES",
     "BROADCASTS",
     "INDEXES",
-    "SUPPORTS"
+    "SUPPORTS",
+    "ENABLES",
+    "IMPLEMENTED_BY",
+    "USES_TEMPLATE",
+    "CAN_USE_SIGNER",
+    "HAS_TEST_VECTOR",
+    "HAS_CLI_COMMAND",
+    "ENCODES_AS",
+    "VERIFIES_WITH",
+    "RUNS_ON",
+    "HAS_GUARDRAIL"
   ]
 }

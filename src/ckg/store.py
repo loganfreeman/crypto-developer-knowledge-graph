@@ -16,9 +16,32 @@ class Edge:
     source: str
     type: str
     target: str
+    context: str | None = None
+    layer: str | None = None
+    confidence: str | None = None
+    evidence: list[str] | None = None
+    developer_note: str | None = None
 
-    def as_dict(self) -> dict[str, str]:
-        return {"source": self.source, "type": self.type, "target": self.target}
+    @classmethod
+    def from_dict(cls, payload: dict[str, Any]) -> "Edge":
+        return cls(
+            source=payload["source"],
+            type=payload["type"],
+            target=payload["target"],
+            context=payload.get("context"),
+            layer=payload.get("layer"),
+            confidence=payload.get("confidence"),
+            evidence=payload.get("evidence"),
+            developer_note=payload.get("developer_note"),
+        )
+
+    def as_dict(self) -> dict[str, Any]:
+        payload: dict[str, Any] = {"source": self.source, "type": self.type, "target": self.target}
+        for key in ("context", "layer", "confidence", "evidence", "developer_note"):
+            value = getattr(self, key)
+            if value:
+                payload[key] = value
+        return payload
 
 
 class GraphStore:
@@ -27,7 +50,7 @@ class GraphStore:
         self.schema_path = schema_path
         self.schema = self._load_json(schema_path)
         self.nodes = {node["id"]: node for node in self._load_json(data_dir / "nodes.json")}
-        self.edges = [Edge(**edge) for edge in self._load_json(data_dir / "relationships.json")]
+        self.edges = [Edge.from_dict(edge) for edge in self._load_json(data_dir / "relationships.json")]
         self.goal_paths = {goal["id"]: goal for goal in self._load_json(data_dir / "goal_paths.json")}
         self.sources = {source["id"]: source for source in self._load_optional_json(data_dir / "sources.json", [])}
         self.chunks = {chunk["id"]: chunk for chunk in self._load_optional_json(data_dir / "chunks.json", [])}
@@ -87,6 +110,34 @@ class GraphStore:
         edges = [edge for edge in self.edges if edge.source in selected and edge.target in selected]
         return {
             "nodes": [self.nodes[node_id] for node_id in sorted(selected)],
+            "relationships": [edge.as_dict() for edge in edges],
+        }
+
+    def horizon(self, node_id: str, edge_types: set[str] | None = None, layer: str | None = None) -> dict[str, Any]:
+        if node_id not in self.nodes:
+            raise KeyError(node_id)
+
+        edges: list[Edge] = []
+        for edge in self.outgoing.get(node_id, []) + self.incoming.get(node_id, []):
+            if edge_types and edge.type not in edge_types:
+                continue
+            peer_id = edge.target if edge.source == node_id else edge.source
+            peer = self.nodes.get(peer_id)
+            if layer and peer and layer not in peer.get("layers", []):
+                continue
+            edges.append(edge)
+
+        node_ids = {node_id} | {edge.source for edge in edges} | {edge.target for edge in edges}
+        grouped: dict[str, list[dict[str, Any]]] = {}
+        for item in sorted(node_ids):
+            node = self.nodes[item]
+            group = node.get("display_group") or (node.get("layers") or [node["type"]])[0]
+            grouped.setdefault(group, []).append(node)
+
+        return {
+            "focus": self.nodes[node_id],
+            "groups": grouped,
+            "nodes": [self.nodes[item] for item in sorted(node_ids)],
             "relationships": [edge.as_dict() for edge in edges],
         }
 
