@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, urlparse
 
-from .search import search_nodes
+from .search import search_chunks, search_nodes
 from .store import GraphStore, ROOT
 
 
@@ -48,12 +48,25 @@ class KnowledgeGraphHandler(BaseHTTPRequestHandler):
                 node_id = path.split("/")[1]
                 direction = query.get("direction", ["both"])[0]
                 self.json_response(STORE.neighbors(node_id, direction))
+            elif path.startswith("nodes/") and path.endswith("/citations"):
+                node_id = path.split("/")[1]
+                self.json_response({"citations": STORE.node_citations(node_id)})
             elif path.startswith("nodes/"):
                 node_id = path.split("/", 1)[1]
                 node = STORE.node(node_id)
                 self.json_response(node) if node else self.not_found(node_id)
             elif path == "relationships":
                 self.json_response({"relationships": [edge.as_dict() for edge in STORE.edges]})
+            elif path == "sources":
+                self.json_response({"sources": list(STORE.sources.values())})
+            elif path == "citations":
+                self.json_response({"citations": list(STORE.citations.values())})
+            elif path == "chunks":
+                self.json_response({"chunks": list(STORE.chunks.values())})
+            elif path == "chunks/search":
+                q = query.get("q", [""])[0]
+                limit = int(query.get("limit", ["10"])[0])
+                self.json_response({"query": q, "results": search_chunks(STORE, q, limit)})
             elif path == "goals":
                 self.json_response({"goals": STORE.goals()})
             elif path.startswith("goals/"):
@@ -128,6 +141,10 @@ def execute_graphql_like_query(store: GraphStore, query: str) -> dict[str, Any]:
     if search_match:
         return {"search": search_nodes(store, search_match.group(1))}
 
+    chunk_match = re.search(r'chunks\s*\(\s*q\s*:\s*"([^"]+)"\s*\)', query)
+    if chunk_match:
+        return {"chunks": search_chunks(store, chunk_match.group(1))}
+
     goal_match = re.search(r'goal\s*\(\s*id\s*:\s*"([^"]+)"\s*\)', query)
     if goal_match:
         goal_id = goal_match.group(1)
@@ -136,7 +153,7 @@ def execute_graphql_like_query(store: GraphStore, query: str) -> dict[str, Any]:
             raise ValueError(f"unknown goal: {goal_id}")
         return {"goal": goal}
 
-    raise ValueError('supported queries: node(id:"..."), search(q:"..."), goal(id:"...")')
+    raise ValueError('supported queries: node(id:"..."), search(q:"..."), chunks(q:"..."), goal(id:"...")')
 
 
 def main() -> None:

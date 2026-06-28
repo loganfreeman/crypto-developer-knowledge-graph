@@ -28,11 +28,17 @@ data/
   nodes.json             Typed graph nodes with citations
   relationships.json     Directed typed graph edges
   goal_paths.json        Goal-first developer navigation paths
+  sources.json           Authoritative docs registry
+  chunks.json            Ingested source chunks for retrieval
+  citations.json         Node-to-source claim links
+docs/
+  sources/               Cached source documents
 schemas/
   graph.schema.json      Versioned graph contract
 src/ckg/
   store.py               Graph loading, traversal, and indexes
   search.py              Lightweight keyword search
+  ingest.py              Source ingestion, chunking, and citation generation
   api.py                 REST and GraphQL-style HTTP API
   cli.py                 Command-line search and traversal
 frontend/
@@ -51,6 +57,8 @@ Search from the command line:
 
 ```bash
 PYTHONPATH=src python3 -m ckg.cli search "eth_getBalance"
+PYTHONPATH=src python3 -m ckg.cli chunks "signed transaction"
+PYTHONPATH=src python3 -m ckg.cli citations ethereum
 PYTHONPATH=src python3 -m ckg.cli path build-wallet
 PYTHONPATH=src python3 -m ckg.cli node ethereum
 ```
@@ -59,6 +67,8 @@ Use the REST API:
 
 ```bash
 curl "http://127.0.0.1:8000/search?q=transaction"
+curl "http://127.0.0.1:8000/chunks/search?q=signed%20transaction"
+curl "http://127.0.0.1:8000/nodes/ethereum/citations"
 curl "http://127.0.0.1:8000/nodes/ethereum/neighbors"
 curl "http://127.0.0.1:8000/goals/build-defi-app"
 ```
@@ -76,6 +86,38 @@ curl -X POST http://127.0.0.1:8000/graphql \
   -H "content-type: application/json" \
   -d '{"query":"{ search(q:\"wallet\") { id label type } }"}'
 ```
+
+```bash
+curl -X POST http://127.0.0.1:8000/graphql \
+  -H "content-type: application/json" \
+  -d '{"query":"{ chunks(q:\"signed transaction\") { id title url } }"}'
+```
+
+## Ingestion And Citations
+
+The ingestion layer is offline-first. `data/sources.json` lists authoritative sources, `docs/sources/` stores cached source text, and the ingestion command produces source chunks plus node-to-source citation records.
+
+Regenerate citation artifacts from cached docs:
+
+```bash
+PYTHONPATH=src python3 -m ckg.ingest
+```
+
+Fetch registered source URLs before chunking:
+
+```bash
+PYTHONPATH=src python3 -m ckg.ingest --fetch
+```
+
+Use `--force` with `--fetch` to overwrite cached documents. Network fetches are optional; the repository includes seed cached docs so validation and search work offline.
+
+The validator now checks:
+
+- graph node and relationship types
+- goal path node references
+- citation references against registered source ids or URLs
+- source local document presence
+- generated citation links against known nodes, sources, and chunks
 
 ## Data Model
 

@@ -1,0 +1,90 @@
+[
+  {
+    "id": "bitcoin-core-rpc",
+    "title": "Bitcoin Core RPC API Reference",
+    "url": "https://developer.bitcoin.org/reference/rpc/",
+    "authority": "official",
+    "protocols": ["bitcoin"],
+    "local_path": "docs/sources/bitcoin-core-rpc.md"
+  },
+  {
+    "id": "bitcoin-sendrawtransaction",
+    "title": "Bitcoin Core sendrawtransaction RPC",
+    "url": "https://developer.bitcoin.org/reference/rpc/sendrawtransaction.html",
+    "authority": "official",
+    "protocols": ["bitcoin"],
+    "local_path": "docs/sources/bitcoin-sendrawtransaction.md"
+  },
+  {
+    "id": "ethereum-json-rpc",
+    "title": "Ethereum JSON-RPC API",
+    "url": "https://ethereum.org/en/developers/docs/apis/json-rpc/",
+    "authority": "official",
+    "protocols": ["ethereum"],
+    "local_path": "docs/sources/ethereum-json-rpc.md"
+  },
+  {
+    "id": "ethereum-json-rpc-eth-getbalance",
+    "title": "Ethereum JSON-RPC eth_getBalance",
+    "url": "https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_getbalance",
+    "authority": "official",
+    "protocols": ["ethereum"],
+    "local_path": "docs/sources/ethereum-json-rpc.md"
+  },
+  {
+    "id": "ethereum-json-rpc-eth-sendrawtransaction",
+    "title": "Ethereum JSON-RPC eth_sendRawTransaction",
+    "url": "https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_sendrawtransaction",
+    "authority": "official",
+    "protocols": ["ethereum"],
+    "local_path": "docs/sources/ethereum-json-rpc.md"
+  },
+  {
+    "id": "json-rpc-spec",
+    "title": "JSON-RPC 2.0 Specification",
+    "url": "https://www.jsonrpc.org/specification",
+    "authority": "standard",
+    "protocols": [],
+    "local_path": "docs/sources/json-rpc-spec.md"
+  },
+  {
+    "id": "eip-20",
+    "title": "ERC-20 Token Standard",
+    "url": "https://eips.ethereum.org/EIPS/eip-20",
+    "authority": "standard",
+    "protocols": ["ethereum"],
+    "local_path": "docs/sources/eip-20.md"
+  },
+  {
+    "id": "eip-721",
+    "title": "ERC-721 Non-Fungible Token Standard",
+    "url": "https://eips.ethereum.org/EIPS/eip-721",
+    "authority": "standard",
+    "protocols": ["ethereum"],
+    "local_path": "docs/sources/eip-721.md"
+  },
+  {
+    "id": "solidity-abi",
+    "title": "Solidity ABI Specification",
+    "url": "https://docs.soliditylang.org/en/latest/abi-spec.html",
+    "authority": "official",
+    "protocols": ["ethereum"],
+    "local_path": "docs/sources/solidity-abi.md"
+  },
+  {
+    "id": "solana-rpc",
+    "title": "Solana RPC Methods",
+    "url": "https://solana.com/docs/rpc",
+    "authority": "official",
+    "protocols": ["solana"],
+    "local_path": "docs/sources/solana-rpc.md"
+  },
+  {
+    "id": "solana-sendtransaction",
+    "title": "Solana sendTransaction RPC",
+    "url": "https://solana.com/docs/rpc/http/sendtransaction",
+    "authority": "official",
+    "protocols": ["solana"],
+    "local_path": "docs/sources/solana-rpc.md"
+  }
+]

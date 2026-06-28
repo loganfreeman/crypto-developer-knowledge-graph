@@ -1,0 +1,110 @@
+[
+  {
+    "id": "bitcoin::bitcoin-core-rpc",
+    "node_id": "bitcoin",
+    "source_id": "bitcoin-core-rpc",
+    "source_url": "https://developer.bitcoin.org/reference/rpc/",
+    "chunk_id": "bitcoin-core-rpc#chunk-1",
+    "claim": "UTXO-based proof-of-work settlement network with Bitcoin Core RPC APIs for node, wallet, mining, network, and transaction operations.",
+    "status": "seeded"
+  },
+  {
+    "id": "ethereum::ethereum-json-rpc",
+    "node_id": "ethereum",
+    "source_id": "ethereum-json-rpc",
+    "source_url": "https://ethereum.org/en/developers/docs/apis/json-rpc/",
+    "chunk_id": "ethereum-json-rpc#chunk-1",
+    "claim": "Account-based smart contract network whose execution clients expose Ethereum JSON-RPC for apps and tooling.",
+    "status": "seeded"
+  },
+  {
+    "id": "solana::solana-rpc",
+    "node_id": "solana",
+    "source_id": "solana-rpc",
+    "source_url": "https://solana.com/docs/rpc",
+    "chunk_id": "solana-rpc#chunk-1",
+    "claim": "High-throughput smart contract chain with HTTP and WebSocket RPC interfaces and account-centric runtime semantics.",
+    "status": "seeded"
+  },
+  {
+    "id": "json-rpc::json-rpc-spec",
+    "node_id": "json-rpc",
+    "source_id": "json-rpc-spec",
+    "source_url": "https://www.jsonrpc.org/specification",
+    "chunk_id": "json-rpc-spec#chunk-1",
+    "claim": "Request-response interface pattern used by Ethereum execution clients and many crypto node APIs.",
+    "status": "seeded"
+  },
+  {
+    "id": "eth-get-balance::ethereum-json-rpc-eth-getbalance",
+    "node_id": "eth-get-balance",
+    "source_id": "ethereum-json-rpc-eth-getbalance",
+    "source_url": "https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_getbalance",
+    "chunk_id": "ethereum-json-rpc-eth-getbalance#chunk-2",
+    "claim": "Ethereum JSON-RPC method that returns an account balance at a block tag.",
+    "status": "seeded"
+  },
+  {
+    "id": "eth-send-raw-transaction::ethereum-json-rpc-eth-sendrawtransaction",
+    "node_id": "eth-send-raw-transaction",
+    "source_id": "ethereum-json-rpc-eth-sendrawtransaction",
+    "source_url": "https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_sendrawtransaction",
+    "chunk_id": "ethereum-json-rpc-eth-sendrawtransaction#chunk-3",
+    "claim": "Ethereum JSON-RPC method used to broadcast a signed transaction to the network.",
+    "status": "seeded"
+  },
+  {
+    "id": "bitcoin-sendrawtransaction::bitcoin-sendrawtransaction",
+    "node_id": "bitcoin-sendrawtransaction",
+    "source_id": "bitcoin-sendrawtransaction",
+    "source_url": "https://developer.bitcoin.org/reference/rpc/sendrawtransaction.html",
+    "chunk_id": "bitcoin-sendrawtransaction#chunk-1",
+    "claim": "Bitcoin Core RPC method used to submit a serialized signed transaction to the node.",
+    "status": "seeded"
+  },
+  {
+    "id": "solana-send-transaction::solana-sendtransaction",
+    "node_id": "solana-send-transaction",
+    "source_id": "solana-sendtransaction",
+    "source_url": "https://solana.com/docs/rpc/http/sendtransaction",
+    "chunk_id": "solana-sendtransaction#chunk-1",
+    "claim": "Solana RPC method used to submit a fully signed transaction.",
+    "status": "seeded"
+  },
+  {
+    "id": "erc-20::eip-20",
+    "node_id": "erc-20",
+    "source_id": "eip-20",
+    "source_url": "https://eips.ethereum.org/EIPS/eip-20",
+    "chunk_id": "eip-20#chunk-1",
+    "claim": "Ethereum fungible token interface for balances, transfers, allowances, and approvals.",
+    "status": "seeded"
+  },
+  {
+    "id": "erc-721::eip-721",
+    "node_id": "erc-721",
+    "source_id": "eip-721",
+    "source_url": "https://eips.ethereum.org/EIPS/eip-721",
+    "chunk_id": "eip-721#chunk-1",
+    "claim": "Ethereum non-fungible token standard for unique token ownership and transfer semantics.",
+    "status": "seeded"
+  },
+  {
+    "id": "abi::solidity-abi",
+    "node_id": "abi",
+    "source_id": "solidity-abi",
+    "source_url": "https://docs.soliditylang.org/en/latest/abi-spec.html",
+    "chunk_id": "solidity-abi#chunk-1",
+    "claim": "Application Binary Interface describing how to encode Ethereum smart contract calls and decode events.",
+    "status": "seeded"
+  },
+  {
+    "id": "wallet-balance-snippet::ethereum-json-rpc-eth-getbalance",
+    "node_id": "wallet-balance-snippet",
+    "source_id": "ethereum-json-rpc-eth-getbalance",
+    "source_url": "https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_getbalance",
+    "chunk_id": "ethereum-json-rpc-eth-getbalance#chunk-2",
+    "claim": "Minimal fetch-based JSON-RPC example for calling eth_getBalance.",
+    "status": "seeded"
+  }
+]

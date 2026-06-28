@@ -45,3 +45,26 @@ def search_nodes(store: GraphStore, query: str, limit: int = 10) -> list[dict[st
 
     scored.sort(key=lambda item: (-item[0], item[1]["label"]))
     return [node for _, node in scored[:limit]]
+
+
+def search_chunks(store: GraphStore, query: str, limit: int = 10) -> list[dict[str, Any]]:
+    query_terms = tokenize(query)
+    if not query_terms:
+        return []
+
+    scored: list[tuple[float, dict[str, Any]]] = []
+    for chunk in store.chunks.values():
+        haystack = " ".join([chunk.get("title", ""), chunk.get("source_id", ""), chunk.get("text", "")])
+        terms = Counter(tokenize(haystack))
+        score = 0.0
+        for term in query_terms:
+            if term in chunk.get("title", "").lower():
+                score += 4
+            score += terms.get(term, 0)
+        if score:
+            result = dict(chunk)
+            result["_score"] = score
+            scored.append((score, result))
+
+    scored.sort(key=lambda item: (-item[0], item[1]["id"]))
+    return [chunk for _, chunk in scored[:limit]]

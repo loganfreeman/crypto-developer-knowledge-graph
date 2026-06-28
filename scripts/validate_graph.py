@@ -18,7 +18,15 @@ def main() -> int:
             print(f"ERROR {error}")
         return 1
 
-    print(f"OK {len(store.nodes)} nodes, {len(store.edges)} relationships, {len(store.goal_paths)} goal paths")
+    print(
+        "OK "
+        f"{len(store.nodes)} nodes, "
+        f"{len(store.edges)} relationships, "
+        f"{len(store.goal_paths)} goal paths, "
+        f"{len(store.sources)} sources, "
+        f"{len(store.chunks)} chunks, "
+        f"{len(store.citations)} citations"
+    )
     return 0
 
 

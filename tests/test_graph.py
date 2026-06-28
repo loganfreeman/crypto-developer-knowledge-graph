@@ -1,4 +1,4 @@
-from ckg.search import search_nodes
+from ckg.search import search_chunks, search_nodes
 from ckg.store import GraphStore
 
 
@@ -16,3 +16,16 @@ def test_search_finds_wallet_task():
     results = search_nodes(GraphStore(), "wallet")
     assert results
     assert any(result["id"] == "wallet-building" for result in results)
+
+
+def test_citations_resolve_to_chunks():
+    store = GraphStore()
+    citations = store.node_citations("ethereum")
+    assert citations
+    assert citations[0]["source"]
+    assert citations[0]["chunk"]
+
+
+def test_chunk_search_finds_rpc_docs():
+    results = search_chunks(GraphStore(), "signed transaction")
+    assert any(result["source_id"] == "ethereum-json-rpc" for result in results)

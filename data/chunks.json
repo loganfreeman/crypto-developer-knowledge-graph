@@ -1,0 +1,154 @@
+[
+  {
+    "id": "bitcoin-core-rpc#chunk-1",
+    "source_id": "bitcoin-core-rpc",
+    "title": "Bitcoin Core RPC API Reference",
+    "url": "https://developer.bitcoin.org/reference/rpc/",
+    "ordinal": 1,
+    "text": "# Bitcoin Core RPC API Reference\n\nBitcoin Core exposes RPC methods for node, wallet, mining, network, blockchain, and transaction operations. Developer tools use the RPC API to inspect chain state, operate wallets, broadcast transactions, and manage node behavior."
+  },
+  {
+    "id": "bitcoin-sendrawtransaction#chunk-1",
+    "source_id": "bitcoin-sendrawtransaction",
+    "title": "Bitcoin Core sendrawtransaction RPC",
+    "url": "https://developer.bitcoin.org/reference/rpc/sendrawtransaction.html",
+    "ordinal": 1,
+    "text": "# Bitcoin Core sendrawtransaction\n\n`sendrawtransaction` submits a raw serialized transaction to a Bitcoin Core node. Wallet software uses this after transaction creation and signing, and then tracks propagation and confirmation through node or indexer APIs."
+  },
+  {
+    "id": "ethereum-json-rpc#chunk-1",
+    "source_id": "ethereum-json-rpc",
+    "title": "Ethereum JSON-RPC API",
+    "url": "https://ethereum.org/en/developers/docs/apis/json-rpc/",
+    "ordinal": 1,
+    "text": "# Ethereum JSON-RPC API\n\nEthereum execution clients expose JSON-RPC methods for applications and tooling. Wallets, indexers, and developer tools use this interface to read account data, inspect blocks, estimate gas, and submit signed transactions."
+  },
+  {
+    "id": "ethereum-json-rpc#chunk-2",
+    "source_id": "ethereum-json-rpc",
+    "title": "Ethereum JSON-RPC API",
+    "url": "https://ethereum.org/en/developers/docs/apis/json-rpc/",
+    "ordinal": 2,
+    "text": "## eth_getBalance\n\n`eth_getBalance` returns the balance of an address at a requested block tag. Wallet applications commonly call it after deriving or importing an address so they can show current account state to the user."
+  },
+  {
+    "id": "ethereum-json-rpc#chunk-3",
+    "source_id": "ethereum-json-rpc",
+    "title": "Ethereum JSON-RPC API",
+    "url": "https://ethereum.org/en/developers/docs/apis/json-rpc/",
+    "ordinal": 3,
+    "text": "## eth_sendRawTransaction\n\n`eth_sendRawTransaction` submits a signed and serialized Ethereum transaction to the network through an execution client. The transaction must already contain valid authorization from the account key."
+  },
+  {
+    "id": "ethereum-json-rpc-eth-getbalance#chunk-1",
+    "source_id": "ethereum-json-rpc-eth-getbalance",
+    "title": "Ethereum JSON-RPC eth_getBalance",
+    "url": "https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_getbalance",
+    "ordinal": 1,
+    "text": "# Ethereum JSON-RPC API\n\nEthereum execution clients expose JSON-RPC methods for applications and tooling. Wallets, indexers, and developer tools use this interface to read account data, inspect blocks, estimate gas, and submit signed transactions."
+  },
+  {
+    "id": "ethereum-json-rpc-eth-getbalance#chunk-2",
+    "source_id": "ethereum-json-rpc-eth-getbalance",
+    "title": "Ethereum JSON-RPC eth_getBalance",
+    "url": "https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_getbalance",
+    "ordinal": 2,
+    "text": "## eth_getBalance\n\n`eth_getBalance` returns the balance of an address at a requested block tag. Wallet applications commonly call it after deriving or importing an address so they can show current account state to the user."
+  },
+  {
+    "id": "ethereum-json-rpc-eth-getbalance#chunk-3",
+    "source_id": "ethereum-json-rpc-eth-getbalance",
+    "title": "Ethereum JSON-RPC eth_getBalance",
+    "url": "https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_getbalance",
+    "ordinal": 3,
+    "text": "## eth_sendRawTransaction\n\n`eth_sendRawTransaction` submits a signed and serialized Ethereum transaction to the network through an execution client. The transaction must already contain valid authorization from the account key."
+  },
+  {
+    "id": "ethereum-json-rpc-eth-sendrawtransaction#chunk-1",
+    "source_id": "ethereum-json-rpc-eth-sendrawtransaction",
+    "title": "Ethereum JSON-RPC eth_sendRawTransaction",
+    "url": "https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_sendrawtransaction",
+    "ordinal": 1,
+    "text": "# Ethereum JSON-RPC API\n\nEthereum execution clients expose JSON-RPC methods for applications and tooling. Wallets, indexers, and developer tools use this interface to read account data, inspect blocks, estimate gas, and submit signed transactions."
+  },
+  {
+    "id": "ethereum-json-rpc-eth-sendrawtransaction#chunk-2",
+    "source_id": "ethereum-json-rpc-eth-sendrawtransaction",
+    "title": "Ethereum JSON-RPC eth_sendRawTransaction",
+    "url": "https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_sendrawtransaction",
+    "ordinal": 2,
+    "text": "## eth_getBalance\n\n`eth_getBalance` returns the balance of an address at a requested block tag. Wallet applications commonly call it after deriving or importing an address so they can show current account state to the user."
+  },
+  {
+    "id": "ethereum-json-rpc-eth-sendrawtransaction#chunk-3",
+    "source_id": "ethereum-json-rpc-eth-sendrawtransaction",
+    "title": "Ethereum JSON-RPC eth_sendRawTransaction",
+    "url": "https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_sendrawtransaction",
+    "ordinal": 3,
+    "text": "## eth_sendRawTransaction\n\n`eth_sendRawTransaction` submits a signed and serialized Ethereum transaction to the network through an execution client. The transaction must already contain valid authorization from the account key."
+  },
+  {
+    "id": "json-rpc-spec#chunk-1",
+    "source_id": "json-rpc-spec",
+    "title": "JSON-RPC 2.0 Specification",
+    "url": "https://www.jsonrpc.org/specification",
+    "ordinal": 1,
+    "text": "# JSON-RPC 2.0 Specification\n\nJSON-RPC is a stateless remote procedure call protocol using JSON as its data format. A request object contains a method name, optional parameters, an id, and the JSON-RPC version."
+  },
+  {
+    "id": "eip-20#chunk-1",
+    "source_id": "eip-20",
+    "title": "ERC-20 Token Standard",
+    "url": "https://eips.ethereum.org/EIPS/eip-20",
+    "ordinal": 1,
+    "text": "# ERC-20 Token Standard\n\nERC-20 defines a standard interface for fungible tokens on Ethereum. The interface includes balance queries, transfer behavior, allowances, and approval workflows used by wallets and DeFi applications."
+  },
+  {
+    "id": "eip-721#chunk-1",
+    "source_id": "eip-721",
+    "title": "ERC-721 Non-Fungible Token Standard",
+    "url": "https://eips.ethereum.org/EIPS/eip-721",
+    "ordinal": 1,
+    "text": "# ERC-721 Non-Fungible Token Standard\n\nERC-721 defines a standard interface for non-fungible tokens. It models unique token ownership, safe transfers, approvals, and metadata extension points used by NFT applications and wallets."
+  },
+  {
+    "id": "solidity-abi#chunk-1",
+    "source_id": "solidity-abi",
+    "title": "Solidity ABI Specification",
+    "url": "https://docs.soliditylang.org/en/latest/abi-spec.html",
+    "ordinal": 1,
+    "text": "# Solidity ABI Specification\n\nThe Ethereum Application Binary Interface defines how contract calls are encoded and how return values and events are decoded. Developer tools use ABIs to construct smart contract calls and interpret logs."
+  },
+  {
+    "id": "solana-rpc#chunk-1",
+    "source_id": "solana-rpc",
+    "title": "Solana RPC Methods",
+    "url": "https://solana.com/docs/rpc",
+    "ordinal": 1,
+    "text": "# Solana RPC Methods\n\nSolana exposes HTTP and WebSocket RPC methods for developers building wallets, applications, and indexers. RPC methods allow clients to read accounts, submit transactions, and subscribe to network activity."
+  },
+  {
+    "id": "solana-rpc#chunk-2",
+    "source_id": "solana-rpc",
+    "title": "Solana RPC Methods",
+    "url": "https://solana.com/docs/rpc",
+    "ordinal": 2,
+    "text": "## sendTransaction\n\n`sendTransaction` submits a fully signed Solana transaction. The RPC service verifies transaction encoding and signatures before forwarding it for processing."
+  },
+  {
+    "id": "solana-sendtransaction#chunk-1",
+    "source_id": "solana-sendtransaction",
+    "title": "Solana sendTransaction RPC",
+    "url": "https://solana.com/docs/rpc/http/sendtransaction",
+    "ordinal": 1,
+    "text": "# Solana RPC Methods\n\nSolana exposes HTTP and WebSocket RPC methods for developers building wallets, applications, and indexers. RPC methods allow clients to read accounts, submit transactions, and subscribe to network activity."
+  },
+  {
+    "id": "solana-sendtransaction#chunk-2",
+    "source_id": "solana-sendtransaction",
+    "title": "Solana sendTransaction RPC",
+    "url": "https://solana.com/docs/rpc/http/sendtransaction",
+    "ordinal": 2,
+    "text": "## sendTransaction\n\n`sendTransaction` submits a fully signed Solana transaction. The RPC service verifies transaction encoding and signatures before forwarding it for processing."
+  }
+]

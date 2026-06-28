@@ -29,11 +29,21 @@ class GraphStore:
         self.nodes = {node["id"]: node for node in self._load_json(data_dir / "nodes.json")}
         self.edges = [Edge(**edge) for edge in self._load_json(data_dir / "relationships.json")]
         self.goal_paths = {goal["id"]: goal for goal in self._load_json(data_dir / "goal_paths.json")}
+        self.sources = {source["id"]: source for source in self._load_optional_json(data_dir / "sources.json", [])}
+        self.chunks = {chunk["id"]: chunk for chunk in self._load_optional_json(data_dir / "chunks.json", [])}
+        self.citations = {citation["id"]: citation for citation in self._load_optional_json(data_dir / "citations.json", [])}
         self.outgoing = self._group_edges("source")
         self.incoming = self._group_edges("target")
 
     @staticmethod
     def _load_json(path: Path) -> Any:
+        with path.open(encoding="utf-8") as handle:
+            return json.load(handle)
+
+    @staticmethod
+    def _load_optional_json(path: Path, default: Any) -> Any:
+        if not path.exists():
+            return default
         with path.open(encoding="utf-8") as handle:
             return json.load(handle)
 
@@ -80,10 +90,28 @@ class GraphStore:
             "relationships": [edge.as_dict() for edge in edges],
         }
 
+    def node_citations(self, node_id: str) -> list[dict[str, Any]]:
+        citations = [citation for citation in self.citations.values() if citation["node_id"] == node_id]
+        enriched = []
+        for citation in citations:
+            item = dict(citation)
+            item["source"] = self.sources.get(citation["source_id"])
+            item["chunk"] = self.chunks.get(citation.get("chunk_id"))
+            enriched.append(item)
+        return enriched
+
+    def citation_keys(self) -> set[str]:
+        keys = set(self.sources)
+        keys.update(source["url"] for source in self.sources.values())
+        keys.update(self.citations)
+        keys.update(citation["source_url"] for citation in self.citations.values())
+        return keys
+
     def validate(self) -> list[str]:
         errors: list[str] = []
         allowed_node_types = set(self.schema["node_types"])
         allowed_edge_types = set(self.schema["relationship_types"])
+        citation_keys = self.citation_keys()
 
         for node_id, node in self.nodes.items():
             if node.get("type") not in allowed_node_types:
@@ -92,6 +120,9 @@ class GraphStore:
                 errors.append(f"{node_id}: missing label")
             if "citations" not in node:
                 errors.append(f"{node_id}: missing citations")
+            for citation in node.get("citations", []):
+                if citation not in citation_keys:
+                    errors.append(f"{node_id}: unresolved citation {citation}")
 
         for edge in self.edges:
             if edge.source not in self.nodes:
@@ -106,6 +137,20 @@ class GraphStore:
                 for node_id in goal.get(field, []):
                     if node_id not in self.nodes:
                         errors.append(f"{goal_id}.{field}: missing node {node_id}")
+
+        for source_id, source in self.sources.items():
+            local_path = ROOT / source["local_path"]
+            if not local_path.exists():
+                errors.append(f"{source_id}: missing local source document {source['local_path']}")
+
+        for citation_id, citation in self.citations.items():
+            if citation["node_id"] not in self.nodes:
+                errors.append(f"{citation_id}: missing cited node {citation['node_id']}")
+            if citation["source_id"] not in self.sources:
+                errors.append(f"{citation_id}: missing source {citation['source_id']}")
+            chunk_id = citation.get("chunk_id")
+            if chunk_id and chunk_id not in self.chunks:
+                errors.append(f"{citation_id}: missing chunk {chunk_id}")
 
         return errors
 

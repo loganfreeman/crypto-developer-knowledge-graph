@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 
-from .search import search_nodes
+from .search import search_chunks, search_nodes
 from .store import GraphStore
 
 
@@ -14,6 +14,9 @@ def main() -> None:
     search_parser = subparsers.add_parser("search")
     search_parser.add_argument("query")
 
+    chunks_parser = subparsers.add_parser("chunks")
+    chunks_parser.add_argument("query")
+
     node_parser = subparsers.add_parser("node")
     node_parser.add_argument("id")
 
@@ -23,15 +26,22 @@ def main() -> None:
     neighbors_parser = subparsers.add_parser("neighbors")
     neighbors_parser.add_argument("id")
 
+    citations_parser = subparsers.add_parser("citations")
+    citations_parser.add_argument("id")
+
     args = parser.parse_args()
     store = GraphStore()
 
     if args.command == "search":
         payload = search_nodes(store, args.query)
+    elif args.command == "chunks":
+        payload = search_chunks(store, args.query)
     elif args.command == "node":
         payload = store.node(args.id)
     elif args.command == "path":
         payload = store.goal(args.id)
+    elif args.command == "citations":
+        payload = store.node_citations(args.id)
     else:
         payload = store.neighbors(args.id)
 
