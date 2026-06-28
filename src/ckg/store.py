@@ -58,6 +58,7 @@ class GraphStore:
         self.trust_report = self._load_optional_json(data_dir / "trust_report.json", {"summary": {}, "nodes": [], "sources": []})
         self.network_conditions = self._load_optional_json(data_dir / "network_conditions.json", {"conditions": []})
         self.live_metadata = self._load_optional_json(data_dir / "live_metadata.json", {"targets": []})
+        self.serialization_sandboxes = self._load_optional_json(data_dir / "serialization_sandboxes.json", {"sandboxes": []})
         self.outgoing = self._group_edges("source")
         self.incoming = self._group_edges("target")
 
@@ -189,6 +190,13 @@ class GraphStore:
             if target.get("node_id") == node_id
         ]
 
+    def node_serialization_sandboxes(self, node_id: str) -> list[dict[str, Any]]:
+        return [
+            sandbox
+            for sandbox in self.serialization_sandboxes.get("sandboxes", [])
+            if sandbox.get("node_id") == node_id
+        ]
+
     def validate(self) -> list[str]:
         errors: list[str] = []
         allowed_node_types = set(self.schema["node_types"])
@@ -242,6 +250,15 @@ class GraphStore:
                 errors.append(f"{target_id}: unknown live metadata kind {target.get('kind')}")
             if not target.get("checks"):
                 errors.append(f"{target_id}: missing live metadata checks")
+
+        for sandbox in self.serialization_sandboxes.get("sandboxes", []):
+            sandbox_id = sandbox.get("id", "serialization-sandbox")
+            if sandbox.get("node_id") not in self.nodes:
+                errors.append(f"{sandbox_id}: missing sandbox node {sandbox.get('node_id')}")
+            if sandbox.get("codec") not in {"rlp", "scale", "cbor"}:
+                errors.append(f"{sandbox_id}: unknown serialization codec {sandbox.get('codec')}")
+            if not sandbox.get("layouts"):
+                errors.append(f"{sandbox_id}: missing layout constraints")
 
         return errors
 

@@ -1,0 +1,67 @@
+{
+  "generated_at": "2026-06-28T00:00:00Z",
+  "sandboxes": [
+    {
+      "id": "ethereum-legacy-rlp-parser",
+      "node_id": "ethereum-legacy-rlp-byte-template",
+      "codec": "rlp",
+      "runtime": "wasm-ready",
+      "title": "Ethereum Legacy RLP Payload Parser",
+      "description": "Decode a legacy Ethereum RLP list and check whether the tuple matches an EIP-155 unsigned preimage or signed envelope.",
+      "sample_hex": "ec018504a817c8008252089400000000000000000000000000000000000000000180018080",
+      "layouts": [
+        {
+          "id": "eip155_unsigned_preimage",
+          "label": "EIP-155 unsigned signing preimage",
+          "fields": ["nonce", "gasPrice", "gasLimit", "to", "value", "data", "chainId", "zero", "zero"]
+        },
+        {
+          "id": "legacy_signed_envelope",
+          "label": "Legacy signed transaction envelope",
+          "fields": ["nonce", "gasPrice", "gasLimit", "to", "value", "data", "v", "r", "s"]
+        }
+      ]
+    },
+    {
+      "id": "substrate-scale-signing-parser",
+      "node_id": "substrate-scale-byte-template",
+      "codec": "scale",
+      "runtime": "wasm-ready",
+      "title": "Substrate SCALE Signing Payload Parser",
+      "description": "Walk the runtime-dependent Substrate signing payload boundary: call bytes, era, compact nonce, compact tip, specVersion, transactionVersion, genesisHash, and blockHash.",
+      "sample_hex": "0503000000000000000000002a0000000100000011111111111111111111111111111111111111111111111111111111111111112222222222222222222222222222222222222222222222222222222222222222",
+      "layouts": [
+        {
+          "id": "substrate_signing_payload",
+          "label": "Substrate signed extra + additional fields",
+          "fields": [
+            { "name": "callIndex", "type": "bytes", "length": 2 },
+            { "name": "era", "type": "bytes", "length": 1 },
+            { "name": "nonce", "type": "scaleCompact" },
+            { "name": "tip", "type": "scaleCompact" },
+            { "name": "specVersion", "type": "u32le" },
+            { "name": "transactionVersion", "type": "u32le" },
+            { "name": "genesisHash", "type": "bytes", "length": 32 },
+            { "name": "blockHash", "type": "bytes", "length": 32 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "filecoin-dag-cbor-message-parser",
+      "node_id": "filecoin-cbor-byte-template",
+      "codec": "cbor",
+      "runtime": "wasm-ready",
+      "title": "Filecoin DAG-CBOR Message Parser",
+      "description": "Decode a canonical CBOR array/map and check the expected Filecoin message field count before CID/signing.",
+      "sample_hex": "8a00010203040506070809",
+      "layouts": [
+        {
+          "id": "filecoin_message_tuple",
+          "label": "Filecoin message tuple",
+          "fields": ["Version", "To", "From", "Nonce", "Value", "GasLimit", "GasFeeCap", "GasPremium", "Method", "Params"]
+        }
+      ]
+    }
+  ]
+}

@@ -84,6 +84,8 @@ class KnowledgeGraphHandler(BaseHTTPRequestHandler):
                 self.json_response({"conditions": STORE.network_conditions.get("conditions", [])})
             elif api_path == "live-metadata":
                 self.json_response({"targets": STORE.live_metadata.get("targets", [])})
+            elif api_path == "serialization-sandboxes":
+                self.json_response(STORE.serialization_sandboxes)
             elif api_path == "sources":
                 self.json_response({"sources": list(STORE.sources.values())})
             elif api_path == "citations":
@@ -201,6 +203,7 @@ def graph_payload(store: GraphStore) -> dict[str, Any]:
         "trust": store.trust_report,
         "network_conditions": store.network_conditions,
         "live_metadata": store.live_metadata,
+        "serialization_sandboxes": store.serialization_sandboxes,
     }
 
 
@@ -219,6 +222,7 @@ def node_context(store: GraphStore, node_id: str) -> dict[str, Any]:
         "code_solutions": code_snippets_for_nodes(store, node_ids),
         "network_conditions": store.node_network_conditions(node_id),
         "live_metadata": store.node_live_metadata(node_id),
+        "serialization_sandboxes": store.node_serialization_sandboxes(node_id),
         "trust": store.node_trust(node_id),
     }
 
