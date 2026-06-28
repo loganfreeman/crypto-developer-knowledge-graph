@@ -12,6 +12,10 @@ const state = {
   activeEdgeTypes: [],
   activeLayer: "all",
   activeTab: "docs",
+  assistant: {
+    prompt: "",
+    result: null,
+  },
 };
 
 const primaryEdgeTypes = [
@@ -34,11 +38,45 @@ const primaryEdgeTypes = [
 ];
 
 const sidecarTabs = [
+  ["assistant", "Assistant"],
   ["docs", "Documentation"],
   ["code", "Code Snippets"],
   ["state", "State"],
+  ["sandbox", "Sandbox"],
   ["risks", "Risks"],
   ["sources", "Sources"],
+];
+
+const assistantBlueprints = [
+  {
+    id: "go-turnkey-concurrent-signer",
+    title: "Go concurrent transaction signer with Turnkey",
+    matchTokens: ["go", "golang", "concurrent", "matching", "engine", "turnkey", "sign", "transactions", "non-custodial"],
+    goalId: "build-offline-signer",
+    focusNodeId: "offline-transaction-signer",
+    highlightedNodeIds: [
+      "offline-transaction-signer",
+      "transaction-creation",
+      "deterministic-serialization",
+      "payload-signing",
+      "turnkey-raw-payload-signing-pattern",
+      "signing-byte-boundary-guardrail",
+      "replay-domain-guardrail",
+      "eth-send-raw-transaction",
+    ],
+    architecturalSteps: [
+      "Treat the matching engine as the off-graph service layer: it receives fills/orders, assigns idempotency keys, and pushes signing jobs to bounded Go worker pools.",
+      "Build canonical unsigned transactions before workers touch Turnkey, then freeze every field that affects the signing preimage.",
+      "Serialize with the chain codec, hash only at the documented boundary, and persist a hex dump of raw bytes plus request metadata for audit replay.",
+      "Call Turnkey sign_raw_payload from each worker with explicit payload encoding, hash mode, organization policy, and signer identity.",
+      "Normalize the returned signature into the target chain envelope, then broadcast through the chain RPC and track nonce or sequence conflicts.",
+      "Put replay-domain and byte-boundary guardrails in the queue contract so a concurrent retry cannot sign a different payload under the same business id.",
+    ],
+    caveats: [
+      "No dedicated matching-engine node exists yet; the assistant maps that phrase to a backend orchestration layer.",
+      "Turnkey, serialization, and broadcast code examples live in the Code Snippets tab for the highlighted nodes.",
+    ],
+  },
 ];
 
 async function loadJson(path) {
@@ -85,6 +123,23 @@ function networkConditionsForNode(nodeId) {
   return (state.networkConditions.conditions || []).filter((item) => item.node_id === nodeId);
 }
 
+function nodeSearchText(node) {
+  return [
+    node.id,
+    node.label,
+    node.type,
+    node.summary,
+    ...(node.tags || []),
+    ...(node.contexts || []),
+    ...(node.layers || []),
+  ].join(" ").toLowerCase();
+}
+
+function nodeMatches(node, tokens) {
+  const text = nodeSearchText(node);
+  return tokens.some((token) => text.includes(token));
+}
+
 function nodeLayers(node) {
   return node.layers || [node.type];
 }
@@ -118,15 +173,20 @@ function goalNodeIds(goal) {
   ]);
 }
 
+function assistantHighlightIds() {
+  return new Set(state.assistant.result?.highlightedNodeIds || []);
+}
+
 function focusedHorizon(goal) {
   const map = nodeMap();
   const focus = state.selectedNodeId || goal.task_node_id;
   const base = goalNodeIds(goal);
+  const highlighted = assistantHighlightIds();
   const edges = state.relationships.filter((edge) => {
     if (!edgeAllowed(edge)) return false;
-    return edge.source === focus || edge.target === focus || (base.has(edge.source) && base.has(edge.target));
+    return edge.source === focus || edge.target === focus || (base.has(edge.source) && base.has(edge.target)) || (highlighted.has(edge.source) && highlighted.has(edge.target));
   });
-  const selected = new Set([focus, ...base]);
+  const selected = new Set([focus, ...base, ...highlighted]);
   edges.forEach((edge) => {
     selected.add(edge.source);
     selected.add(edge.target);
@@ -142,6 +202,59 @@ function focusedHorizon(goal) {
 
 function selectNode(nodeId) {
   state.selectedNodeId = nodeId;
+  render();
+}
+
+function scorePromptAgainstBlueprint(query, blueprint) {
+  const q = query.toLowerCase();
+  return blueprint.matchTokens.reduce((score, token) => score + (q.includes(token) ? 1 : 0), 0);
+}
+
+function topNodesForPrompt(query) {
+  const q = query.toLowerCase();
+  return state.nodes
+    .map((node) => {
+      const score = q.split(/\s+/).filter((token) => token.length > 2 && nodeSearchText(node).includes(token)).length;
+      return { node, score };
+    })
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 7)
+    .map((item) => item.node.id);
+}
+
+function buildAssistantFallback(query) {
+  const highlightedNodeIds = topNodesForPrompt(query);
+  const focusNodeId = highlightedNodeIds[0] || selectedGoal().task_node_id;
+  return {
+    id: "semantic-local-search",
+    title: "Local graph retrieval path",
+    prompt: query,
+    goalId: state.selectedGoalId,
+    focusNodeId,
+    highlightedNodeIds,
+    architecturalSteps: highlightedNodeIds.length
+      ? highlightedNodeIds.map((id) => `Inspect ${nodeLabel(id)} and follow its adjacent relationships for implementation constraints.`)
+      : ["No strong node match was found. Try naming a protocol, runtime, serialization format, signing provider, or build goal."],
+    caveats: ["This local assistant uses graph metadata only; plug a server-side RAG model into the same path contract for synthesized answers."],
+  };
+}
+
+function runAssistantPrompt(query) {
+  const prompt = query.trim();
+  if (!prompt) return;
+  const ranked = assistantBlueprints
+    .map((blueprint) => ({ blueprint, score: scorePromptAgainstBlueprint(prompt, blueprint) }))
+    .sort((a, b) => b.score - a.score);
+  const result = ranked[0]?.score >= 2
+    ? { ...ranked[0].blueprint, prompt }
+    : buildAssistantFallback(prompt);
+  state.assistant = { prompt, result };
+  state.selectedGoalId = result.goalId || state.selectedGoalId;
+  state.selectedNodeId = result.focusNodeId || result.highlightedNodeIds[0] || state.selectedNodeId;
+  state.activeLayer = "all";
+  state.activeEdgeTypes = [];
+  state.activeTab = "assistant";
   render();
 }
 
@@ -179,6 +292,11 @@ function renderSummary(goal) {
       <span>${goal.example_flow.length} execution steps</span>
     </div>
   `;
+}
+
+function renderAssistantBridge() {
+  const input = document.querySelector("#assistant-prompt");
+  if (input && document.activeElement !== input) input.value = state.assistant.prompt || "";
 }
 
 function renderControls() {
@@ -250,6 +368,7 @@ function relationCaption(edge, focusId) {
 function renderGraph(goal) {
   renderControls();
   state.selectedNodeId = state.selectedNodeId || goal.task_node_id;
+  const highlighted = assistantHighlightIds();
   const { focus, nodes, relationships } = focusedHorizon(goal);
   const { coords, width, height } = coordinatesFor(nodes, focus);
   document.querySelector("#counts").textContent = `${nodes.length} nodes / ${relationships.length} edges`;
@@ -261,9 +380,10 @@ function renderGraph(goal) {
       const target = coords[edge.target];
       const midX = (source.x + target.x) / 2;
       const midY = (source.y + target.y) / 2;
+      const highlightedEdge = highlighted.has(edge.source) && highlighted.has(edge.target);
       return `
-        <line class="graph-edge" x1="${source.x}" y1="${source.y}" x2="${target.x}" y2="${target.y}"></line>
-        <text class="edge-label" x="${midX}" y="${midY}">${escapeHtml(edge.type)}</text>
+        <line class="graph-edge ${highlightedEdge ? "assistant-highlight" : ""}" x1="${source.x}" y1="${source.y}" x2="${target.x}" y2="${target.y}"></line>
+        <text class="edge-label ${highlightedEdge ? "assistant-highlight" : ""}" x="${midX}" y="${midY}">${escapeHtml(edge.type)}</text>
       `;
     })
     .join("");
@@ -275,7 +395,7 @@ function renderGraph(goal) {
       const relations = relationships.filter((edge) => edge.source === node.id || edge.target === node.id);
       return `
         <button
-          class="canvas-node ${node.id === focus ? "selected" : ""}"
+          class="canvas-node ${node.id === focus ? "selected" : ""} ${highlighted.has(node.id) ? "assistant-highlight" : ""}"
           type="button"
           data-node-id="${node.id}"
           style="left:${point.x}px;top:${point.y}px"
@@ -464,6 +584,206 @@ function sourcesPanel(node) {
   return citationRows(node.id);
 }
 
+function assistantPanel() {
+  const result = state.assistant.result;
+  if (!result) {
+    return `
+      <section class="assistant-answer">
+        <p class="muted">Ask the Copilot Bridge to trace an implementation path. The answer will highlight graph nodes and render architectural steps here.</p>
+      </section>
+    `;
+  }
+  return `
+    <section class="assistant-answer">
+      <p class="eyebrow">Prompt</p>
+      <blockquote>${escapeHtml(result.prompt)}</blockquote>
+      <h3>${escapeHtml(result.title)}</h3>
+      <div class="assistant-path">
+        ${result.highlightedNodeIds.map((id) => `
+          <button type="button" class="path-node" data-node-id="${id}">
+            <span>${escapeHtml(nodeMap()[id]?.type || "Node")}</span>
+            <strong>${escapeHtml(nodeLabel(id))}</strong>
+          </button>
+        `).join("")}
+      </div>
+      <div class="detail-section">
+        <h3>Architecture Steps</h3>
+        <ol class="step-list">${result.architecturalSteps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>
+      </div>
+      <div class="detail-section">
+        <h3>Grounding Notes</h3>
+        <ul class="note-list">${result.caveats.map((note) => `<li>${escapeHtml(note)}</li>`).join("")}</ul>
+      </div>
+    </section>
+  `;
+}
+
+function hasCryptoSandbox(node) {
+  return nodeMatches(node, [
+    "hash",
+    "signature",
+    "signing",
+    "signer",
+    "kms",
+    "payload",
+    "serialization",
+    "rlp",
+    "scale",
+    "cbor",
+    "secp256k1",
+    "ed25519",
+    "bad-signature",
+  ]);
+}
+
+function hasStakingSandbox(node) {
+  return nodeMatches(node, ["staking", "stake", "validator", "nomination", "delegation", "bond"]);
+}
+
+function hashSandboxMarkup() {
+  return `
+    <article class="sandbox-widget" data-sandbox="hash">
+      <div>
+        <p class="eyebrow">Byte calculator</p>
+        <h3>Hash Raw Payload</h3>
+        <p class="muted">Use this to check the exact bytes before a signing or serialization step.</p>
+      </div>
+      <label class="sandbox-control">
+        Raw string
+        <textarea id="hash-input" rows="4" spellcheck="false">staking.nominate</textarea>
+      </label>
+      <label class="sandbox-control">
+        Algorithm
+        <select id="hash-algorithm">
+          <option value="SHA-256">SHA-256</option>
+          <option value="Keccak-256">Keccak-256</option>
+          <option value="BLAKE2b-256">BLAKE2b-256</option>
+        </select>
+      </label>
+      <div class="sandbox-output">
+        <span id="hash-status">Waiting for input.</span>
+        <code id="hash-output"></code>
+      </div>
+      <p class="warning-note">Keccak-256 and BLAKE2b need a vetted implementation; this sandbox will not substitute SHA3 or a toy hash.</p>
+    </article>
+  `;
+}
+
+function stakingSandboxMarkup(node) {
+  const conditions = networkConditionsForNode(node.id);
+  const networkLine = conditions.length
+    ? conditions.map((condition) => `${condition.network}: ${condition.status}, ${condition.freshness_policy}`).join(" · ")
+    : "No cached live-state feed is attached yet.";
+  return `
+    <article class="sandbox-widget" data-sandbox="staking">
+      <div>
+        <p class="eyebrow">State model</p>
+        <h3>Staking Reward Scenario</h3>
+        <p class="muted">${escapeHtml(networkLine)}</p>
+      </div>
+      <label class="sandbox-control">
+        Bonded amount
+        <div class="range-row">
+          <input id="bond-amount" type="range" min="100" max="100000" step="100" value="10000">
+          <input id="bond-amount-number" type="number" min="0" step="100" value="10000">
+        </div>
+      </label>
+      <label class="sandbox-control">
+        Assumed APR (%)
+        <input id="staking-apr" type="number" min="0" max="100" step="0.1" value="8.0">
+      </label>
+      <label class="sandbox-control">
+        Validator commission (%)
+        <input id="staking-commission" type="number" min="0" max="100" step="0.1" value="5.0">
+      </label>
+      <div class="metric-grid">
+        <div class="metric"><span>Annual reward</span><strong id="annual-reward">0</strong></div>
+        <div class="metric"><span>Monthly reward</span><strong id="monthly-reward">0</strong></div>
+        <div class="metric"><span>Daily reward</span><strong id="daily-reward">0</strong></div>
+      </div>
+      <p class="warning-note">This is a client-side scenario model. Production yields must replace the APR input with the live protocol formula and validator state.</p>
+    </article>
+  `;
+}
+
+function sandboxPanel(node) {
+  const widgets = [];
+  if (hasCryptoSandbox(node)) widgets.push(hashSandboxMarkup(node));
+  if (hasStakingSandbox(node)) widgets.push(stakingSandboxMarkup(node));
+  if (!widgets.length) {
+    return `<p class="muted">No sandbox is attached to this node yet. Select a hashing, signing, serialization, or staking node to use interactive calculators.</p>`;
+  }
+  return `<div class="sandbox-grid">${widgets.join("")}</div>`;
+}
+
+function toHex(buffer) {
+  return [...new Uint8Array(buffer)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+async function updateHashSandbox() {
+  const input = document.querySelector("#hash-input");
+  const algorithm = document.querySelector("#hash-algorithm");
+  const output = document.querySelector("#hash-output");
+  const status = document.querySelector("#hash-status");
+  if (!input || !algorithm || !output || !status) return;
+  const value = input.value || "";
+  if (!window.crypto?.subtle) {
+    output.textContent = "";
+    status.textContent = "WebCrypto is unavailable in this browser context.";
+    return;
+  }
+  if (algorithm.value !== "SHA-256") {
+    output.textContent = "";
+    status.textContent = `${algorithm.value} is not exposed by native WebCrypto here. Use a vetted library or WASM module for exact output.`;
+    return;
+  }
+  const digest = await window.crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  output.textContent = toHex(digest);
+  status.textContent = `SHA-256 over ${new TextEncoder().encode(value).length} UTF-8 bytes.`;
+}
+
+function updateStakingSandbox() {
+  const range = document.querySelector("#bond-amount");
+  const number = document.querySelector("#bond-amount-number");
+  const apr = document.querySelector("#staking-apr");
+  const commission = document.querySelector("#staking-commission");
+  const annual = document.querySelector("#annual-reward");
+  const monthly = document.querySelector("#monthly-reward");
+  const daily = document.querySelector("#daily-reward");
+  if (!range || !number || !apr || !commission || !annual || !monthly || !daily) return;
+  const bonded = Math.max(0, Number(number.value || range.value || 0));
+  range.value = String(Math.min(Number(range.max), bonded));
+  const netApr = Math.max(0, Number(apr.value || 0)) / 100;
+  const validatorFee = Math.min(100, Math.max(0, Number(commission.value || 0))) / 100;
+  const annualReward = bonded * netApr * (1 - validatorFee);
+  const formatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 4 });
+  annual.textContent = formatter.format(annualReward);
+  monthly.textContent = formatter.format(annualReward / 12);
+  daily.textContent = formatter.format(annualReward / 365);
+}
+
+function wireSandboxControls() {
+  const hashInput = document.querySelector("#hash-input");
+  const hashAlgorithm = document.querySelector("#hash-algorithm");
+  if (hashInput && hashAlgorithm) {
+    hashInput.addEventListener("input", updateHashSandbox);
+    hashAlgorithm.addEventListener("change", updateHashSandbox);
+    updateHashSandbox();
+  }
+  const range = document.querySelector("#bond-amount");
+  const number = document.querySelector("#bond-amount-number");
+  const apr = document.querySelector("#staking-apr");
+  const commission = document.querySelector("#staking-commission");
+  if (range && number && apr && commission) {
+    range.addEventListener("input", () => {
+      number.value = range.value;
+      updateStakingSandbox();
+    });
+    [number, apr, commission].forEach((input) => input.addEventListener("input", updateStakingSandbox));
+    updateStakingSandbox();
+  }
+}
+
 function renderDetail() {
   const node = nodeMap()[state.selectedNodeId] || nodeMap()[selectedGoal().task_node_id];
   const detail = document.querySelector("#detail");
@@ -473,9 +793,11 @@ function renderDetail() {
   }
   const trust = trustForNode(node.id);
   const tabBody = {
+    assistant: assistantPanel,
     docs: docsPanel,
     code: codePanel,
     state: statePanel,
+    sandbox: sandboxPanel,
     risks: risksPanel,
     sources: sourcesPanel,
   }[state.activeTab](node);
@@ -500,12 +822,17 @@ function renderDetail() {
   detail.querySelectorAll(".edge[data-node-id]").forEach((button) => {
     button.addEventListener("click", () => selectNode(button.dataset.nodeId));
   });
+  detail.querySelectorAll(".path-node[data-node-id]").forEach((button) => {
+    button.addEventListener("click", () => selectNode(button.dataset.nodeId));
+  });
+  if (state.activeTab === "sandbox") wireSandboxControls();
 }
 
 function render() {
   renderGoals();
   const goal = selectedGoal();
   state.selectedNodeId = state.selectedNodeId || goal.task_node_id;
+  renderAssistantBridge();
   renderSummary(goal);
   renderGraph(goal);
   renderDetail();
@@ -534,13 +861,19 @@ async function init() {
   document.querySelector("#search").addEventListener("keydown", (event) => {
     if (event.key === "Enter") renderSearch(event.currentTarget.value);
   });
+  document.querySelector("#assistant-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    runAssistantPrompt(document.querySelector("#assistant-prompt").value);
+  });
   document.querySelector("#reset").addEventListener("click", () => {
     document.querySelector("#search").value = "";
+    document.querySelector("#assistant-prompt").value = "";
     state.selectedGoalId = "build-offline-signer";
     state.selectedNodeId = "offline-transaction-signer";
     state.activeLayer = "all";
     state.activeEdgeTypes = [];
     state.activeTab = "docs";
+    state.assistant = { prompt: "", result: null };
     render();
   });
   state.selectedNodeId = selectedGoal().task_node_id;

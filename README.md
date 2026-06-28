@@ -220,18 +220,20 @@ Relationships include:
 The frontend now avoids whole-graph hairballs. It uses an Intent-Driven Dual View:
 
 - left: a visual horizon canvas scoped to the selected build intent or node
-- right: a dense tabbed sidecar for documentation, code snippets, live state, risks, and sources
+- right: a dense tabbed sidecar for documentation, code snippets, live state, interactive sandboxes, risks, and sources
 
 Clicking a node recenters the local graph without a page refresh and pulls in adjacent relational nodes. Developers can filter by layer and relationship type, then inspect exact execution blueprints in the sidecar.
 
 The sidecar is implementation-first:
 
 - overview, layers, and contexts
+- contextual assistant traces from a natural-language prompt
 - code snippets and payload templates, including multi-language examples
 - implementation notes
 - relationship metadata with context, layer, confidence, and developer notes
 - security guardrails
 - live/cached network conditions
+- client-side simulation widgets for hashing/signing and staking scenarios
 - citations and source chunks
 
 Seeded production-style examples include:
@@ -278,6 +280,20 @@ The serialization layer makes byte-level failures explicit:
 - Substrate SCALE call, extra, and additional signed payload layout
 - Filecoin DAG-CBOR message serialization before CID/signing
 - `Bad signature` diagnostic workflow for tuple misalignment, wrong hash mode, and signature normalization errors
+
+The Sandbox tab adds execution-adjacent calculators:
+
+- crypto/signing nodes expose a raw payload hash calculator with exact SHA-256 output through native WebCrypto
+- Keccak-256 and BLAKE2b are shown as required algorithms, but the widget refuses to fake output when the browser lacks a vetted implementation
+- staking nodes expose a reward scenario dashboard for bonded amount, assumed APR, and validator commission
+- live-state panels remain source-of-truth; sandbox reward values are local scenarios, not protocol guarantees
+
+The Copilot Bridge adds a graph-grounded assistant surface:
+
+- prompts are matched against local graph metadata and curated implementation blueprints
+- the canvas highlights the retrieved node path instead of dumping a full hairball
+- the Assistant tab renders architectural steps, grounding notes, and clickable path nodes
+- the current implementation is local and deterministic; a server-side RAG model can later produce answers against the same highlighted-node contract
 
 ## Live Network Conditions
 

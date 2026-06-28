@@ -25,6 +25,21 @@
           <nav id="goals" class="goal-list" aria-label="Build goals"></nav>
         </div>
 
+        <section class="assistant-bridge" aria-label="Contextual RAG assistant">
+          <div>
+            <p class="eyebrow">Copilot bridge</p>
+            <h2>Ask the graph for an implementation path</h2>
+          </div>
+          <form id="assistant-form" class="assistant-form">
+            <input
+              id="assistant-prompt"
+              type="search"
+              placeholder="Show me how to build a Go-based matching engine that signs concurrent transactions using Turnkey"
+            >
+            <button type="submit">Trace</button>
+          </form>
+        </section>
+
         <section id="summary" class="intent-summary"></section>
 
         <section class="canvas-wrap">
