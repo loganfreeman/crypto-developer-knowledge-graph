@@ -86,6 +86,36 @@ async function loadJson(path) {
   return response.json();
 }
 
+async function loadGraphData() {
+  try {
+    const graph = await loadJson("/api/graph");
+    return {
+      nodes: graph.nodes,
+      relationships: graph.relationships,
+      goals: graph.goals,
+      citations: graph.citations,
+      chunks: graph.chunks,
+      sources: graph.sources,
+      trust: graph.trust,
+      networkConditions: graph.network_conditions,
+      liveMetadata: graph.live_metadata,
+    };
+  } catch (error) {
+    const [nodes, relationships, goals, citations, chunks, sources, trust, networkConditions, liveMetadata] = await Promise.all([
+      loadJson("../data/nodes.json"),
+      loadJson("../data/relationships.json"),
+      loadJson("../data/goal_paths.json"),
+      loadJson("../data/citations.json"),
+      loadJson("../data/chunks.json"),
+      loadJson("../data/sources.json"),
+      loadJson("../data/trust_report.json"),
+      loadJson("../data/network_conditions.json"),
+      loadJson("../data/live_metadata.json"),
+    ]);
+    return { nodes, relationships, goals, citations, chunks, sources, trust, networkConditions, liveMetadata };
+  }
+}
+
 function byId(items) {
   return Object.fromEntries(items.map((item) => [item.id, item]));
 }
@@ -880,17 +910,7 @@ function render() {
 }
 
 async function init() {
-  const [nodes, relationships, goals, citations, chunks, sources, trust, networkConditions, liveMetadata] = await Promise.all([
-    loadJson("../data/nodes.json"),
-    loadJson("../data/relationships.json"),
-    loadJson("../data/goal_paths.json"),
-    loadJson("../data/citations.json"),
-    loadJson("../data/chunks.json"),
-    loadJson("../data/sources.json"),
-    loadJson("../data/trust_report.json"),
-    loadJson("../data/network_conditions.json"),
-    loadJson("../data/live_metadata.json"),
-  ]);
+  const { nodes, relationships, goals, citations, chunks, sources, trust, networkConditions, liveMetadata } = await loadGraphData();
   state.nodes = nodes;
   state.relationships = relationships;
   state.goals = goals;

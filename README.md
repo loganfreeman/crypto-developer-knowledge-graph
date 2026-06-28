@@ -21,7 +21,10 @@ Then open:
 
 - Graph browser: `http://127.0.0.1:8000/`
 - API health: `http://127.0.0.1:8000/health`
+- API index: `http://127.0.0.1:8000/api`
+- API graph bundle: `http://127.0.0.1:8000/api/graph`
 - REST search: `http://127.0.0.1:8000/search?q=wallet`
+- Semantic trace: `http://127.0.0.1:8000/api/trace?q=offline%20signing`
 - Goal path: `http://127.0.0.1:8000/goals/build-wallet`
 - GraphQL-style query endpoint: `http://127.0.0.1:8000/graphql`
 
@@ -123,6 +126,11 @@ See `skills/SKILLS.md` for the concept-to-skill mapping and example prompts.
 Use the REST API:
 
 ```bash
+curl "http://127.0.0.1:8000/api"
+curl "http://127.0.0.1:8000/api/graph"
+curl "http://127.0.0.1:8000/api/search?q=transaction"
+curl "http://127.0.0.1:8000/api/trace?q=Filecoin%20CBOR%20tuple%20misalignment"
+curl "http://127.0.0.1:8000/api/nodes/substrate-scale-byte-template/context"
 curl "http://127.0.0.1:8000/search?q=transaction"
 curl "http://127.0.0.1:8000/chunks/search?q=signed%20transaction"
 curl "http://127.0.0.1:8000/nodes/ethereum/citations"
@@ -131,6 +139,14 @@ curl "http://127.0.0.1:8000/nodes/cross-chain-state-verification/horizon"
 curl "http://127.0.0.1:8000/nodes/polkadot-staking-nominations/network-conditions"
 curl "http://127.0.0.1:8000/trust"
 curl "http://127.0.0.1:8000/goals/build-defi-app"
+```
+
+POST a stable command envelope from an IDE or workspace tool:
+
+```bash
+curl -X POST "http://127.0.0.1:8000/api/query" \
+  -H "content-type: application/json" \
+  -d '{"type":"trace","q":"Go concurrent Turnkey signer","limit":6}'
 ```
 
 Run the database ingestion/export pipeline:

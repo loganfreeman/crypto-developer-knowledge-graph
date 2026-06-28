@@ -1,3 +1,4 @@
+from ckg.api import execute_api_query, graph_payload, node_context
 from ckg.search import search_chunks, search_nodes
 from ckg.pipeline import build_exports, strict_node_kind
 from ckg.release_rig import run_release_rig
@@ -126,6 +127,29 @@ def test_release_rig_flags_removed_structural_signals(tmp_path):
     substrate_diff = next(diff for diff in report["diffs"] if diff["payload_id"] == "substrate-extrinsic-scale-payload")
     assert substrate_diff["breaking"] is True
     assert "RemovedField" in substrate_diff["removed_signals"]
+
+
+def test_api_graph_payload_is_frontend_and_curl_ready():
+    payload = graph_payload(GraphStore())
+    assert payload["nodes"]
+    assert payload["relationships"]
+    assert payload["goals"]
+    assert payload["network_conditions"]["conditions"]
+    assert payload["live_metadata"]["targets"]
+
+
+def test_api_node_context_and_query_trace():
+    store = GraphStore()
+    context = node_context(store, "substrate-scale-byte-template")
+    assert context["node"]["id"] == "substrate-scale-byte-template"
+    assert context["horizon"]["relationships"]
+    assert context["citations"]
+    assert context["live_metadata"]
+
+    trace = execute_api_query(store, {"type": "trace", "q": "Filecoin CBOR tuple misalignment", "limit": 4})
+    assert trace["nodes"]
+    assert trace["relationships"]
+    assert trace["code_solutions"]
 
 
 def test_trace_returns_contextual_mapping_and_code_solutions():
