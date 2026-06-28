@@ -67,6 +67,7 @@ PYTHONPATH=src python3 -m ckg.cli chunks "signed transaction"
 PYTHONPATH=src python3 -m ckg.cli citations ethereum
 PYTHONPATH=src python3 -m ckg.cli horizon cross-chain-state-verification
 PYTHONPATH=src python3 -m ckg.cli horizon wallet-building --edge-type REQUIRES --layer infrastructure
+PYTHONPATH=src python3 -m ckg.cli horizon offline-transaction-signer --edge-type CAN_USE_SIGNER
 PYTHONPATH=src python3 -m ckg.cli trust
 PYTHONPATH=src python3 -m ckg.cli path build-wallet
 PYTHONPATH=src python3 -m ckg.cli node ethereum
@@ -235,8 +236,20 @@ Seeded production-style examples include:
 - Substrate raw extrinsic template
 - ERC-20 transfer calldata template
 - Turnkey-style KMS signing pattern
+- AWS KMS secp256k1 signing pattern
+- Ethereum EIP-155 signing preimage template
+- ECDSA DER to r/s/v normalization snippet
 - Replay domain guardrail
 - Remix EVM sandbox
+
+The `Build offline transaction signer` path shows the raw engineering bridge from primitives to executable signing:
+
+- canonical transaction fields and signing preimages
+- hash boundaries and KMS `RAW` versus `DIGEST` modes
+- AWS KMS secp256k1 signing
+- Turnkey raw-payload signing
+- DER ECDSA normalization into chain-specific `r/s/v`
+- Ed25519 raw/prehash guardrails
 
 Every node should carry citations where practical. Citation values are source identifiers or URLs that ingestion can later resolve into document chunks, embeddings, and provenance metadata.
 

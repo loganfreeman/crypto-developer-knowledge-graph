@@ -86,5 +86,50 @@
     "authority": "official",
     "protocols": ["solana"],
     "local_path": "docs/sources/solana-rpc.md"
+  },
+  {
+    "id": "aws-kms-asymmetric-key-specs",
+    "title": "AWS KMS Asymmetric Key Specs",
+    "url": "https://docs.aws.amazon.com/kms/latest/developerguide/symm-asymm-choose-key-spec.html",
+    "authority": "official",
+    "protocols": [],
+    "freshness_policy": "monthly",
+    "local_path": "docs/sources/aws-kms-asymmetric-key-specs.md"
+  },
+  {
+    "id": "aws-kms-sign-api",
+    "title": "AWS KMS Sign API",
+    "url": "https://docs.aws.amazon.com/kms/latest/APIReference/API_Sign.html",
+    "authority": "official",
+    "protocols": [],
+    "freshness_policy": "monthly",
+    "local_path": "docs/sources/aws-kms-sign-api.md"
+  },
+  {
+    "id": "turnkey-sign-raw-payload",
+    "title": "Turnkey Sign Raw Payload",
+    "url": "https://docs.turnkey.com/api-reference/activities/sign-raw-payload",
+    "authority": "official",
+    "protocols": [],
+    "freshness_policy": "weekly",
+    "local_path": "docs/sources/turnkey-sign-raw-payload.md"
+  },
+  {
+    "id": "eip-155",
+    "title": "EIP-155 Simple Replay Attack Protection",
+    "url": "https://eips.ethereum.org/EIPS/eip-155",
+    "authority": "standard",
+    "protocols": ["ethereum"],
+    "freshness_policy": "yearly",
+    "local_path": "docs/sources/eip-155.md"
+  },
+  {
+    "id": "polkadot-transaction-construction",
+    "title": "Polkadot Transaction Construction",
+    "url": "https://docs.polkadot.com/chain-interactions/send-transactions/with-sdks/",
+    "authority": "official",
+    "protocols": ["polkadot", "substrate"],
+    "freshness_policy": "monthly",
+    "local_path": "docs/sources/polkadot-transaction-construction.md"
   }
 ]

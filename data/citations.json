@@ -106,5 +106,95 @@
     "chunk_id": "ethereum-json-rpc-eth-getbalance#chunk-2",
     "claim": "Minimal fetch-based JSON-RPC example for calling eth_getBalance.",
     "status": "seeded"
+  },
+  {
+    "id": "ethereum-eip155-signing-preimage-template::eip-155",
+    "node_id": "ethereum-eip155-signing-preimage-template",
+    "source_id": "eip-155",
+    "source_url": "https://eips.ethereum.org/EIPS/eip-155",
+    "chunk_id": "eip-155#chunk-1",
+    "claim": "Legacy Ethereum signing payload shape that includes chain id to prevent cross-chain replay before hashing and ECDSA signing.",
+    "status": "seeded"
+  },
+  {
+    "id": "aws-kms-secp256k1-signing-pattern::aws-kms-asymmetric-key-specs",
+    "node_id": "aws-kms-secp256k1-signing-pattern",
+    "source_id": "aws-kms-asymmetric-key-specs",
+    "source_url": "https://docs.aws.amazon.com/kms/latest/developerguide/symm-asymm-choose-key-spec.html",
+    "chunk_id": "aws-kms-asymmetric-key-specs#chunk-1",
+    "claim": "Use an AWS KMS asymmetric secp256k1 key to sign a chain-specific digest while the private key remains inside KMS.",
+    "status": "seeded"
+  },
+  {
+    "id": "aws-kms-secp256k1-signing-pattern::aws-kms-sign-api",
+    "node_id": "aws-kms-secp256k1-signing-pattern",
+    "source_id": "aws-kms-sign-api",
+    "source_url": "https://docs.aws.amazon.com/kms/latest/APIReference/API_Sign.html",
+    "chunk_id": "aws-kms-sign-api#chunk-1",
+    "claim": "Use an AWS KMS asymmetric secp256k1 key to sign a chain-specific digest while the private key remains inside KMS.",
+    "status": "seeded"
+  },
+  {
+    "id": "ecdsa-der-to-rsv-normalization-snippet::aws-kms-sign-api",
+    "node_id": "ecdsa-der-to-rsv-normalization-snippet",
+    "source_id": "aws-kms-sign-api",
+    "source_url": "https://docs.aws.amazon.com/kms/latest/APIReference/API_Sign.html",
+    "chunk_id": "aws-kms-sign-api#chunk-1",
+    "claim": "Decode ASN.1 DER ECDSA output into fixed-width r and s values, then derive recovery id v for Ethereum-style serialized transactions.",
+    "status": "seeded"
+  },
+  {
+    "id": "ecdsa-der-to-rsv-normalization-snippet::eip-155",
+    "node_id": "ecdsa-der-to-rsv-normalization-snippet",
+    "source_id": "eip-155",
+    "source_url": "https://eips.ethereum.org/EIPS/eip-155",
+    "chunk_id": "eip-155#chunk-1",
+    "claim": "Decode ASN.1 DER ECDSA output into fixed-width r and s values, then derive recovery id v for Ethereum-style serialized transactions.",
+    "status": "seeded"
+  },
+  {
+    "id": "turnkey-raw-payload-signing-pattern::turnkey-sign-raw-payload",
+    "node_id": "turnkey-raw-payload-signing-pattern",
+    "source_id": "turnkey-sign-raw-payload",
+    "source_url": "https://docs.turnkey.com/api-reference/activities/sign-raw-payload",
+    "chunk_id": "turnkey-sign-raw-payload#chunk-1",
+    "claim": "Use Turnkey sign_raw_payload to sign explicitly encoded payload bytes with a selected hash function and policy-controlled signer.",
+    "status": "seeded"
+  },
+  {
+    "id": "ed25519-kms-mode-guardrail::aws-kms-asymmetric-key-specs",
+    "node_id": "ed25519-kms-mode-guardrail",
+    "source_id": "aws-kms-asymmetric-key-specs",
+    "source_url": "https://docs.aws.amazon.com/kms/latest/developerguide/symm-asymm-choose-key-spec.html",
+    "chunk_id": "aws-kms-asymmetric-key-specs#chunk-1",
+    "claim": "Ed25519 signing APIs distinguish raw-message signing from prehashed digest signing; mixing these modes can produce invalid or unsafe signatures.",
+    "status": "seeded"
+  },
+  {
+    "id": "ed25519-kms-mode-guardrail::aws-kms-sign-api",
+    "node_id": "ed25519-kms-mode-guardrail",
+    "source_id": "aws-kms-sign-api",
+    "source_url": "https://docs.aws.amazon.com/kms/latest/APIReference/API_Sign.html",
+    "chunk_id": "aws-kms-sign-api#chunk-1",
+    "claim": "Ed25519 signing APIs distinguish raw-message signing from prehashed digest signing; mixing these modes can produce invalid or unsafe signatures.",
+    "status": "seeded"
+  },
+  {
+    "id": "signing-byte-boundary-guardrail::aws-kms-sign-api",
+    "node_id": "signing-byte-boundary-guardrail",
+    "source_id": "aws-kms-sign-api",
+    "source_url": "https://docs.aws.amazon.com/kms/latest/APIReference/API_Sign.html",
+    "chunk_id": "aws-kms-sign-api#chunk-1",
+    "claim": "Every offline signer must explicitly define whether the signer receives structured transaction fields, serialized transaction bytes, or a final digest.",
+    "status": "seeded"
+  },
+  {
+    "id": "signing-byte-boundary-guardrail::turnkey-sign-raw-payload",
+    "node_id": "signing-byte-boundary-guardrail",
+    "source_id": "turnkey-sign-raw-payload",
+    "source_url": "https://docs.turnkey.com/api-reference/activities/sign-raw-payload",
+    "chunk_id": "turnkey-sign-raw-payload#chunk-1",
+    "claim": "Every offline signer must explicitly define whether the signer receives structured transaction fields, serialized transaction bytes, or a final digest.",
+    "status": "seeded"
   }
 ]

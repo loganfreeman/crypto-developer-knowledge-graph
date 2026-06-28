@@ -150,5 +150,45 @@
     "url": "https://solana.com/docs/rpc/http/sendtransaction",
     "ordinal": 2,
     "text": "## sendTransaction\n\n`sendTransaction` submits a fully signed Solana transaction. The RPC service verifies transaction encoding and signatures before forwarding it for processing."
+  },
+  {
+    "id": "aws-kms-asymmetric-key-specs#chunk-1",
+    "source_id": "aws-kms-asymmetric-key-specs",
+    "title": "AWS KMS Asymmetric Key Specs",
+    "url": "https://docs.aws.amazon.com/kms/latest/developerguide/symm-asymm-choose-key-spec.html",
+    "ordinal": 1,
+    "text": "# AWS KMS Asymmetric Key Specs\n\nAWS KMS supports asymmetric elliptic curve keys for signing and verification. `ECC_SECG_P256K1` is the secp256k1 key spec commonly used for cryptocurrencies, and it supports `ECDSA_SHA_256`.\n\nFor Ed25519, AWS KMS supports `ECC_NIST_EDWARDS25519`. `ED25519_SHA_512` requires `MessageType: RAW`, while `ED25519_PH_SHA_512` requires `MessageType: DIGEST`; these modes are not interchangeable.\n\nThe private key stays inside AWS KMS. Applications download or use the public key for verification and call signing APIs for authorization."
+  },
+  {
+    "id": "aws-kms-sign-api#chunk-1",
+    "source_id": "aws-kms-sign-api",
+    "title": "AWS KMS Sign API",
+    "url": "https://docs.aws.amazon.com/kms/latest/APIReference/API_Sign.html",
+    "ordinal": 1,
+    "text": "# AWS KMS Sign API\n\nThe AWS KMS `Sign` operation signs a message using an asymmetric KMS key and a required signing algorithm. Callers choose `MessageType: RAW` when KMS should hash the message as part of the signing operation, or `MessageType: DIGEST` when passing a precomputed digest.\n\nFor offline blockchain signing, the application must construct the exact canonical transaction or message bytes, compute the chain-required digest when needed, and send the correct raw or digest bytes to KMS."
+  },
+  {
+    "id": "turnkey-sign-raw-payload#chunk-1",
+    "source_id": "turnkey-sign-raw-payload",
+    "title": "Turnkey Sign Raw Payload",
+    "url": "https://docs.turnkey.com/api-reference/activities/sign-raw-payload",
+    "ordinal": 1,
+    "text": "# Turnkey Sign Raw Payload\n\nTurnkey exposes a `sign_raw_payload` activity for signing raw payloads. The request includes activity type, timestamp, organization id, `signWith`, `payload`, `encoding`, and `hashFunction`.\n\nThe API supports payload encodings such as hexadecimal and hash functions such as no-op, SHA-256, Keccak-256, or not applicable. The signing result returns ECDSA components including `r`, `s`, and `v`."
+  },
+  {
+    "id": "eip-155#chunk-1",
+    "source_id": "eip-155",
+    "title": "EIP-155 Simple Replay Attack Protection",
+    "url": "https://eips.ethereum.org/EIPS/eip-155",
+    "ordinal": 1,
+    "text": "# EIP-155 Simple Replay Attack Protection\n\nEIP-155 adds chain id into Ethereum transaction signing to protect against replay across chains. For legacy transactions, the signing hash includes nonce, gas price, gas limit, recipient, value, data, chain id, zero, and zero.\n\nThe final transaction signature uses `v = chain_id * 2 + 35` or `chain_id * 2 + 36`."
+  },
+  {
+    "id": "polkadot-transaction-construction#chunk-1",
+    "source_id": "polkadot-transaction-construction",
+    "title": "Polkadot Transaction Construction",
+    "url": "https://docs.polkadot.com/chain-interactions/send-transactions/with-sdks/",
+    "ordinal": 1,
+    "text": "# Polkadot Transaction Construction\n\nSubstrate and Polkadot transaction construction requires runtime-aware extrinsic payloads. Signing payloads include encoded call data, account nonce, era, tip, runtime spec version, transaction version, genesis hash, and recent block hash.\n\nDevelopers building offline signers must fetch chain metadata and runtime versions before constructing bytes to sign, because runtime upgrades can change call indexes and encoding expectations."
   }
 ]

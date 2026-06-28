@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-06-28T03:10:59.790104+00:00",
+  "generated_at": "2026-06-28T03:20:40.961687+00:00",
   "summary": {
-    "nodes": 51,
-    "sources": 11,
-    "citations": 12,
+    "nodes": 58,
+    "sources": 16,
+    "citations": 22,
     "uncited_production_nodes": 18,
     "fast_moving_uncited_nodes": 3,
     "stale_sources": 0,
@@ -163,6 +163,76 @@
       "last_verified_at": "2026-06-27",
       "age_days": 1,
       "current_hash": "7d64655f27bbc4b51d83ccc42a655d3f1545fe78bab1fff2ada100498a8d77ad",
+      "stored_hash": null,
+      "changed": false
+    },
+    {
+      "id": "aws-kms-asymmetric-key-specs",
+      "title": "AWS KMS Asymmetric Key Specs",
+      "url": "https://docs.aws.amazon.com/kms/latest/developerguide/symm-asymm-choose-key-spec.html",
+      "local_path": "docs/sources/aws-kms-asymmetric-key-specs.md",
+      "status": "healthy",
+      "authority": "official",
+      "freshness_days": 30,
+      "last_verified_at": "2026-06-27",
+      "age_days": 1,
+      "current_hash": "c3c60375724db6fc2430ec2e420c20b9889e873474ba79afe9b726615b3305b5",
+      "stored_hash": null,
+      "changed": false
+    },
+    {
+      "id": "aws-kms-sign-api",
+      "title": "AWS KMS Sign API",
+      "url": "https://docs.aws.amazon.com/kms/latest/APIReference/API_Sign.html",
+      "local_path": "docs/sources/aws-kms-sign-api.md",
+      "status": "healthy",
+      "authority": "official",
+      "freshness_days": 30,
+      "last_verified_at": "2026-06-27",
+      "age_days": 1,
+      "current_hash": "deb77177ffe3a88882ef8ad6069f9ba98dbec86e21399986e982e114685e706c",
+      "stored_hash": null,
+      "changed": false
+    },
+    {
+      "id": "turnkey-sign-raw-payload",
+      "title": "Turnkey Sign Raw Payload",
+      "url": "https://docs.turnkey.com/api-reference/activities/sign-raw-payload",
+      "local_path": "docs/sources/turnkey-sign-raw-payload.md",
+      "status": "healthy",
+      "authority": "official",
+      "freshness_days": 7,
+      "last_verified_at": "2026-06-27",
+      "age_days": 1,
+      "current_hash": "516f9b34ba04573edbc8a8a84be63fabd0203427d3a0a06cdcc9a2d2b52ab5b4",
+      "stored_hash": null,
+      "changed": false
+    },
+    {
+      "id": "eip-155",
+      "title": "EIP-155 Simple Replay Attack Protection",
+      "url": "https://eips.ethereum.org/EIPS/eip-155",
+      "local_path": "docs/sources/eip-155.md",
+      "status": "healthy",
+      "authority": "standard",
+      "freshness_days": 365,
+      "last_verified_at": "2026-06-27",
+      "age_days": 1,
+      "current_hash": "5a5c69694d8c19bb2c9670915f7426ab1d2e9f79b9c09ae7b7c09de124bc923c",
+      "stored_hash": null,
+      "changed": false
+    },
+    {
+      "id": "polkadot-transaction-construction",
+      "title": "Polkadot Transaction Construction",
+      "url": "https://docs.polkadot.com/chain-interactions/send-transactions/with-sdks/",
+      "local_path": "docs/sources/polkadot-transaction-construction.md",
+      "status": "healthy",
+      "authority": "official",
+      "freshness_days": 30,
+      "last_verified_at": "2026-06-27",
+      "age_days": 1,
+      "current_hash": "680e256f2713907e4ebbe5eede13386eac41b27e9f6a722f28c6d256227b6af9",
       "stored_hash": null,
       "changed": false
     }
@@ -574,6 +644,62 @@
       "type": "SecurityGuardrail",
       "status": "needs_citation",
       "citation_count": 0,
+      "staleness_risk": "medium"
+    },
+    {
+      "id": "offline-transaction-signer",
+      "label": "Build an offline transaction signer",
+      "type": "DeveloperTask",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "ethereum-eip155-signing-preimage-template",
+      "label": "Ethereum EIP-155 signing preimage template",
+      "type": "PayloadTemplate",
+      "status": "verified",
+      "citation_count": 1,
+      "staleness_risk": "high"
+    },
+    {
+      "id": "aws-kms-secp256k1-signing-pattern",
+      "label": "AWS KMS secp256k1 signing pattern",
+      "type": "SigningIntegration",
+      "status": "verified",
+      "citation_count": 2,
+      "staleness_risk": "high"
+    },
+    {
+      "id": "ecdsa-der-to-rsv-normalization-snippet",
+      "label": "ECDSA DER to r/s/v normalization snippet",
+      "type": "CodeSnippet",
+      "status": "verified",
+      "citation_count": 2,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "turnkey-raw-payload-signing-pattern",
+      "label": "Turnkey raw payload signing pattern",
+      "type": "SigningIntegration",
+      "status": "verified",
+      "citation_count": 1,
+      "staleness_risk": "high"
+    },
+    {
+      "id": "ed25519-kms-mode-guardrail",
+      "label": "Ed25519 KMS mode guardrail",
+      "type": "SecurityGuardrail",
+      "status": "verified",
+      "citation_count": 2,
+      "staleness_risk": "medium"
+    },
+    {
+      "id": "signing-byte-boundary-guardrail",
+      "label": "Signing byte boundary guardrail",
+      "type": "SecurityGuardrail",
+      "status": "verified",
+      "citation_count": 2,
       "staleness_risk": "medium"
     }
   ],

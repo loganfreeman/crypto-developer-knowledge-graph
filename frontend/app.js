@@ -13,7 +13,7 @@ const state = {
 };
 
 const typeOrder = ["Concepts", "APIs", "Security warnings"];
-const primaryEdgeTypes = ["REQUIRES", "DEPENDS_ON", "CALLS", "USES_TEMPLATE", "CAN_USE_SIGNER", "HAS_GUARDRAIL", "VERIFIES_WITH", "ENABLES", "RUNS_ON"];
+const primaryEdgeTypes = ["REQUIRES", "DEPENDS_ON", "CALLS", "IMPLEMENTED_BY", "USES_TEMPLATE", "CAN_USE_SIGNER", "HAS_GUARDRAIL", "VERIFIES_WITH", "ENABLES", "RUNS_ON"];
 
 async function loadJson(path) {
   const response = await fetch(path);

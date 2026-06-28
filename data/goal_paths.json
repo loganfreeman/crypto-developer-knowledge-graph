@@ -50,5 +50,18 @@
     "security_warnings": ["reorg-risk", "replay-risk", "replay-domain-guardrail"],
     "supported_chains": ["ethereum", "solana"],
     "suggested_database_stack": ["Postgres for message state", "Graph DB for dependency and protocol mappings", "Queue/worker system for relayer jobs", "Vector DB for protocol docs and audits"]
+  },
+  {
+    "id": "build-offline-signer",
+    "title": "Build offline transaction signer",
+    "task_node_id": "offline-transaction-signer",
+    "concepts": ["offline-transaction-signer", "payload-signing", "hashing", "ecdsa-secp256k1", "ed25519", "replay-domain-guardrail", "signing-byte-boundary-guardrail"],
+    "apis": ["eth-send-raw-transaction", "bitcoin-sendrawtransaction", "solana-send-transaction"],
+    "sdks_libraries": ["AWS KMS SDK", "Turnkey API", "chain-specific transaction encoders", "ASN.1 DER decoder"],
+    "example_flow": ["Fetch chain parameters and account nonce", "Construct canonical unsigned transaction fields", "Serialize and hash exactly as the chain expects", "Send digest or raw payload to KMS with explicit algorithm/mode", "Normalize returned signature into chain format", "Assemble signed transaction", "Broadcast and track confirmation"],
+    "code_examples": ["ethereum-eip155-signing-preimage-template", "aws-kms-secp256k1-signing-pattern", "ecdsa-der-to-rsv-normalization-snippet", "turnkey-raw-payload-signing-pattern"],
+    "security_warnings": ["replay-domain-guardrail", "ed25519-kms-mode-guardrail", "signing-byte-boundary-guardrail", "private-key-loss"],
+    "supported_chains": ["ethereum", "bitcoin", "solana"],
+    "suggested_database_stack": ["Postgres for signing requests and audit logs", "Immutable object storage for payload evidence", "Queue/worker system for signer orchestration", "Graph DB for signer-policy-to-chain dependency mapping"]
   }
 ]
