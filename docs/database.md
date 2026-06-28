@@ -4,7 +4,7 @@ The production database layer uses Supabase Postgres with `pgvector` and a clean
 
 ## Migration
 
-Apply the initial schema:
+Apply the schema:
 
 ```bash
 supabase db push
@@ -14,6 +14,7 @@ or run:
 
 ```text
 supabase/migrations/001_initial_graph_schema.sql
+supabase/migrations/002_normalized_graph_dimensions.sql
 ```
 
 The migration enables:
@@ -24,7 +25,21 @@ The migration enables:
 - adjacency-list edges
 - code snippet storage
 - document chunks for RAG grounding
+- normalized dimensions for tags, contexts, layers, sources, aliases, code metadata, ABI items, and runtime observations
 - HNSW cosine indexes for node, documentation, snippet, and chunk embeddings
+
+## DB-First Topology
+
+The JSON files in `data/` are now seed fixtures and offline developer ergonomics. The production topology is Supabase/Postgres:
+
+- `nodes` and `edges` define the canonical graph.
+- `node_tags`, `node_contexts`, and `node_layers` provide fast semantic filtering without array scans.
+- `node_sources` and `document_chunk_nodes` make every claim traceable to source chunks.
+- `code_snippets` plus `code_snippet_sources`, `code_snippet_package_hints`, and `code_snippet_security_notes` expose executable implementation guidance.
+- `live_metadata_targets`, `live_metadata_checks`, `runtime_metadata_observations`, and `contract_abi_items` bind concepts to live network state and contract ABI facts.
+- `node_runtime_dependencies` records which graph concepts must be revalidated when runtime metadata, registry tracks, or ABI bindings change.
+
+The compatibility arrays on `nodes`, `code_snippets`, and `live_metadata_targets` remain useful for quick imports and local browsing, but new application queries should prefer the normalized tables.
 
 ## Ingestion Pipeline
 
@@ -45,6 +60,19 @@ data/exports/code_snippets.jsonl
 data/exports/document_chunks.jsonl
 data/exports/live_metadata_targets.jsonl
 data/exports/live_metadata_checks.jsonl
+data/exports/node_tags.jsonl
+data/exports/node_contexts.jsonl
+data/exports/node_layers.jsonl
+data/exports/node_sources.jsonl
+data/exports/node_aliases.jsonl
+data/exports/code_snippet_sources.jsonl
+data/exports/code_snippet_package_hints.jsonl
+data/exports/code_snippet_security_notes.jsonl
+data/exports/document_chunk_nodes.jsonl
+data/exports/live_metadata_target_sources.jsonl
+data/exports/contract_abi_items.jsonl
+data/exports/runtime_metadata_observations.jsonl
+data/exports/node_runtime_dependencies.jsonl
 ```
 
 Fetch registered sources before chunking:
@@ -190,6 +218,32 @@ order by language, title;
 `document_chunks` stores cited theoretical documentation and retrieval chunks.
 
 `live_metadata_targets` stores RPC-backed registry tracks and contract ABI bindings. `live_metadata_checks` stores the individual observed claims, such as metadata availability, chain id availability, deployed bytecode presence, or selector verification.
+
+Normalized query tables:
+
+```sql
+select n.label, nt.tag, nc.context, nl.layer
+from nodes n
+join node_tags nt on nt.node_id = n.id
+left join node_contexts nc on nc.node_id = n.id
+left join node_layers nl on nl.node_id = n.id
+where nt.tag = 'offline-signing';
+```
+
+```sql
+select abi.signature, abi.selector, abi.inputs, abi.outputs
+from contract_abi_items abi
+join nodes n on n.id = abi.node_id
+where n.id = 'erc20-transfer-calldata-template';
+```
+
+```sql
+select n.label, obs.runtime, obs.serialization, obs.observed_at, obs.verification
+from runtime_metadata_observations obs
+join nodes n on n.id = obs.node_id
+where obs.network = 'Polkadot'
+order by obs.observed_at desc nulls last;
+```
 
 ## Semantic Search
 
