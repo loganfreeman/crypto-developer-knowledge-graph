@@ -1,5 +1,6 @@
 from ckg.search import search_chunks, search_nodes
 from ckg.pipeline import build_exports, strict_node_kind
+from ckg.release_rig import run_release_rig
 from ckg.store import GraphStore
 from ckg.trace import format_trace, node_trace
 
@@ -86,6 +87,45 @@ def test_pipeline_exports_database_rows(tmp_path):
     assert (tmp_path / "document_chunks.jsonl").exists()
     assert (tmp_path / "live_metadata_targets.jsonl").exists()
     assert (tmp_path / "live_metadata_checks.jsonl").exists()
+
+
+def test_release_rig_extracts_structural_payloads_offline(tmp_path):
+    report = run_release_rig(snapshot_path=tmp_path / "snapshots.json")
+    assert report["summary"]["payloads"] >= 3
+    assert report["summary"]["incomplete"] == 0
+    payload_ids = {payload["payload_id"] for payload in report["payloads"]}
+    assert "substrate-extrinsic-scale-payload" in payload_ids
+    assert "solana-versioned-message-payload" in payload_ids
+    assert "helios-consensus-ssz-payload" in payload_ids
+    substrate = next(payload for payload in report["payloads"] if payload["payload_id"] == "substrate-extrinsic-scale-payload")
+    assert substrate["serialization"] == "SCALE"
+    assert substrate["structural_hash"]
+
+
+def test_release_rig_flags_removed_structural_signals(tmp_path):
+    snapshot_path = tmp_path / "snapshots.json"
+    snapshot_path.write_text(
+        """
+{
+  "payloads": {
+    "substrate::substrate-extrinsic-scale-payload": {
+      "release": "previous",
+      "structural_hash": "previous-hash",
+      "signals": [
+        { "name": "UncheckedExtrinsic", "present": true },
+        { "name": "RemovedField", "present": true }
+      ]
+    }
+  }
+}
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+    report = run_release_rig(snapshot_path=snapshot_path)
+    substrate_diff = next(diff for diff in report["diffs"] if diff["payload_id"] == "substrate-extrinsic-scale-payload")
+    assert substrate_diff["breaking"] is True
+    assert "RemovedField" in substrate_diff["removed_signals"]
 
 
 def test_trace_returns_contextual_mapping_and_code_solutions():

@@ -5,6 +5,7 @@ import json
 
 from .pipeline import build_exports
 from .live_metadata import refresh_targets
+from .release_rig import run_release_rig
 from .search import search_chunks, search_nodes
 from .store import GraphStore, ROOT
 from .trace import format_trace, node_trace
@@ -56,6 +57,11 @@ def main() -> None:
     export_parser.add_argument("--export-dir", default="data/exports")
     export_parser.add_argument("--embedding-mode", choices=["none", "hash"], default="none")
 
+    rig_parser = subparsers.add_parser("release-rig")
+    rig_parser.add_argument("--refresh", action="store_true")
+    rig_parser.add_argument("--write-snapshot", action="store_true")
+    rig_parser.add_argument("--write-report", action="store_true")
+
     args = parser.parse_args()
     store = GraphStore()
 
@@ -87,6 +93,12 @@ def main() -> None:
             payload = store.node_live_metadata(args.id) if args.id else store.live_metadata
     elif args.command == "export-db":
         payload = build_exports(export_dir=ROOT / args.export_dir, embedding_mode=args.embedding_mode)
+    elif args.command == "release-rig":
+        payload = run_release_rig(
+            refresh=args.refresh,
+            write_snapshot=args.write_snapshot,
+            write_report=args.write_report,
+        )
     else:
         payload = store.neighbors(args.id)
 

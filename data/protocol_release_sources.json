@@ -1,0 +1,125 @@
+{
+  "generated_at": "2026-06-28T00:00:00Z",
+  "sources": [
+    {
+      "id": "substrate",
+      "label": "Substrate / Polkadot SDK",
+      "repository": "paritytech/polkadot-sdk",
+      "release_limit": 3,
+      "file_patterns": [
+        "*/frame/system/src/extensions/*.rs",
+        "*/primitives/runtime/src/generic/*.rs",
+        "*/substrate/primitives/runtime/src/generic/*.rs"
+      ],
+      "payloads": [
+        {
+          "id": "substrate-extrinsic-scale-payload",
+          "node_id": "substrate-scale-byte-template",
+          "serialization": "SCALE",
+          "signals": [
+            { "name": "UncheckedExtrinsic", "pattern": "UncheckedExtrinsic", "required": true },
+            { "name": "SignedPayload", "pattern": "SignedPayload", "required": true },
+            { "name": "CheckSpecVersion", "pattern": "CheckSpecVersion", "required": true },
+            { "name": "CheckTxVersion", "pattern": "CheckTxVersion", "required": true },
+            { "name": "CheckGenesis", "pattern": "CheckGenesis", "required": true },
+            { "name": "CheckMortality", "pattern": "CheckMortality", "required": true },
+            { "name": "CheckNonce", "pattern": "CheckNonce", "required": true },
+            { "name": "ChargeTransactionPayment", "pattern": "ChargeTransactionPayment", "required": false }
+          ]
+        }
+      ],
+      "seed_release": {
+        "tag_name": "seed-substrate-runtime-v1",
+        "published_at": "2026-06-28T00:00:00Z",
+        "files": [
+          {
+            "path": "substrate/primitives/runtime/src/generic/unchecked_extrinsic.rs",
+            "text": "pub struct UncheckedExtrinsic<Address, Call, Signature, Extra>(Address, Signature, Extra, Call);\npub struct SignedPayload<Call, Extra>(Call, Extra);\n"
+          },
+          {
+            "path": "substrate/frame/system/src/extensions/checks.rs",
+            "text": "pub struct CheckSpecVersion<T>(sp_std::marker::PhantomData<T>);\npub struct CheckTxVersion<T>(sp_std::marker::PhantomData<T>);\npub struct CheckGenesis<T>(sp_std::marker::PhantomData<T>);\npub struct CheckMortality<T>(sp_std::marker::PhantomData<T>);\npub struct CheckNonce<T>(sp_std::marker::PhantomData<T>);\npub struct ChargeTransactionPayment<T>(sp_std::marker::PhantomData<T>);\n"
+          }
+        ]
+      }
+    },
+    {
+      "id": "solana",
+      "label": "Solana Monorepo",
+      "repository": "solana-labs/solana",
+      "release_limit": 3,
+      "file_patterns": [
+        "*/sdk/program/src/message/*.rs",
+        "*/sdk/src/transaction/*.rs",
+        "*/transaction/src/*.rs"
+      ],
+      "payloads": [
+        {
+          "id": "solana-versioned-message-payload",
+          "node_id": "solana-transaction-lifecycle",
+          "serialization": "shortvec+bincode",
+          "signals": [
+            { "name": "MessageHeader", "pattern": "MessageHeader", "required": true },
+            { "name": "CompiledInstruction", "pattern": "CompiledInstruction", "required": true },
+            { "name": "recent_blockhash", "pattern": "recent_blockhash", "required": true },
+            { "name": "VersionedMessage", "pattern": "VersionedMessage", "required": true },
+            { "name": "AddressTableLookup", "pattern": "AddressTableLookup", "required": false }
+          ]
+        }
+      ],
+      "seed_release": {
+        "tag_name": "seed-solana-message-v1",
+        "published_at": "2026-06-28T00:00:00Z",
+        "files": [
+          {
+            "path": "sdk/program/src/message/versions/mod.rs",
+            "text": "pub enum VersionedMessage { Legacy(LegacyMessage), V0(v0::Message) }\npub struct AddressTableLookup { account_key: Pubkey, writable_indexes: Vec<u8>, readonly_indexes: Vec<u8> }\n"
+          },
+          {
+            "path": "sdk/program/src/message/legacy.rs",
+            "text": "pub struct MessageHeader { pub num_required_signatures: u8, pub num_readonly_signed_accounts: u8, pub num_readonly_unsigned_accounts: u8 }\npub struct CompiledInstruction { pub program_id_index: u8, pub accounts: Vec<u8>, pub data: Vec<u8> }\npub struct Message { pub header: MessageHeader, pub account_keys: Vec<Pubkey>, pub recent_blockhash: Hash, pub instructions: Vec<CompiledInstruction> }\n"
+          }
+        ]
+      }
+    },
+    {
+      "id": "helios",
+      "label": "Helios Light Client",
+      "repository": "a16z/helios",
+      "release_limit": 3,
+      "file_patterns": [
+        "*/consensus_core/src/types/*.rs",
+        "*/ethereum/consensus/src/types/*.rs",
+        "*/crates/*/src/types/*.rs"
+      ],
+      "payloads": [
+        {
+          "id": "helios-consensus-ssz-payload",
+          "node_id": "cross-chain-state-verification",
+          "serialization": "SSZ",
+          "signals": [
+            { "name": "ExecutionPayload", "pattern": "ExecutionPayload", "required": true },
+            { "name": "BeaconBlockHeader", "pattern": "BeaconBlockHeader", "required": true },
+            { "name": "SyncCommittee", "pattern": "SyncCommittee", "required": true },
+            { "name": "fork_version", "pattern": "fork_version", "required": false },
+            { "name": "tree_hash_root", "pattern": "tree_hash_root", "required": false }
+          ]
+        }
+      ],
+      "seed_release": {
+        "tag_name": "seed-helios-consensus-v1",
+        "published_at": "2026-06-28T00:00:00Z",
+        "files": [
+          {
+            "path": "consensus_core/src/types/block.rs",
+            "text": "pub struct BeaconBlockHeader { slot: u64, proposer_index: u64, parent_root: B256, state_root: B256, body_root: B256 }\npub struct ExecutionPayload { parent_hash: B256, fee_recipient: Address, state_root: B256, receipts_root: B256 }\n"
+          },
+          {
+            "path": "consensus_core/src/types/sync_committee.rs",
+            "text": "pub struct SyncCommittee { pub pubkeys: Vector<PublicKeyBytes, 512>, pub aggregate_pubkey: PublicKeyBytes }\nimpl SyncCommittee { pub fn tree_hash_root(&self) -> B256 { B256::ZERO } }\n"
+          }
+        ]
+      }
+    }
+  ]
+}
