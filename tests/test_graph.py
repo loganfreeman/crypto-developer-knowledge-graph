@@ -136,6 +136,7 @@ def test_api_graph_payload_is_frontend_and_curl_ready():
     assert payload["goals"]
     assert payload["network_conditions"]["conditions"]
     assert payload["live_metadata"]["targets"]
+    assert payload["serialization_sandboxes"]["sandboxes"]
 
 
 def test_api_node_context_and_query_trace():
@@ -145,6 +146,7 @@ def test_api_node_context_and_query_trace():
     assert context["horizon"]["relationships"]
     assert context["citations"]
     assert context["live_metadata"]
+    assert context["serialization_sandboxes"]
 
     trace = execute_api_query(store, {"type": "trace", "q": "Filecoin CBOR tuple misalignment", "limit": 4})
     assert trace["nodes"]

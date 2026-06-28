@@ -35,7 +35,7 @@ class KnowledgeGraphHandler(BaseHTTPRequestHandler):
         try:
             if path in ("", "index.html"):
                 self.static_response(ROOT / "frontend" / "index.html")
-            elif path in ("app.js", "styles.css"):
+            elif path in ("app.js", "styles.css", "serialization_sandbox.js"):
                 self.static_response(ROOT / "frontend" / path)
             elif path.startswith("frontend/"):
                 self.static_response(ROOT / path)
@@ -187,6 +187,7 @@ def api_index() -> dict[str, Any]:
             "citations": "/api/nodes/{id}/citations",
             "network_conditions": "/api/nodes/{id}/network-conditions",
             "live_metadata": "/api/nodes/{id}/live-metadata",
+            "serialization_sandboxes": "/api/serialization-sandboxes",
             "query": "POST /api/query",
         },
     }

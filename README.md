@@ -41,6 +41,7 @@ data/
   chunks.json            Ingested source chunks for retrieval
   citations.json         Node-to-source claim links
   live_metadata.json     RPC-backed registry tracks and ABI verification targets
+  serialization_sandboxes.json
 docs/
   database.md            Supabase/Postgres graph and pgvector schema guide
   sources/               Cached source documents
@@ -90,6 +91,14 @@ The JSON files are offline seed fixtures. Production queries should use the norm
 
 See `docs/database.md` for the schema model, embedding conventions, and example queries.
 
+Run the database locally with Docker:
+
+```bash
+docker compose up -d db
+docker compose run --rm migrate
+psql postgres://ckg:ckg@127.0.0.1:54322/ckg
+```
+
 ## Example Usage
 
 Search from the command line:
@@ -131,6 +140,7 @@ curl "http://127.0.0.1:8000/api/graph"
 curl "http://127.0.0.1:8000/api/search?q=transaction"
 curl "http://127.0.0.1:8000/api/trace?q=Filecoin%20CBOR%20tuple%20misalignment"
 curl "http://127.0.0.1:8000/api/nodes/substrate-scale-byte-template/context"
+curl "http://127.0.0.1:8000/api/serialization-sandboxes"
 curl "http://127.0.0.1:8000/search?q=transaction"
 curl "http://127.0.0.1:8000/chunks/search?q=signed%20transaction"
 curl "http://127.0.0.1:8000/nodes/ethereum/citations"
@@ -385,6 +395,12 @@ Current seeded examples:
 - Avalanche P-Chain staking
 
 The frontend sidecar shows network condition panels for matching nodes, including cached/live status, provider, query, units, and developer notes. Null values mean "query live"; they are intentionally not invented.
+
+## Deterministic Byte Sandboxes
+
+Byte-layout nodes for Ethereum RLP, Substrate SCALE, and Filecoin DAG-CBOR attach parser specs from `data/serialization_sandboxes.json`. The sidecar Sandbox tab lets a developer paste raw transaction hex and decode it against graph-owned tuple constraints, surfacing the tuple index or byte offset where the payload misaligns.
+
+The browser runtime instantiates a tiny embedded WASM core for deterministic parser identity and runs offline codec walkers for RLP list offsets, SCALE compact/fixed fields, and CBOR definite-length tuples.
 
 CLI:
 

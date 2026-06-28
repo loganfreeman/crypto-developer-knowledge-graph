@@ -17,6 +17,27 @@ supabase/migrations/001_initial_graph_schema.sql
 supabase/migrations/002_normalized_graph_dimensions.sql
 ```
 
+Run the migrations in Docker:
+
+```bash
+docker compose up -d db
+docker compose run --rm migrate
+```
+
+Connect locally:
+
+```bash
+psql postgres://ckg:ckg@127.0.0.1:54322/ckg
+```
+
+Replay from a clean database:
+
+```bash
+docker compose down -v
+docker compose up -d db
+docker compose run --rm migrate
+```
+
 The migration enables:
 
 - `vector` for semantic search

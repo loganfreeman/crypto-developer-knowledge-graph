@@ -1,3 +1,5 @@
+import { analyzeSerializationPayload } from "./serialization_sandbox.js";
+
 const state = {
   nodes: [],
   relationships: [],
@@ -8,6 +10,7 @@ const state = {
   trust: { nodes: [], sources: [], summary: {} },
   networkConditions: { conditions: [] },
   liveMetadata: { targets: [] },
+  serializationSandboxes: { sandboxes: [] },
   selectedGoalId: "build-offline-signer",
   selectedNodeId: null,
   activeEdgeTypes: [],
@@ -99,9 +102,10 @@ async function loadGraphData() {
       trust: graph.trust,
       networkConditions: graph.network_conditions,
       liveMetadata: graph.live_metadata,
+      serializationSandboxes: graph.serialization_sandboxes,
     };
   } catch (error) {
-    const [nodes, relationships, goals, citations, chunks, sources, trust, networkConditions, liveMetadata] = await Promise.all([
+    const [nodes, relationships, goals, citations, chunks, sources, trust, networkConditions, liveMetadata, serializationSandboxes] = await Promise.all([
       loadJson("../data/nodes.json"),
       loadJson("../data/relationships.json"),
       loadJson("../data/goal_paths.json"),
@@ -111,8 +115,9 @@ async function loadGraphData() {
       loadJson("../data/trust_report.json"),
       loadJson("../data/network_conditions.json"),
       loadJson("../data/live_metadata.json"),
+      loadJson("../data/serialization_sandboxes.json"),
     ]);
-    return { nodes, relationships, goals, citations, chunks, sources, trust, networkConditions, liveMetadata };
+    return { nodes, relationships, goals, citations, chunks, sources, trust, networkConditions, liveMetadata, serializationSandboxes };
   }
 }
 
@@ -156,6 +161,10 @@ function networkConditionsForNode(nodeId) {
 
 function liveMetadataForNode(nodeId) {
   return (state.liveMetadata.targets || []).filter((item) => item.node_id === nodeId);
+}
+
+function serializationSandboxesForNode(nodeId) {
+  return (state.serializationSandboxes.sandboxes || []).filter((item) => item.node_id === nodeId);
 }
 
 function nodeSearchText(node) {
@@ -777,8 +786,42 @@ function stakingSandboxMarkup(node) {
   `;
 }
 
+function serializationSandboxMarkup(node) {
+  return serializationSandboxesForNode(node.id)
+    .map((sandbox) => `
+      <article class="sandbox-widget serialization-widget" data-sandbox="serialization" data-sandbox-id="${escapeHtml(sandbox.id)}">
+        <div>
+          <p class="eyebrow">Deterministic parser</p>
+          <h3>${escapeHtml(sandbox.title)}</h3>
+          <p class="muted">${escapeHtml(sandbox.description)}</p>
+        </div>
+        <label class="sandbox-control">
+          Layout
+          <select data-serialization-layout>
+            ${(sandbox.layouts || []).map((layout) => `<option value="${escapeHtml(layout.id)}">${escapeHtml(layout.label)}</option>`).join("")}
+          </select>
+        </label>
+        <label class="sandbox-control">
+          Hex payload
+          <textarea data-serialization-input rows="7" spellcheck="false">${escapeHtml(sandbox.sample_hex || "")}</textarea>
+        </label>
+        <div class="sandbox-actions">
+          <button type="button" data-serialization-run>Decode</button>
+          <button type="button" data-serialization-sample>Reset Sample</button>
+        </div>
+        <div class="sandbox-output serialization-output" data-serialization-output>
+          <span>Paste hex and decode against ${escapeHtml(sandbox.codec.toUpperCase())} layout constraints.</span>
+        </div>
+        <p class="warning-note">Runtime: ${escapeHtml(sandbox.runtime)}. Compare against a trusted chain SDK after runtime upgrades.</p>
+      </article>
+    `)
+    .join("");
+}
+
 function sandboxPanel(node) {
   const widgets = [];
+  const serializationMarkup = serializationSandboxMarkup(node);
+  if (serializationMarkup) widgets.push(serializationMarkup);
   if (hasCryptoSandbox(node)) widgets.push(hashSandboxMarkup(node));
   if (hasStakingSandbox(node)) widgets.push(stakingSandboxMarkup(node));
   if (!widgets.length) {
@@ -833,7 +876,45 @@ function updateStakingSandbox() {
   daily.textContent = formatter.format(annualReward / 365);
 }
 
+function renderSerializationResult(container, result) {
+  const diagnostics = result.diagnostics || [];
+  container.innerHTML = `
+    <div class="parser-summary">
+      <span>${escapeHtml(result.layout.label)}</span>
+      <span>${escapeHtml(result.byteLength)} bytes</span>
+      <span>${escapeHtml(result.wasm.runtime)}</span>
+    </div>
+    <code>parser ${escapeHtml(result.wasm.fingerprint.slice(0, 16))}</code>
+    <div class="parser-diagnostics">
+      ${diagnostics.map((item) => `<p class="${escapeHtml(item.level)}">${escapeHtml(item.message)}</p>`).join("")}
+    </div>
+  `;
+}
+
+function wireSerializationSandboxes() {
+  document.querySelectorAll("[data-sandbox='serialization']").forEach((widget) => {
+    const sandbox = (state.serializationSandboxes.sandboxes || []).find((item) => item.id === widget.dataset.sandboxId);
+    if (!sandbox) return;
+    const input = widget.querySelector("[data-serialization-input]");
+    const layout = widget.querySelector("[data-serialization-layout]");
+    const output = widget.querySelector("[data-serialization-output]");
+    widget.querySelector("[data-serialization-sample]")?.addEventListener("click", () => {
+      input.value = sandbox.sample_hex || "";
+    });
+    widget.querySelector("[data-serialization-run]")?.addEventListener("click", async () => {
+      output.innerHTML = `<span>Decoding...</span>`;
+      try {
+        const result = await analyzeSerializationPayload(sandbox, input.value, layout.value);
+        renderSerializationResult(output, result);
+      } catch (error) {
+        output.innerHTML = `<p class="error">${escapeHtml(error.message)}</p>`;
+      }
+    });
+  });
+}
+
 function wireSandboxControls() {
+  wireSerializationSandboxes();
   const hashInput = document.querySelector("#hash-input");
   const hashAlgorithm = document.querySelector("#hash-algorithm");
   if (hashInput && hashAlgorithm) {

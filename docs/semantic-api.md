@@ -40,6 +40,12 @@ Fetch a node-centered context packet:
 curl "http://127.0.0.1:8000/api/nodes/substrate-scale-byte-template/context"
 ```
 
+Fetch deterministic byte-layout sandbox specs for RLP, SCALE, and DAG-CBOR nodes:
+
+```bash
+curl "http://127.0.0.1:8000/api/serialization-sandboxes"
+```
+
 Use the POST query endpoint when an IDE wants a stable JSON command envelope:
 
 ```bash

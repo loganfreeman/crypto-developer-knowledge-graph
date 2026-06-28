@@ -1,0 +1,41 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: ckg-postgres
+    environment:
+      POSTGRES_DB: ckg
+      POSTGRES_USER: ckg
+      POSTGRES_PASSWORD: ckg
+    ports:
+      - "54322:5432"
+    volumes:
+      - ckg-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ckg -d ckg"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  migrate:
+    image: pgvector/pgvector:pg16
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGHOST: db
+      PGPORT: 5432
+      PGDATABASE: ckg
+      PGUSER: ckg
+      PGPASSWORD: ckg
+    volumes:
+      - ./supabase/migrations:/migrations:ro
+    command: >
+      sh -c '
+        find /migrations -maxdepth 1 -name "*.sql" |
+        sort |
+        xargs -n 1 psql -v ON_ERROR_STOP=1 -f
+      '
+    restart: "no"
+
+volumes:
+  ckg-postgres-data:

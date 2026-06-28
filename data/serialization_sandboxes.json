@@ -8,7 +8,7 @@
       "runtime": "wasm-ready",
       "title": "Ethereum Legacy RLP Payload Parser",
       "description": "Decode a legacy Ethereum RLP list and check whether the tuple matches an EIP-155 unsigned preimage or signed envelope.",
-      "sample_hex": "ec018504a817c8008252089400000000000000000000000000000000000000000180018080",
+      "sample_hex": "c9018080808080018080",
       "layouts": [
         {
           "id": "eip155_unsigned_preimage",
