@@ -38,9 +38,12 @@ data/
   chunks.json            Ingested source chunks for retrieval
   citations.json         Node-to-source claim links
 docs/
+  database.md            Supabase/Postgres graph and pgvector schema guide
   sources/               Cached source documents
 schemas/
   graph.schema.json      Versioned graph contract
+supabase/
+  migrations/            Postgres migrations for the production database layer
 src/ckg/
   store.py               Graph loading, traversal, and indexes
   search.py              Lightweight keyword search
@@ -56,6 +59,25 @@ scripts/
 tests/
   test_graph.py          Smoke tests for core graph behavior
 ```
+
+## Database Layer
+
+The production schema lives in:
+
+```text
+supabase/migrations/001_initial_graph_schema.sql
+```
+
+It defines a Supabase/Postgres graph layer with:
+
+- strict node kinds: `Primitive`, `Protocol`, `Action`, and `Vulnerability`
+- adjacency-list `edges`
+- `code_snippets` attached to nodes
+- `document_chunks` for citation-grounded RAG
+- `pgvector` columns for semantic node, documentation, snippet, and chunk embeddings
+- HNSW cosine indexes and helper search functions
+
+See `docs/database.md` for the schema model, embedding conventions, and example queries.
 
 ## Example Usage
 
