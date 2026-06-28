@@ -431,6 +431,22 @@ h3 {
   background: #fbfcfe;
 }
 
+.code-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.code-card-head span {
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: #e8f4f1;
+  color: #0f766e;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
 .doc-block p,
 .code-card p,
 .citation p,

@@ -227,7 +227,7 @@ Clicking a node recenters the local graph without a page refresh and pulls in ad
 The sidecar is implementation-first:
 
 - overview, layers, and contexts
-- code snippets and payload templates
+- code snippets and payload templates, including multi-language examples
 - implementation notes
 - relationship metadata with context, layer, confidence, and developer notes
 - security guardrails
@@ -259,6 +259,18 @@ The `Build offline transaction signer` path shows the raw engineering bridge fro
 - Turnkey raw-payload signing
 - DER ECDSA normalization into chain-specific `r/s/v`
 - Ed25519 raw/prehash guardrails
+- TypeScript, Go, and Rust implementations for signer orchestration and broadcast flows
+
+Nodes can attach `multi_language_examples`:
+
+```json
+{
+  "language": "Go",
+  "title": "Broadcast signed Ethereum transaction",
+  "summary": "Post an eth_sendRawTransaction request from a backend worker.",
+  "code": "..."
+}
+```
 
 The serialization layer makes byte-level failures explicit:
 

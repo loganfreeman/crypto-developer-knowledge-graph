@@ -53,7 +53,27 @@
     "type": "RPCMethod",
     "summary": "Ethereum JSON-RPC method used to broadcast a signed transaction to the network.",
     "tags": ["mvp", "wallet", "ethereum", "broadcast"],
-    "citations": ["https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_sendrawtransaction"]
+    "citations": ["https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_sendrawtransaction"],
+    "multi_language_examples": [
+      {
+        "language": "TypeScript",
+        "title": "Broadcast signed Ethereum transaction",
+        "summary": "Submit a hex-serialized signed transaction through Ethereum JSON-RPC.",
+        "code": "const res = await fetch(rpcUrl, {\n  method: 'POST',\n  headers: { 'content-type': 'application/json' },\n  body: JSON.stringify({\n    jsonrpc: '2.0', id: 1,\n    method: 'eth_sendRawTransaction',\n    params: [signedTxHex]\n  })\n});\nconst { result, error } = await res.json();\nif (error) throw new Error(error.message);\nconsole.log('tx hash', result);"
+      },
+      {
+        "language": "Go",
+        "title": "Broadcast signed Ethereum transaction",
+        "summary": "Post an eth_sendRawTransaction request from a backend worker.",
+        "code": "body := `{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"eth_sendRawTransaction\",\"params\":[\"` + signedTxHex + `\"]}`\nreq, _ := http.NewRequest(\"POST\", rpcURL, strings.NewReader(body))\nreq.Header.Set(\"content-type\", \"application/json\")\nresp, err := http.DefaultClient.Do(req)\nif err != nil { return err }\ndefer resp.Body.Close()\nif resp.StatusCode >= 300 { return fmt.Errorf(\"rpc status %s\", resp.Status) }"
+      },
+      {
+        "language": "Rust",
+        "title": "Broadcast signed Ethereum transaction",
+        "summary": "Submit a signed transaction from an async Rust service.",
+        "code": "let payload = serde_json::json!({\n  \"jsonrpc\": \"2.0\", \"id\": 1,\n  \"method\": \"eth_sendRawTransaction\",\n  \"params\": [signed_tx_hex]\n});\nlet value: serde_json::Value = reqwest::Client::new()\n  .post(rpc_url)\n  .json(&payload)\n  .send().await?\n  .json().await?;\nprintln!(\"tx hash: {}\", value[\"result\"]);"
+      }
+    ]
   },
   {
     "id": "bitcoin-sendrawtransaction",
@@ -61,7 +81,27 @@
     "type": "RPCMethod",
     "summary": "Bitcoin Core RPC method used to submit a serialized signed transaction to the node.",
     "tags": ["mvp", "wallet", "bitcoin", "broadcast"],
-    "citations": ["https://developer.bitcoin.org/reference/rpc/sendrawtransaction.html"]
+    "citations": ["https://developer.bitcoin.org/reference/rpc/sendrawtransaction.html"],
+    "multi_language_examples": [
+      {
+        "language": "TypeScript",
+        "title": "Broadcast Bitcoin raw transaction",
+        "summary": "Call Bitcoin Core RPC with a signed transaction hex.",
+        "code": "const body = { jsonrpc: '1.0', id: 'ckg', method: 'sendrawtransaction', params: [signedTxHex] };\nconst res = await fetch(bitcoinRpcUrl, {\n  method: 'POST',\n  headers: { 'content-type': 'text/plain', authorization: basicAuth },\n  body: JSON.stringify(body)\n});\nconst { result, error } = await res.json();\nif (error) throw new Error(error.message);\nconsole.log(result);"
+      },
+      {
+        "language": "Go",
+        "title": "Broadcast Bitcoin raw transaction",
+        "summary": "Submit signed transaction hex to Bitcoin Core RPC.",
+        "code": "payload := fmt.Sprintf(`{\"jsonrpc\":\"1.0\",\"id\":\"ckg\",\"method\":\"sendrawtransaction\",\"params\":[\"%s\"]}`, signedTxHex)\nreq, _ := http.NewRequest(\"POST\", rpcURL, strings.NewReader(payload))\nreq.SetBasicAuth(user, pass)\nreq.Header.Set(\"content-type\", \"text/plain\")\nresp, err := http.DefaultClient.Do(req)\nif err != nil { return err }\ndefer resp.Body.Close()"
+      },
+      {
+        "language": "Rust",
+        "title": "Broadcast Bitcoin raw transaction",
+        "summary": "Use JSON-RPC over HTTP from a Rust broadcaster.",
+        "code": "let payload = serde_json::json!({\n  \"jsonrpc\": \"1.0\", \"id\": \"ckg\",\n  \"method\": \"sendrawtransaction\",\n  \"params\": [signed_tx_hex]\n});\nlet res = reqwest::Client::new()\n  .post(rpc_url)\n  .basic_auth(user, Some(pass))\n  .json(&payload)\n  .send().await?;"
+      }
+    ]
   },
   {
     "id": "solana-send-transaction",
@@ -69,7 +109,27 @@
     "type": "RPCMethod",
     "summary": "Solana RPC method used to submit a fully signed transaction.",
     "tags": ["mvp", "wallet", "solana", "broadcast"],
-    "citations": ["https://solana.com/docs/rpc/http/sendtransaction"]
+    "citations": ["https://solana.com/docs/rpc/http/sendtransaction"],
+    "multi_language_examples": [
+      {
+        "language": "TypeScript",
+        "title": "Broadcast Solana signed transaction",
+        "summary": "Serialize a signed transaction and submit base64 bytes through sendTransaction.",
+        "code": "const encoded = Buffer.from(tx.serialize()).toString('base64');\nconst res = await fetch(rpcUrl, {\n  method: 'POST', headers: { 'content-type': 'application/json' },\n  body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'sendTransaction', params: [encoded, { encoding: 'base64' }] })\n});\nconst { result, error } = await res.json();\nif (error) throw new Error(error.message);"
+      },
+      {
+        "language": "Go",
+        "title": "Broadcast Solana signed transaction",
+        "summary": "Submit base64 transaction bytes through Solana JSON-RPC.",
+        "code": "encoded := base64.StdEncoding.EncodeToString(signedTxBytes)\nbody := fmt.Sprintf(`{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"sendTransaction\",\"params\":[\"%s\",{\"encoding\":\"base64\"}]}`, encoded)\nresp, err := http.Post(rpcURL, \"application/json\", strings.NewReader(body))\nif err != nil { return err }\ndefer resp.Body.Close()"
+      },
+      {
+        "language": "Rust",
+        "title": "Broadcast Solana signed transaction",
+        "summary": "Send base64-encoded signed transaction bytes from Rust.",
+        "code": "let encoded = base64::engine::general_purpose::STANDARD.encode(signed_tx_bytes);\nlet payload = serde_json::json!({\n  \"jsonrpc\": \"2.0\", \"id\": 1,\n  \"method\": \"sendTransaction\",\n  \"params\": [encoded, { \"encoding\": \"base64\" }]\n});\nreqwest::Client::new().post(rpc_url).json(&payload).send().await?;"
+      }
+    ]
   },
   {
     "id": "erc-20",
@@ -473,7 +533,27 @@
     "contexts": ["offline-signing", "kms", "non-custodial-signing", "transaction-authorization"],
     "display_group": "Signing and custody",
     "tags": ["offline-signing", "kms", "wallets", "transaction-construction"],
-    "citations": []
+    "citations": [],
+    "multi_language_examples": [
+      {
+        "language": "TypeScript",
+        "title": "Offline signing pipeline",
+        "summary": "Construct canonical bytes, hash them, delegate signing, and assemble the signed transaction.",
+        "code": "const preimage = encodeUnsignedTransaction(fields, chainContext);\nconst digest = hashForChain(preimage, chainContext.hash);\nconst sig = await signer.signDigest({ digest, keyRef, algorithm: chainContext.algorithm });\nconst normalized = normalizeSignature(sig, chainContext);\nconst signedTx = assembleSignedTransaction(fields, normalized, chainContext);\nawait broadcaster.broadcast(signedTx);"
+      },
+      {
+        "language": "Go",
+        "title": "Offline signing pipeline",
+        "summary": "Backend-oriented signer orchestration with explicit preimage and digest boundaries.",
+        "code": "preimage, err := EncodeUnsignedTransaction(fields, chainCtx)\nif err != nil { return err }\ndigest := HashForChain(preimage, chainCtx.Hash)\nsig, err := signer.SignDigest(ctx, keyRef, digest, chainCtx.Algorithm)\nif err != nil { return err }\nnormalized, err := NormalizeSignature(sig, chainCtx)\nif err != nil { return err }\nsignedTx, err := AssembleSignedTransaction(fields, normalized, chainCtx)\nif err != nil { return err }\nreturn broadcaster.Broadcast(ctx, signedTx)"
+      },
+      {
+        "language": "Rust",
+        "title": "Offline signing pipeline",
+        "summary": "Rust flow for deterministic preimage construction and signer delegation.",
+        "code": "let preimage = encode_unsigned_transaction(&fields, &chain_ctx)?;\nlet digest = hash_for_chain(&preimage, chain_ctx.hash);\nlet sig = signer.sign_digest(&key_ref, &digest, chain_ctx.algorithm).await?;\nlet normalized = normalize_signature(sig, &chain_ctx)?;\nlet signed_tx = assemble_signed_transaction(fields, normalized, &chain_ctx)?;\nbroadcaster.broadcast(signed_tx).await?;"
+      }
+    ]
   },
   {
     "id": "ethereum-eip155-signing-preimage-template",
@@ -500,7 +580,27 @@
     "code": "const command = new SignCommand({\n  KeyId: kmsKeyId,\n  Message: digestBytes,\n  MessageType: 'DIGEST',\n  SigningAlgorithm: 'ECDSA_SHA_256'\n});\nconst { Signature } = await kms.send(command);\n// Signature is ASN.1 DER. Decode to r/s, enforce low-s if required, recover v separately.",
     "implementation_notes": ["Use secp256k1 key spec for Ethereum-style ECDSA.", "Pass DIGEST only after computing the chain-specific transaction digest.", "KMS returns DER-encoded ECDSA signatures, not Ethereum-ready r/s/v."],
     "tags": ["aws-kms", "secp256k1", "ecdsa", "offline-signing"],
-    "citations": ["https://docs.aws.amazon.com/kms/latest/developerguide/symm-asymm-choose-key-spec.html", "https://docs.aws.amazon.com/kms/latest/APIReference/API_Sign.html"]
+    "citations": ["https://docs.aws.amazon.com/kms/latest/developerguide/symm-asymm-choose-key-spec.html", "https://docs.aws.amazon.com/kms/latest/APIReference/API_Sign.html"],
+    "multi_language_examples": [
+      {
+        "language": "TypeScript",
+        "title": "AWS KMS secp256k1 Sign",
+        "summary": "Sign a precomputed Ethereum-style digest with AWS KMS.",
+        "code": "const out = await kms.send(new SignCommand({\n  KeyId: keyId,\n  Message: digestBytes,\n  MessageType: 'DIGEST',\n  SigningAlgorithm: 'ECDSA_SHA_256'\n}));\nconst { r, s } = decodeDerEcdsa(out.Signature);\nconst v = recoverEthereumV(digestBytes, r, s, expectedPublicKey, chainId);"
+      },
+      {
+        "language": "Go",
+        "title": "AWS KMS secp256k1 Sign",
+        "summary": "Use the AWS SDK for Go to sign a digest and decode DER ECDSA.",
+        "code": "out, err := kmsClient.Sign(ctx, &kms.SignInput{\n  KeyId: aws.String(keyID), Message: digest,\n  MessageType: types.MessageTypeDigest,\n  SigningAlgorithm: types.SigningAlgorithmSpecEcdsaSha256,\n})\nif err != nil { return err }\nr, s, err := DecodeDERECDSA(out.Signature)\nif err != nil { return err }\nv, err := RecoverEthereumV(digest, r, s, expectedPubkey, chainID)"
+      },
+      {
+        "language": "Rust",
+        "title": "AWS KMS secp256k1 Sign",
+        "summary": "Call KMS Sign from Rust and normalize DER output.",
+        "code": "let out = kms.sign()\n  .key_id(key_id)\n  .message(Blob::new(digest.to_vec()))\n  .message_type(MessageType::Digest)\n  .signing_algorithm(SigningAlgorithmSpec::EcdsaSha256)\n  .send().await?;\nlet (r, s) = decode_der_ecdsa(out.signature().unwrap().as_ref())?;\nlet v = recover_ethereum_v(digest, r, s, expected_pubkey, chain_id)?;"
+      }
+    ]
   },
   {
     "id": "ecdsa-der-to-rsv-normalization-snippet",
@@ -527,7 +627,27 @@
     "code": "{\n  \"type\": \"ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2\",\n  \"organizationId\": \"<org-id>\",\n  \"parameters\": {\n    \"signWith\": \"<wallet-account-or-private-key-id>\",\n    \"payload\": \"<hex-or-utf8-payload>\",\n    \"encoding\": \"PAYLOAD_ENCODING_HEXADECIMAL\",\n    \"hashFunction\": \"HASH_FUNCTION_NO_OP\"\n  }\n}",
     "implementation_notes": ["Choose NO_OP only when the payload is already the exact digest or signing bytes expected by the chain.", "Record the hash function and encoding with the transaction audit trail.", "Map returned r/s/v or signature bytes into the chain-specific serialization format."],
     "tags": ["turnkey", "raw-payload", "kms", "signing"],
-    "citations": ["https://docs.turnkey.com/api-reference/activities/sign-raw-payload"]
+    "citations": ["https://docs.turnkey.com/api-reference/activities/sign-raw-payload"],
+    "multi_language_examples": [
+      {
+        "language": "TypeScript",
+        "title": "Turnkey raw payload signing",
+        "summary": "Submit exact digest bytes to Turnkey with explicit encoding and hash mode.",
+        "code": "const activity = await turnkeyClient.signRawPayload({\n  organizationId,\n  signWith: walletAccountId,\n  payload: Buffer.from(digest).toString('hex'),\n  encoding: 'PAYLOAD_ENCODING_HEXADECIMAL',\n  hashFunction: 'HASH_FUNCTION_NO_OP'\n});\nconst { r, s, v } = activity.result.signRawPayloadResult;"
+      },
+      {
+        "language": "Go",
+        "title": "Turnkey raw payload signing",
+        "summary": "Post a sign_raw_payload activity from a Go backend.",
+        "code": "req := SignRawPayloadRequest{\n  OrganizationID: orgID,\n  SignWith: walletAccountID,\n  Payload: hex.EncodeToString(digest),\n  Encoding: \"PAYLOAD_ENCODING_HEXADECIMAL\",\n  HashFunction: \"HASH_FUNCTION_NO_OP\",\n}\nresp, err := turnkey.SignRawPayload(ctx, req)\nif err != nil { return err }\nr, s, v := resp.R, resp.S, resp.V"
+      },
+      {
+        "language": "Rust",
+        "title": "Turnkey raw payload signing",
+        "summary": "Build an explicit Turnkey raw-payload request from Rust.",
+        "code": "let req = serde_json::json!({\n  \"organizationId\": org_id,\n  \"parameters\": {\n    \"signWith\": wallet_account_id,\n    \"payload\": hex::encode(digest),\n    \"encoding\": \"PAYLOAD_ENCODING_HEXADECIMAL\",\n    \"hashFunction\": \"HASH_FUNCTION_NO_OP\"\n  }\n});\nlet activity: Activity = client.post(url).json(&req).send().await?.json().await?;"
+      }
+    ]
   },
   {
     "id": "ed25519-kms-mode-guardrail",

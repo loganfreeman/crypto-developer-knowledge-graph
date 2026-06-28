@@ -384,13 +384,31 @@ function codePanel(node) {
   const relatedCode = state.relationships
     .filter((edge) => edge.source === node.id || edge.target === node.id)
     .map((edge) => nodeMap()[edge.source === node.id ? edge.target : edge.source])
-    .filter((item) => item && item.code);
-  const snippets = [node, ...relatedCode].filter((item) => item.code);
+    .filter((item) => item && (item.code || item.multi_language_examples));
+  const items = [node, ...relatedCode].filter((item) => item.code || item.multi_language_examples);
+  const snippets = items.flatMap((item) => {
+    const examples = item.multi_language_examples || [];
+    const base = item.code ? [{
+      language: item.language || "text",
+      title: item.label,
+      summary: item.summary,
+      code: item.code,
+    }] : [];
+    return [...base, ...examples.map((example) => ({
+      language: example.language,
+      title: example.title || item.label,
+      summary: example.summary || item.summary,
+      code: example.code,
+    }))];
+  });
   if (!snippets.length) return `<p class="muted">No code or payload template attached yet.</p>`;
   return snippets
     .map((item) => `
       <article class="code-card">
-        <h3>${escapeHtml(item.label)}</h3>
+        <div class="code-card-head">
+          <h3>${escapeHtml(item.title)}</h3>
+          <span>${escapeHtml(item.language)}</span>
+        </div>
         <p>${escapeHtml(item.summary)}</p>
         <pre><code>${escapeHtml(item.code)}</code></pre>
       </article>
