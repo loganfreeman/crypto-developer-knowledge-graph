@@ -1,4 +1,4 @@
 interface:
   display_name: "Crypto Trace"
   short_description: "Trace crypto problems through the graph"
-  default_prompt: "Use -trace to trace a crypto implementation problem through graph nodes and code solutions."
+  default_prompt: "Use $crypto-trace to trace a crypto implementation problem through graph nodes and code solutions."

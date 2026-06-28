@@ -43,6 +43,8 @@ docs/
   sources/               Cached source documents
 schemas/
   graph.schema.json      Versioned graph contract
+skills/
+  */SKILL.md             Agent skills generated from high-value graph concepts
 supabase/
   migrations/            Postgres migrations for the production database layer
 src/ckg/
@@ -103,6 +105,16 @@ PYTHONPATH=src python3 -m ckg.cli node ethereum
 ```
 
 `crypto-graph trace` is the semantic API surface for terminals, IDE extensions, and editor tasks. It returns seed nodes, expanded graph relationships, live metadata checks, citations, and code snippets for the problem statement. Use `--json` when an IDE extension needs machine-readable output.
+
+## Concept Skills
+
+High-value graph concepts are also exposed as reusable agent skills under `skills/`:
+
+- `crypto-trace`
+- `offline-transaction-signing`
+- `live-metadata-verification`
+
+See `skills/SKILLS.md` for the concept-to-skill mapping and example prompts.
 
 Use the REST API:
 

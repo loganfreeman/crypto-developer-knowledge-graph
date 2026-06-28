@@ -1,4 +1,4 @@
 interface:
   display_name: "Live Metadata Verification"
   short_description: "Verify graph claims against live RPC metadata"
-  default_prompt: "Use -metadata-verification to check whether a graph claim is backed by live registry or ABI metadata."
+  default_prompt: "Use $live-metadata-verification to check whether a graph claim is backed by live registry or ABI metadata."

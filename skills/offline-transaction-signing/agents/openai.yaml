@@ -1,4 +1,4 @@
 interface:
   display_name: "Offline Transaction Signing"
   short_description: "Build and debug byte-exact signers"
-  default_prompt: "Use -transaction-signing to design or debug an offline transaction signing flow."
+  default_prompt: "Use $offline-transaction-signing to design or debug an offline transaction signing flow."
