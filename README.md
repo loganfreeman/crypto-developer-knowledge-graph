@@ -68,6 +68,7 @@ PYTHONPATH=src python3 -m ckg.cli citations ethereum
 PYTHONPATH=src python3 -m ckg.cli horizon cross-chain-state-verification
 PYTHONPATH=src python3 -m ckg.cli horizon wallet-building --edge-type REQUIRES --layer infrastructure
 PYTHONPATH=src python3 -m ckg.cli horizon offline-transaction-signer --edge-type CAN_USE_SIGNER
+PYTHONPATH=src python3 -m ckg.cli network polkadot-staking-nominations
 PYTHONPATH=src python3 -m ckg.cli trust
 PYTHONPATH=src python3 -m ckg.cli path build-wallet
 PYTHONPATH=src python3 -m ckg.cli node ethereum
@@ -81,6 +82,7 @@ curl "http://127.0.0.1:8000/chunks/search?q=signed%20transaction"
 curl "http://127.0.0.1:8000/nodes/ethereum/citations"
 curl "http://127.0.0.1:8000/nodes/ethereum/neighbors"
 curl "http://127.0.0.1:8000/nodes/cross-chain-state-verification/horizon"
+curl "http://127.0.0.1:8000/nodes/polkadot-staking-nominations/network-conditions"
 curl "http://127.0.0.1:8000/trust"
 curl "http://127.0.0.1:8000/goals/build-defi-app"
 ```
@@ -215,7 +217,12 @@ Relationships include:
 
 ## Semantic Web3 Intelligence Features
 
-The frontend now avoids whole-graph hairballs. It renders a focused horizon around the selected node, grouped into semantic lanes by `display_group`, `layers`, and node type. Developers can filter by layer and relationship type, then inspect the selected node in the sidecar.
+The frontend now avoids whole-graph hairballs. It uses an Intent-Driven Dual View:
+
+- left: a visual horizon canvas scoped to the selected build intent or node
+- right: a dense tabbed sidecar for documentation, code snippets, live state, risks, and sources
+
+Clicking a node recenters the local graph without a page refresh and pulls in adjacent relational nodes. Developers can filter by layer and relationship type, then inspect exact execution blueprints in the sidecar.
 
 The sidecar is implementation-first:
 
@@ -224,6 +231,7 @@ The sidecar is implementation-first:
 - implementation notes
 - relationship metadata with context, layer, confidence, and developer notes
 - security guardrails
+- live/cached network conditions
 - citations and source chunks
 
 Seeded production-style examples include:
@@ -239,6 +247,7 @@ Seeded production-style examples include:
 - AWS KMS secp256k1 signing pattern
 - Ethereum EIP-155 signing preimage template
 - ECDSA DER to r/s/v normalization snippet
+- deterministic serialization and byte-boundary templates for RLP, SCALE, and DAG-CBOR
 - Replay domain guardrail
 - Remix EVM sandbox
 
@@ -250,6 +259,31 @@ The `Build offline transaction signer` path shows the raw engineering bridge fro
 - Turnkey raw-payload signing
 - DER ECDSA normalization into chain-specific `r/s/v`
 - Ed25519 raw/prehash guardrails
+
+The serialization layer makes byte-level failures explicit:
+
+- Ethereum legacy RLP signing preimage and signed envelope boundaries
+- Substrate SCALE call, extra, and additional signed payload layout
+- Filecoin DAG-CBOR message serialization before CID/signing
+- `Bad signature` diagnostic workflow for tuple misalignment, wrong hash mode, and signature normalization errors
+
+## Live Network Conditions
+
+Some concepts are only useful with current chain state. `data/network_conditions.json` stores cached live-condition definitions for staking and validator workflows. Each condition records provider, freshness policy, last update time, and the exact query a production fetcher should run.
+
+Current seeded examples:
+
+- Polkadot staking and nominations
+- Avalanche P-Chain staking
+
+The frontend sidecar shows network condition panels for matching nodes, including cached/live status, provider, query, units, and developer notes. Null values mean "query live"; they are intentionally not invented.
+
+CLI:
+
+```bash
+PYTHONPATH=src python3 -m ckg.cli network polkadot-staking-nominations
+PYTHONPATH=src python3 -m ckg.cli network avalanche-pchain-staking
+```
 
 Every node should carry citations where practical. Citation values are source identifiers or URLs that ingestion can later resolve into document chunks, embeddings, and provenance metadata.
 

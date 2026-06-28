@@ -131,5 +131,68 @@
     "protocols": ["polkadot", "substrate"],
     "freshness_policy": "monthly",
     "local_path": "docs/sources/polkadot-transaction-construction.md"
+  },
+  {
+    "id": "ethereum-rlp",
+    "title": "Ethereum RLP Encoding",
+    "url": "https://ethereum.org/en/developers/docs/data-structures-and-encoding/rlp/",
+    "authority": "official",
+    "protocols": ["ethereum"],
+    "freshness_policy": "monthly",
+    "local_path": "docs/sources/ethereum-rlp.md"
+  },
+  {
+    "id": "substrate-scale-codec",
+    "title": "Substrate SCALE Codec",
+    "url": "https://docs.substrate.io/reference/scale-codec/",
+    "authority": "official",
+    "protocols": ["polkadot", "substrate"],
+    "freshness_policy": "monthly",
+    "local_path": "docs/sources/substrate-scale-codec.md"
+  },
+  {
+    "id": "filecoin-message-signing",
+    "title": "Filecoin Message Signing and CBOR Serialization",
+    "url": "https://spec.filecoin.io/systems/filecoin_vm/message/",
+    "authority": "official",
+    "protocols": ["filecoin"],
+    "freshness_policy": "monthly",
+    "local_path": "docs/sources/filecoin-message-signing.md"
+  },
+  {
+    "id": "polkadot-staking-docs",
+    "title": "Polkadot Staking and Validator Operations",
+    "url": "https://docs.polkadot.com/infrastructure/running-a-validator/",
+    "authority": "official",
+    "protocols": ["polkadot"],
+    "freshness_policy": "weekly",
+    "local_path": "docs/sources/polkadot-staking-docs.md"
+  },
+  {
+    "id": "polkadot-js-api",
+    "title": "Polkadot.js API Libraries",
+    "url": "https://docs.polkadot.com/develop/toolkit/api-libraries/polkadot-js-api/",
+    "authority": "official",
+    "protocols": ["polkadot", "substrate"],
+    "freshness_policy": "weekly",
+    "local_path": "docs/sources/polkadot-staking-docs.md"
+  },
+  {
+    "id": "avalanche-pchain-rpc",
+    "title": "AvalancheGo P-Chain RPC",
+    "url": "https://build.avax.network/docs/rpcs/p-chain",
+    "authority": "official",
+    "protocols": ["avalanche"],
+    "freshness_policy": "weekly",
+    "local_path": "docs/sources/avalanche-staking-docs.md"
+  },
+  {
+    "id": "avalanche-staking-docs",
+    "title": "Avalanche Staking and Validators",
+    "url": "https://build.avax.network/docs/nodes/validate/staking",
+    "authority": "official",
+    "protocols": ["avalanche"],
+    "freshness_policy": "weekly",
+    "local_path": "docs/sources/avalanche-staking-docs.md"
   }
 ]

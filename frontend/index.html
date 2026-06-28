@@ -7,41 +7,40 @@
     <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
-    <main class="shell">
-      <aside class="sidebar">
-        <div>
-          <p class="eyebrow">Developer graph</p>
-          <h1>Crypto Knowledge Graph</h1>
-        </div>
-        <label class="search">
-          <span>Search</span>
-          <input id="search" type="search" placeholder="wallet, eth_getBalance, signatures">
-        </label>
-        <nav id="goals" class="goal-list" aria-label="Build goals"></nav>
-      </aside>
-
-      <section class="workspace">
-        <div class="toolbar">
+    <main class="dual-shell">
+      <section class="horizon-panel">
+        <header class="horizon-header">
           <div>
-            <p class="eyebrow">Goal path</p>
-            <h2 id="title">Build a wallet</h2>
+            <p class="eyebrow">Intent-driven graph</p>
+            <h1>Semantic Web3 Intelligence</h1>
           </div>
           <button id="reset" type="button">Reset</button>
+        </header>
+
+        <div class="intent-bar">
+          <label class="search">
+            <span>Ask by intent</span>
+            <input id="search" type="search" placeholder="offline signer, staking, SCALE, bad signature">
+          </label>
+          <nav id="goals" class="goal-list" aria-label="Build goals"></nav>
         </div>
 
-        <section id="summary" class="summary"></section>
-        <section id="columns" class="columns"></section>
-        <section>
+        <section id="summary" class="intent-summary"></section>
+
+        <section class="canvas-wrap">
           <div class="section-head">
-            <h3>Focused Horizon</h3>
+            <div>
+              <p class="eyebrow">Visual horizon</p>
+              <h2 id="title">Build a wallet</h2>
+            </div>
             <span id="counts"></span>
           </div>
           <div id="graph-controls" class="graph-controls"></div>
-          <div id="graph" class="graph"></div>
+          <div id="graph" class="intent-canvas" role="application" aria-label="Focused local network graph"></div>
         </section>
       </section>
 
-      <aside id="detail" class="detail" aria-live="polite"></aside>
+      <aside id="detail" class="sidecar" aria-live="polite"></aside>
     </main>
     <script src="./app.js"></script>
   </body>

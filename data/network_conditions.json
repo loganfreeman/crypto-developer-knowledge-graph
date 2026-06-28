@@ -1,0 +1,103 @@
+{
+  "generated_at": "2026-06-28T00:00:00Z",
+  "conditions": [
+    {
+      "id": "polkadot-staking-live-conditions",
+      "node_id": "polkadot-staking-nominations",
+      "network": "Polkadot",
+      "status": "cached",
+      "freshness_policy": "daily",
+      "last_updated_at": "2026-06-28T00:00:00Z",
+      "provider_id": "polkadot-js-api-provider",
+      "provider_url": "wss://rpc.polkadot.io",
+      "source_ids": ["polkadot-js-api", "polkadot-staking-docs"],
+      "parameters": [
+        {
+          "key": "active_validator_set_size",
+          "label": "Active validator set size",
+          "value": null,
+          "unit": "validators",
+          "kind": "live_query",
+          "query": "api.query.session.validators()",
+          "developer_note": "Fetch through a runtime-aware Polkadot SDK connection; the returned validator list changes by session/era."
+        },
+        {
+          "key": "minimum_active_bond",
+          "label": "Minimum active bond",
+          "value": null,
+          "unit": "Planck",
+          "kind": "live_query",
+          "query": "api.query.staking.minimumActiveStake() or chain-specific staking dashboard",
+          "developer_note": "Treat as live chain state, not a constant. Exact storage item availability can vary by runtime."
+        },
+        {
+          "key": "bonding_duration",
+          "label": "Bonding duration",
+          "value": null,
+          "unit": "eras",
+          "kind": "runtime_constant",
+          "query": "api.consts.staking.bondingDuration",
+          "developer_note": "Runtime constants can change after governance-approved runtime upgrades."
+        },
+        {
+          "key": "slashing_history_depth",
+          "label": "Slashing history depth",
+          "value": null,
+          "unit": "eras",
+          "kind": "runtime_constant",
+          "query": "api.consts.staking.slashDeferDuration / staking slash records",
+          "developer_note": "Pair constants with historical event queries when building operator risk dashboards."
+        }
+      ]
+    },
+    {
+      "id": "avalanche-pchain-staking-live-conditions",
+      "node_id": "avalanche-pchain-staking",
+      "network": "Avalanche P-Chain",
+      "status": "cached",
+      "freshness_policy": "hourly",
+      "last_updated_at": "2026-06-28T00:00:00Z",
+      "provider_id": "avalanche-pchain-rpc-provider",
+      "provider_url": "https://api.avax.network/ext/bc/P",
+      "source_ids": ["avalanche-pchain-rpc", "avalanche-staking-docs"],
+      "parameters": [
+        {
+          "key": "current_validator_count",
+          "label": "Current validator count",
+          "value": null,
+          "unit": "validators",
+          "kind": "json_rpc",
+          "query": "platform.getCurrentValidators",
+          "developer_note": "Count returned validators from P-Chain RPC; optionally scope by subnetID."
+        },
+        {
+          "key": "pending_validator_count",
+          "label": "Pending validator count",
+          "value": null,
+          "unit": "validators",
+          "kind": "json_rpc",
+          "query": "platform.getPendingValidators",
+          "developer_note": "Use to estimate near-term validator set changes and warm-up schedule."
+        },
+        {
+          "key": "minimum_validation_stake",
+          "label": "Minimum validation stake",
+          "value": null,
+          "unit": "nAVAX",
+          "kind": "network_parameter",
+          "query": "platform.getMinStake",
+          "developer_note": "Fetch from RPC or config docs before constructing staking transactions."
+        },
+        {
+          "key": "minimum_stake_duration",
+          "label": "Minimum stake duration",
+          "value": null,
+          "unit": "seconds",
+          "kind": "network_parameter",
+          "query": "platform.getStakingAssetID / staking transaction validation rules",
+          "developer_note": "Duration constraints matter when scheduling validator add/delegator transactions."
+        }
+      ]
+    }
+  ]
+}

@@ -36,6 +36,9 @@ def main() -> None:
 
     subparsers.add_parser("trust")
 
+    network_parser = subparsers.add_parser("network")
+    network_parser.add_argument("id", nargs="?")
+
     args = parser.parse_args()
     store = GraphStore()
 
@@ -53,6 +56,8 @@ def main() -> None:
         payload = store.horizon(args.id, edge_types=set(args.edge_type) or None, layer=args.layer)
     elif args.command == "trust":
         payload = store.trust_report
+    elif args.command == "network":
+        payload = store.node_network_conditions(args.id) if args.id else store.network_conditions
     else:
         payload = store.neighbors(args.id)
 

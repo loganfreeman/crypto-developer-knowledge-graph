@@ -190,5 +190,61 @@
     "url": "https://docs.polkadot.com/chain-interactions/send-transactions/with-sdks/",
     "ordinal": 1,
     "text": "# Polkadot Transaction Construction\n\nSubstrate and Polkadot transaction construction requires runtime-aware extrinsic payloads. Signing payloads include encoded call data, account nonce, era, tip, runtime spec version, transaction version, genesis hash, and recent block hash.\n\nDevelopers building offline signers must fetch chain metadata and runtime versions before constructing bytes to sign, because runtime upgrades can change call indexes and encoding expectations."
+  },
+  {
+    "id": "ethereum-rlp#chunk-1",
+    "source_id": "ethereum-rlp",
+    "title": "Ethereum RLP Encoding",
+    "url": "https://ethereum.org/en/developers/docs/data-structures-and-encoding/rlp/",
+    "ordinal": 1,
+    "text": "# Ethereum RLP Encoding\n\nEthereum uses Recursive Length Prefix encoding for byte arrays and nested lists. Legacy Ethereum transactions are serialized as RLP lists, and EIP-155 signing includes chain id, zero, and zero in the unsigned transaction list before hashing.\n\nOffline signers must distinguish unsigned signing preimages from signed transaction envelopes. Hashing or signing the final signed envelope instead of the unsigned preimage causes invalid signatures."
+  },
+  {
+    "id": "substrate-scale-codec#chunk-1",
+    "source_id": "substrate-scale-codec",
+    "title": "Substrate SCALE Codec",
+    "url": "https://docs.substrate.io/reference/scale-codec/",
+    "ordinal": 1,
+    "text": "# Substrate SCALE Codec\n\nSCALE is the compact binary codec used by Substrate runtimes. It is not self-describing, so the encoder and decoder must agree on type order, tuple layout, enum variants, compact integer encoding, and runtime metadata.\n\nSubstrate signing payloads depend on exact SCALE encoding of the call and signed extensions. Runtime metadata, spec version, transaction version, genesis hash, and block hash affect the bytes that are signed."
+  },
+  {
+    "id": "filecoin-message-signing#chunk-1",
+    "source_id": "filecoin-message-signing",
+    "title": "Filecoin Message Signing and CBOR Serialization",
+    "url": "https://spec.filecoin.io/systems/filecoin_vm/message/",
+    "ordinal": 1,
+    "text": "# Filecoin Message Signing and CBOR Serialization\n\nFilecoin messages are serialized using DAG-CBOR/IPLD conventions before signing and CID computation. The message fields, address encoding, nonce, gas fields, method, parameters, and value must be encoded deterministically.\n\nOffline signers must preserve Filecoin's exact CBOR message serialization and domain expectations. Signing JSON, reordered fields, or a display representation instead of canonical message bytes produces invalid signatures."
+  },
+  {
+    "id": "polkadot-staking-docs#chunk-1",
+    "source_id": "polkadot-staking-docs",
+    "title": "Polkadot Staking and Validator Operations",
+    "url": "https://docs.polkadot.com/infrastructure/running-a-validator/",
+    "ordinal": 1,
+    "text": "# Polkadot Staking And Validator Operations\n\nPolkadot staking and validator operations depend on live chain state, runtime constants, sessions, eras, validator set membership, nominations, rewards, and offenses or slashes. Developers should query chain state through runtime-aware APIs instead of treating staking parameters as static documentation.\n\nThe Polkadot developer docs describe API categories for constants, chain state, and transactions. Runtime constants can be read from `api.consts`, while state such as active validators, accounts, and staking data is queried from `api.query`."
+  },
+  {
+    "id": "polkadot-js-api#chunk-1",
+    "source_id": "polkadot-js-api",
+    "title": "Polkadot.js API Libraries",
+    "url": "https://docs.polkadot.com/develop/toolkit/api-libraries/polkadot-js-api/",
+    "ordinal": 1,
+    "text": "# Polkadot Staking And Validator Operations\n\nPolkadot staking and validator operations depend on live chain state, runtime constants, sessions, eras, validator set membership, nominations, rewards, and offenses or slashes. Developers should query chain state through runtime-aware APIs instead of treating staking parameters as static documentation.\n\nThe Polkadot developer docs describe API categories for constants, chain state, and transactions. Runtime constants can be read from `api.consts`, while state such as active validators, accounts, and staking data is queried from `api.query`."
+  },
+  {
+    "id": "avalanche-pchain-rpc#chunk-1",
+    "source_id": "avalanche-pchain-rpc",
+    "title": "AvalancheGo P-Chain RPC",
+    "url": "https://build.avax.network/docs/rpcs/p-chain",
+    "ordinal": 1,
+    "text": "# Avalanche P-Chain Staking And Validators\n\nAvalanche's P-Chain maintains validator sets and staking transactions. The P-Chain RPC uses JSON-RPC and exposes validator and staking methods such as current validators, pending validators, balances, staking transactions, and rewards.\n\nDeveloper tooling should fetch validator set information from the P-Chain RPC rather than treating validator set size or pending validator count as static facts."
+  },
+  {
+    "id": "avalanche-staking-docs#chunk-1",
+    "source_id": "avalanche-staking-docs",
+    "title": "Avalanche Staking and Validators",
+    "url": "https://build.avax.network/docs/nodes/validate/staking",
+    "ordinal": 1,
+    "text": "# Avalanche P-Chain Staking And Validators\n\nAvalanche's P-Chain maintains validator sets and staking transactions. The P-Chain RPC uses JSON-RPC and exposes validator and staking methods such as current validators, pending validators, balances, staking transactions, and rewards.\n\nDeveloper tooling should fetch validator set information from the P-Chain RPC rather than treating validator set size or pending validator count as static facts."
   }
 ]

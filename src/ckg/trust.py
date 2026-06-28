@@ -31,6 +31,8 @@ PRODUCTION_TYPES = {
     "SigningIntegration",
     "ImplementationPattern",
     "SecurityGuardrail",
+    "SerializationFormat",
+    "Diagnostic",
 }
 
 

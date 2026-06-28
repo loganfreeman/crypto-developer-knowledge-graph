@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-06-28T03:20:40.961687+00:00",
+  "generated_at": "2026-06-28T03:35:53.536594+00:00",
   "summary": {
-    "nodes": 58,
-    "sources": 16,
-    "citations": 22,
-    "uncited_production_nodes": 18,
+    "nodes": 72,
+    "sources": 23,
+    "citations": 37,
+    "uncited_production_nodes": 20,
     "fast_moving_uncited_nodes": 3,
     "stale_sources": 0,
     "changed_sources": 0,
@@ -233,6 +233,104 @@
       "last_verified_at": "2026-06-27",
       "age_days": 1,
       "current_hash": "680e256f2713907e4ebbe5eede13386eac41b27e9f6a722f28c6d256227b6af9",
+      "stored_hash": null,
+      "changed": false
+    },
+    {
+      "id": "ethereum-rlp",
+      "title": "Ethereum RLP Encoding",
+      "url": "https://ethereum.org/en/developers/docs/data-structures-and-encoding/rlp/",
+      "local_path": "docs/sources/ethereum-rlp.md",
+      "status": "healthy",
+      "authority": "official",
+      "freshness_days": 30,
+      "last_verified_at": "2026-06-27",
+      "age_days": 1,
+      "current_hash": "4252b5f5a627b444894bfdacf64b143c32de87cb21641d326e4ecb0be7002917",
+      "stored_hash": null,
+      "changed": false
+    },
+    {
+      "id": "substrate-scale-codec",
+      "title": "Substrate SCALE Codec",
+      "url": "https://docs.substrate.io/reference/scale-codec/",
+      "local_path": "docs/sources/substrate-scale-codec.md",
+      "status": "healthy",
+      "authority": "official",
+      "freshness_days": 30,
+      "last_verified_at": "2026-06-27",
+      "age_days": 1,
+      "current_hash": "3e2f9cdd0b9f63c5872ebf1523a2ff4ab22fe4f97aca5359746ea83070e89d47",
+      "stored_hash": null,
+      "changed": false
+    },
+    {
+      "id": "filecoin-message-signing",
+      "title": "Filecoin Message Signing and CBOR Serialization",
+      "url": "https://spec.filecoin.io/systems/filecoin_vm/message/",
+      "local_path": "docs/sources/filecoin-message-signing.md",
+      "status": "healthy",
+      "authority": "official",
+      "freshness_days": 30,
+      "last_verified_at": "2026-06-27",
+      "age_days": 1,
+      "current_hash": "9673d89b48760ec0212909fc283341903363d8d655bfc2f74e5595894d522f77",
+      "stored_hash": null,
+      "changed": false
+    },
+    {
+      "id": "polkadot-staking-docs",
+      "title": "Polkadot Staking and Validator Operations",
+      "url": "https://docs.polkadot.com/infrastructure/running-a-validator/",
+      "local_path": "docs/sources/polkadot-staking-docs.md",
+      "status": "healthy",
+      "authority": "official",
+      "freshness_days": 7,
+      "last_verified_at": "2026-06-27",
+      "age_days": 1,
+      "current_hash": "5163ec09360dfcf9db4fbef56081c11346c0547f6e8d2c8fb90b909bb5b95f15",
+      "stored_hash": null,
+      "changed": false
+    },
+    {
+      "id": "polkadot-js-api",
+      "title": "Polkadot.js API Libraries",
+      "url": "https://docs.polkadot.com/develop/toolkit/api-libraries/polkadot-js-api/",
+      "local_path": "docs/sources/polkadot-staking-docs.md",
+      "status": "healthy",
+      "authority": "official",
+      "freshness_days": 7,
+      "last_verified_at": "2026-06-27",
+      "age_days": 1,
+      "current_hash": "5163ec09360dfcf9db4fbef56081c11346c0547f6e8d2c8fb90b909bb5b95f15",
+      "stored_hash": null,
+      "changed": false
+    },
+    {
+      "id": "avalanche-pchain-rpc",
+      "title": "AvalancheGo P-Chain RPC",
+      "url": "https://build.avax.network/docs/rpcs/p-chain",
+      "local_path": "docs/sources/avalanche-staking-docs.md",
+      "status": "healthy",
+      "authority": "official",
+      "freshness_days": 7,
+      "last_verified_at": "2026-06-27",
+      "age_days": 1,
+      "current_hash": "429fa802fcfb9648248e055b515cbb026a8738c22d0e8993ef32ba2289f69d81",
+      "stored_hash": null,
+      "changed": false
+    },
+    {
+      "id": "avalanche-staking-docs",
+      "title": "Avalanche Staking and Validators",
+      "url": "https://build.avax.network/docs/nodes/validate/staking",
+      "local_path": "docs/sources/avalanche-staking-docs.md",
+      "status": "healthy",
+      "authority": "official",
+      "freshness_days": 7,
+      "last_verified_at": "2026-06-27",
+      "age_days": 1,
+      "current_hash": "429fa802fcfb9648248e055b515cbb026a8738c22d0e8993ef32ba2289f69d81",
       "stored_hash": null,
       "changed": false
     }
@@ -701,9 +799,122 @@
       "status": "verified",
       "citation_count": 2,
       "staleness_risk": "medium"
+    },
+    {
+      "id": "deterministic-serialization",
+      "label": "Deterministic serialization",
+      "type": "Concept",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "rlp-encoding",
+      "label": "RLP encoding",
+      "type": "SerializationFormat",
+      "status": "verified",
+      "citation_count": 1,
+      "staleness_risk": "medium"
+    },
+    {
+      "id": "scale-codec",
+      "label": "SCALE codec",
+      "type": "SerializationFormat",
+      "status": "verified",
+      "citation_count": 2,
+      "staleness_risk": "medium"
+    },
+    {
+      "id": "dag-cbor",
+      "label": "DAG-CBOR",
+      "type": "SerializationFormat",
+      "status": "verified",
+      "citation_count": 1,
+      "staleness_risk": "medium"
+    },
+    {
+      "id": "ethereum-legacy-rlp-byte-template",
+      "label": "Ethereum legacy RLP byte template",
+      "type": "PayloadTemplate",
+      "status": "verified",
+      "citation_count": 2,
+      "staleness_risk": "high"
+    },
+    {
+      "id": "substrate-scale-byte-template",
+      "label": "Substrate SCALE signing byte template",
+      "type": "PayloadTemplate",
+      "status": "verified",
+      "citation_count": 2,
+      "staleness_risk": "high"
+    },
+    {
+      "id": "filecoin-cbor-byte-template",
+      "label": "Filecoin CBOR message byte template",
+      "type": "PayloadTemplate",
+      "status": "verified",
+      "citation_count": 1,
+      "staleness_risk": "high"
+    },
+    {
+      "id": "bad-signature-diagnostic",
+      "label": "Bad signature diagnostic",
+      "type": "Diagnostic",
+      "status": "needs_citation",
+      "citation_count": 0,
+      "staleness_risk": "medium"
+    },
+    {
+      "id": "staking-nominations",
+      "label": "Staking & nominations",
+      "type": "Concept",
+      "status": "seeded",
+      "citation_count": 0,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "polkadot-staking-nominations",
+      "label": "Polkadot staking & nominations",
+      "type": "NetworkCondition",
+      "status": "verified",
+      "citation_count": 2,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "avalanche-pchain-staking",
+      "label": "Avalanche P-Chain staking",
+      "type": "NetworkCondition",
+      "status": "verified",
+      "citation_count": 2,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "polkadot-js-api-provider",
+      "label": "Polkadot.js live state provider",
+      "type": "LiveDataProvider",
+      "status": "verified",
+      "citation_count": 1,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "avalanche-pchain-rpc-provider",
+      "label": "Avalanche P-Chain RPC provider",
+      "type": "LiveDataProvider",
+      "status": "verified",
+      "citation_count": 1,
+      "staleness_risk": "low"
+    },
+    {
+      "id": "staking-parameter-staleness-guardrail",
+      "label": "Staking parameter staleness guardrail",
+      "type": "SecurityGuardrail",
+      "status": "needs_citation",
+      "citation_count": 0,
+      "staleness_risk": "medium"
     }
   ],
   "uncited_nodes": [
+    "bad-signature-diagnostic",
     "bls12-381",
     "ecdsa-secp256k1",
     "ed25519",
@@ -717,6 +928,7 @@
     "payload-signing",
     "replay-domain-guardrail",
     "signatures",
+    "staking-parameter-staleness-guardrail",
     "substrate-raw-extrinsic-template",
     "svm-runtime",
     "turnkey-kms-signing",

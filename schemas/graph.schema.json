@@ -27,7 +27,12 @@
     "SecurityGuardrail",
     "ExecutionSandbox",
     "Runtime",
-    "ProofSystem"
+    "ProofSystem",
+    "SerializationFormat",
+    "Diagnostic",
+    "NetworkCondition",
+    "NetworkParameter",
+    "LiveDataProvider"
   ],
   "relationship_types": [
     "USES",
@@ -54,6 +59,12 @@
     "ENCODES_AS",
     "VERIFIES_WITH",
     "RUNS_ON",
-    "HAS_GUARDRAIL"
+    "HAS_GUARDRAIL",
+    "SERIALIZES_AS",
+    "HASHES_TO",
+    "FAILS_WITH",
+    "DEBUGGED_BY",
+    "HAS_LIVE_CONDITION",
+    "MEASURED_BY"
   ]
 }

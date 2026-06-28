@@ -41,3 +41,11 @@ def test_trust_report_surfaces_uncited_production_nodes():
     report = GraphStore().trust_report
     assert report["summary"]["uncited_production_nodes"] > 0
     assert "bls12-381" in report["uncited_nodes"]
+
+
+def test_network_conditions_attach_to_staking_nodes():
+    store = GraphStore()
+    conditions = store.node_network_conditions("polkadot-staking-nominations")
+    assert conditions
+    assert conditions[0]["freshness_status"] in {"cached", "live", "stale"}
+    assert any(param["key"] == "active_validator_set_size" for param in conditions[0]["parameters"])

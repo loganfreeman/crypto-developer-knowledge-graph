@@ -56,6 +56,7 @@ class GraphStore:
         self.chunks = {chunk["id"]: chunk for chunk in self._load_optional_json(data_dir / "chunks.json", [])}
         self.citations = {citation["id"]: citation for citation in self._load_optional_json(data_dir / "citations.json", [])}
         self.trust_report = self._load_optional_json(data_dir / "trust_report.json", {"summary": {}, "nodes": [], "sources": []})
+        self.network_conditions = self._load_optional_json(data_dir / "network_conditions.json", {"conditions": []})
         self.outgoing = self._group_edges("source")
         self.incoming = self._group_edges("target")
 
@@ -164,6 +165,17 @@ class GraphStore:
             if item["id"] == node_id:
                 return item
         return None
+
+    def node_network_conditions(self, node_id: str) -> list[dict[str, Any]]:
+        try:
+            from .network_conditions import annotate_condition
+        except ImportError:
+            return []
+        return [
+            annotate_condition(condition)
+            for condition in self.network_conditions.get("conditions", [])
+            if condition.get("node_id") == node_id
+        ]
 
     def validate(self) -> list[str]:
         errors: list[str] = []

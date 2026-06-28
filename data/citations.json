@@ -196,5 +196,140 @@
     "chunk_id": "turnkey-sign-raw-payload#chunk-1",
     "claim": "Every offline signer must explicitly define whether the signer receives structured transaction fields, serialized transaction bytes, or a final digest.",
     "status": "seeded"
+  },
+  {
+    "id": "rlp-encoding::ethereum-rlp",
+    "node_id": "rlp-encoding",
+    "source_id": "ethereum-rlp",
+    "source_url": "https://ethereum.org/en/developers/docs/data-structures-and-encoding/rlp/",
+    "chunk_id": "ethereum-rlp#chunk-1",
+    "claim": "Ethereum Recursive Length Prefix encoding for byte arrays and nested lists, used by legacy transaction serialization.",
+    "status": "seeded"
+  },
+  {
+    "id": "scale-codec::substrate-scale-codec",
+    "node_id": "scale-codec",
+    "source_id": "substrate-scale-codec",
+    "source_url": "https://docs.substrate.io/reference/scale-codec/",
+    "chunk_id": "substrate-scale-codec#chunk-1",
+    "claim": "Substrate compact binary codec whose correctness depends on runtime metadata, type order, compact integer rules, and signed extension layout.",
+    "status": "seeded"
+  },
+  {
+    "id": "scale-codec::polkadot-transaction-construction",
+    "node_id": "scale-codec",
+    "source_id": "polkadot-transaction-construction",
+    "source_url": "https://docs.polkadot.com/chain-interactions/send-transactions/with-sdks/",
+    "chunk_id": "polkadot-transaction-construction#chunk-1",
+    "claim": "Substrate compact binary codec whose correctness depends on runtime metadata, type order, compact integer rules, and signed extension layout.",
+    "status": "seeded"
+  },
+  {
+    "id": "dag-cbor::filecoin-message-signing",
+    "node_id": "dag-cbor",
+    "source_id": "filecoin-message-signing",
+    "source_url": "https://spec.filecoin.io/systems/filecoin_vm/message/",
+    "chunk_id": "filecoin-message-signing#chunk-1",
+    "claim": "IPLD-compatible deterministic CBOR encoding used in Filecoin message and content-addressed data flows.",
+    "status": "seeded"
+  },
+  {
+    "id": "ethereum-legacy-rlp-byte-template::eip-155",
+    "node_id": "ethereum-legacy-rlp-byte-template",
+    "source_id": "eip-155",
+    "source_url": "https://eips.ethereum.org/EIPS/eip-155",
+    "chunk_id": "eip-155#chunk-1",
+    "claim": "Byte-level checklist for producing an EIP-155 legacy Ethereum signing digest and signed transaction envelope.",
+    "status": "seeded"
+  },
+  {
+    "id": "ethereum-legacy-rlp-byte-template::ethereum-rlp",
+    "node_id": "ethereum-legacy-rlp-byte-template",
+    "source_id": "ethereum-rlp",
+    "source_url": "https://ethereum.org/en/developers/docs/data-structures-and-encoding/rlp/",
+    "chunk_id": "ethereum-rlp#chunk-1",
+    "claim": "Byte-level checklist for producing an EIP-155 legacy Ethereum signing digest and signed transaction envelope.",
+    "status": "seeded"
+  },
+  {
+    "id": "substrate-scale-byte-template::substrate-scale-codec",
+    "node_id": "substrate-scale-byte-template",
+    "source_id": "substrate-scale-codec",
+    "source_url": "https://docs.substrate.io/reference/scale-codec/",
+    "chunk_id": "substrate-scale-codec#chunk-1",
+    "claim": "Byte-level checklist for constructing Substrate extrinsic signing payloads using SCALE and runtime metadata.",
+    "status": "seeded"
+  },
+  {
+    "id": "substrate-scale-byte-template::polkadot-transaction-construction",
+    "node_id": "substrate-scale-byte-template",
+    "source_id": "polkadot-transaction-construction",
+    "source_url": "https://docs.polkadot.com/chain-interactions/send-transactions/with-sdks/",
+    "chunk_id": "polkadot-transaction-construction#chunk-1",
+    "claim": "Byte-level checklist for constructing Substrate extrinsic signing payloads using SCALE and runtime metadata.",
+    "status": "seeded"
+  },
+  {
+    "id": "filecoin-cbor-byte-template::filecoin-message-signing",
+    "node_id": "filecoin-cbor-byte-template",
+    "source_id": "filecoin-message-signing",
+    "source_url": "https://spec.filecoin.io/systems/filecoin_vm/message/",
+    "chunk_id": "filecoin-message-signing#chunk-1",
+    "claim": "Byte-level checklist for canonical Filecoin message serialization before CID computation and signing.",
+    "status": "seeded"
+  },
+  {
+    "id": "polkadot-staking-nominations::polkadot-staking-docs",
+    "node_id": "polkadot-staking-nominations",
+    "source_id": "polkadot-staking-docs",
+    "source_url": "https://docs.polkadot.com/infrastructure/running-a-validator/",
+    "chunk_id": "polkadot-staking-docs#chunk-1",
+    "claim": "Live Polkadot staking context: validator set, nominations, bonding duration, minimum active bond, eras, rewards, and slashing records.",
+    "status": "seeded"
+  },
+  {
+    "id": "polkadot-staking-nominations::polkadot-js-api",
+    "node_id": "polkadot-staking-nominations",
+    "source_id": "polkadot-js-api",
+    "source_url": "https://docs.polkadot.com/develop/toolkit/api-libraries/polkadot-js-api/",
+    "chunk_id": "polkadot-js-api#chunk-1",
+    "claim": "Live Polkadot staking context: validator set, nominations, bonding duration, minimum active bond, eras, rewards, and slashing records.",
+    "status": "seeded"
+  },
+  {
+    "id": "avalanche-pchain-staking::avalanche-pchain-rpc",
+    "node_id": "avalanche-pchain-staking",
+    "source_id": "avalanche-pchain-rpc",
+    "source_url": "https://build.avax.network/docs/rpcs/p-chain",
+    "chunk_id": "avalanche-pchain-rpc#chunk-1",
+    "claim": "Live Avalanche P-Chain staking context: current validators, pending validators, staking constraints, delegation, and reward-related parameters.",
+    "status": "seeded"
+  },
+  {
+    "id": "avalanche-pchain-staking::avalanche-staking-docs",
+    "node_id": "avalanche-pchain-staking",
+    "source_id": "avalanche-staking-docs",
+    "source_url": "https://build.avax.network/docs/nodes/validate/staking",
+    "chunk_id": "avalanche-staking-docs#chunk-1",
+    "claim": "Live Avalanche P-Chain staking context: current validators, pending validators, staking constraints, delegation, and reward-related parameters.",
+    "status": "seeded"
+  },
+  {
+    "id": "polkadot-js-api-provider::polkadot-js-api",
+    "node_id": "polkadot-js-api-provider",
+    "source_id": "polkadot-js-api",
+    "source_url": "https://docs.polkadot.com/develop/toolkit/api-libraries/polkadot-js-api/",
+    "chunk_id": "polkadot-js-api#chunk-1",
+    "claim": "Runtime-aware API provider for Polkadot SDK chains that can read constants, storage state, transactions, and metadata-generated endpoints.",
+    "status": "seeded"
+  },
+  {
+    "id": "avalanche-pchain-rpc-provider::avalanche-pchain-rpc",
+    "node_id": "avalanche-pchain-rpc-provider",
+    "source_id": "avalanche-pchain-rpc",
+    "source_url": "https://build.avax.network/docs/rpcs/p-chain",
+    "chunk_id": "avalanche-pchain-rpc#chunk-1",
+    "claim": "JSON-RPC provider for Avalanche P-Chain validator, staking, subnet, balance, reward, and transaction methods.",
+    "status": "seeded"
   }
 ]

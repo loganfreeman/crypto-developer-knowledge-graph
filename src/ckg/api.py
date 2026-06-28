@@ -65,6 +65,11 @@ class KnowledgeGraphHandler(BaseHTTPRequestHandler):
                 self.json_response({"relationships": [edge.as_dict() for edge in STORE.edges]})
             elif path == "trust":
                 self.json_response(STORE.trust_report)
+            elif path == "network-conditions":
+                self.json_response({"conditions": STORE.network_conditions.get("conditions", [])})
+            elif path.startswith("nodes/") and path.endswith("/network-conditions"):
+                node_id = path.split("/")[1]
+                self.json_response({"conditions": STORE.node_network_conditions(node_id)})
             elif path == "sources":
                 self.json_response({"sources": list(STORE.sources.values())})
             elif path == "citations":
