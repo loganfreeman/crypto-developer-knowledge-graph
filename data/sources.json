@@ -194,5 +194,32 @@
     "protocols": ["avalanche"],
     "freshness_policy": "weekly",
     "local_path": "docs/sources/avalanche-staking-docs.md"
+  },
+  {
+    "id": "certora-prover-docs",
+    "title": "Certora Prover Documentation",
+    "url": "https://docs.certora.com/",
+    "authority": "official",
+    "protocols": ["ethereum", "evm"],
+    "freshness_policy": "monthly",
+    "local_path": "docs/sources/certora-prover-docs.md"
+  },
+  {
+    "id": "foundry-invariant-testing",
+    "title": "Foundry Invariant Testing",
+    "url": "https://book.getfoundry.sh/forge/invariant-testing",
+    "authority": "official",
+    "protocols": ["ethereum", "evm"],
+    "freshness_policy": "monthly",
+    "local_path": "docs/sources/foundry-invariant-testing.md"
+  },
+  {
+    "id": "halmos-symbolic-testing",
+    "title": "Halmos Symbolic Testing",
+    "url": "https://github.com/a16z/halmos",
+    "authority": "official",
+    "protocols": ["ethereum", "evm"],
+    "freshness_policy": "monthly",
+    "local_path": "docs/sources/halmos-symbolic-testing.md"
   }
 ]
