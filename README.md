@@ -400,7 +400,7 @@ The frontend sidecar shows network condition panels for matching nodes, includin
 
 Byte-layout nodes for Ethereum RLP, Substrate SCALE, and Filecoin DAG-CBOR attach parser specs from `data/serialization_sandboxes.json`. The sidecar Sandbox tab lets a developer paste raw transaction hex and decode it against graph-owned tuple constraints, surfacing the tuple index or byte offset where the payload misaligns.
 
-The browser runtime instantiates a tiny embedded WASM core for deterministic parser identity and runs offline codec walkers for RLP list offsets, SCALE compact/fixed fields, and CBOR definite-length tuples.
+The browser runtime instantiates a tiny embedded WASM core for deterministic parser identity and runs offline codec walkers for RLP list offsets, SCALE compact/fixed fields, CBOR definite-length tuples, and cross-language integer alignment. The type guardrail checks JavaScript `BigInt` versus safe `Number`, Rust `u128`, Go `big.Int`, SCALE little-endian bytes, and CBOR big-endian integer payloads.
 
 CLI:
 

@@ -788,33 +788,47 @@ function stakingSandboxMarkup(node) {
 
 function serializationSandboxMarkup(node) {
   return serializationSandboxesForNode(node.id)
-    .map((sandbox) => `
-      <article class="sandbox-widget serialization-widget" data-sandbox="serialization" data-sandbox-id="${escapeHtml(sandbox.id)}">
-        <div>
-          <p class="eyebrow">Deterministic parser</p>
-          <h3>${escapeHtml(sandbox.title)}</h3>
-          <p class="muted">${escapeHtml(sandbox.description)}</p>
-        </div>
-        <label class="sandbox-control">
-          Layout
-          <select data-serialization-layout>
-            ${(sandbox.layouts || []).map((layout) => `<option value="${escapeHtml(layout.id)}">${escapeHtml(layout.label)}</option>`).join("")}
-          </select>
-        </label>
-        <label class="sandbox-control">
-          Hex payload
-          <textarea data-serialization-input rows="7" spellcheck="false">${escapeHtml(sandbox.sample_hex || "")}</textarea>
-        </label>
-        <div class="sandbox-actions">
-          <button type="button" data-serialization-run>Decode</button>
-          <button type="button" data-serialization-sample>Reset Sample</button>
-        </div>
-        <div class="sandbox-output serialization-output" data-serialization-output>
-          <span>Paste hex and decode against ${escapeHtml(sandbox.codec.toUpperCase())} layout constraints.</span>
-        </div>
-        <p class="warning-note">Runtime: ${escapeHtml(sandbox.runtime)}. Compare against a trusted chain SDK after runtime upgrades.</p>
-      </article>
-    `)
+    .map((sandbox) => {
+      const isTypeAlignment = sandbox.codec === "type-alignment";
+      return `
+        <article class="sandbox-widget serialization-widget" data-sandbox="serialization" data-sandbox-id="${escapeHtml(sandbox.id)}">
+          <div>
+            <p class="eyebrow">${isTypeAlignment ? "Type guardrail" : "Deterministic parser"}</p>
+            <h3>${escapeHtml(sandbox.title)}</h3>
+            <p class="muted">${escapeHtml(sandbox.description)}</p>
+          </div>
+          ${isTypeAlignment ? `
+            <label class="sandbox-control">
+              Decimal integer
+              <input data-type-decimal value="${escapeHtml(sandbox.sample_value || "")}" inputmode="numeric">
+            </label>
+            <label class="sandbox-control">
+              Hex bytes
+              <textarea data-serialization-input rows="5" spellcheck="false">${escapeHtml(sandbox.sample_hex || "")}</textarea>
+            </label>
+          ` : `
+            <label class="sandbox-control">
+              Layout
+              <select data-serialization-layout>
+                ${(sandbox.layouts || []).map((layout) => `<option value="${escapeHtml(layout.id)}">${escapeHtml(layout.label)}</option>`).join("")}
+              </select>
+            </label>
+            <label class="sandbox-control">
+              Hex payload
+              <textarea data-serialization-input rows="7" spellcheck="false">${escapeHtml(sandbox.sample_hex || "")}</textarea>
+            </label>
+          `}
+          <div class="sandbox-actions">
+            <button type="button" data-serialization-run>${isTypeAlignment ? "Check Alignment" : "Decode"}</button>
+            <button type="button" data-serialization-sample>Reset Sample</button>
+          </div>
+          <div class="sandbox-output serialization-output" data-serialization-output>
+            <span>${isTypeAlignment ? "Check integer range and endian interpretation across JS, Rust, Go, SCALE, and CBOR." : `Paste hex and decode against ${escapeHtml(sandbox.codec.toUpperCase())} layout constraints.`}</span>
+          </div>
+          <p class="warning-note">Runtime: ${escapeHtml(sandbox.runtime)}. Compare against a trusted chain SDK after runtime upgrades.</p>
+        </article>
+      `;
+    })
     .join("");
 }
 
@@ -897,14 +911,18 @@ function wireSerializationSandboxes() {
     if (!sandbox) return;
     const input = widget.querySelector("[data-serialization-input]");
     const layout = widget.querySelector("[data-serialization-layout]");
+    const decimal = widget.querySelector("[data-type-decimal]");
     const output = widget.querySelector("[data-serialization-output]");
     widget.querySelector("[data-serialization-sample]")?.addEventListener("click", () => {
       input.value = sandbox.sample_hex || "";
+      if (decimal) decimal.value = sandbox.sample_value || "";
     });
     widget.querySelector("[data-serialization-run]")?.addEventListener("click", async () => {
       output.innerHTML = `<span>Decoding...</span>`;
       try {
-        const result = await analyzeSerializationPayload(sandbox, input.value, layout.value);
+        const result = sandbox.codec === "type-alignment"
+          ? await analyzeSerializationPayload(sandbox, decimal?.value || "", input.value)
+          : await analyzeSerializationPayload(sandbox, input.value, layout.value);
         renderSerializationResult(output, result);
       } catch (error) {
         output.innerHTML = `<p class="error">${escapeHtml(error.message)}</p>`;

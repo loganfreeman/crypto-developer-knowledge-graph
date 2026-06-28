@@ -38,6 +38,40 @@ function bytesFromHex(input) {
   return bytes;
 }
 
+function parseIntegerInput(value, hexValue = "") {
+  const decimal = value.trim();
+  const hex = hexValue.trim().replace(/^0x/i, "").replace(/\s+/g, "");
+  if (decimal) {
+    if (!/^[0-9]+$/.test(decimal)) throw new Error("Decimal integer contains non-numeric characters.");
+    return BigInt(decimal);
+  }
+  if (hex) {
+    if (hex.length % 2) throw new Error(`Odd-length hex at nibble ${hex.length}.`);
+    if (!/^[0-9a-fA-F]+$/.test(hex)) throw new Error("Hex integer contains non-hex characters.");
+    return BigInt(`0x${hex}`);
+  }
+  throw new Error("Enter a decimal integer or hex bytes.");
+}
+
+function bigintToBytes(value, length, endianness) {
+  if (value < 0n) throw new Error("Negative integers are not supported by these unsigned guardrails.");
+  const bytes = [];
+  let remaining = value;
+  while (remaining > 0n) {
+    bytes.push(Number(remaining & 0xffn));
+    remaining >>= 8n;
+  }
+  if (length && bytes.length > length) throw new Error(`Integer needs ${bytes.length} bytes, exceeding ${length}.`);
+  while (length && bytes.length < length) bytes.push(0);
+  const ordered = endianness === "big" ? [...bytes].reverse() : bytes;
+  return ordered.map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function bytesToBigint(bytes, endianness) {
+  const ordered = endianness === "little" ? [...bytes].reverse() : bytes;
+  return ordered.reduce((acc, byte) => (acc << 8n) + BigInt(byte), 0n);
+}
+
 function parseRlpItem(bytes, offset = 0, depth = 0) {
   if (offset >= bytes.length) throw new Error(`RLP ended before tuple index at byte ${offset}.`);
   const prefix = bytes[offset];
@@ -204,8 +238,49 @@ function scaleDiagnostics(fields, bytes) {
   return diagnostics;
 }
 
+function analyzeTypeAlignment(sandbox, valueInput, hexInput) {
+  const value = parseIntegerInput(valueInput, hexInput);
+  const hex = hexInput.trim().replace(/^0x/i, "").replace(/\s+/g, "");
+  const bytes = hex ? bytesFromHex(hex) : [];
+  const diagnostics = [];
+  for (const type of sandbox.types || []) {
+    const min = type.min === null ? null : BigInt(type.min);
+    const max = type.max === null ? null : BigInt(type.max);
+    if (min !== null && value < min) {
+      diagnostics.push({ level: "error", message: `${type.label}: underflows minimum ${min}.` });
+    } else if (max !== null && value > max) {
+      diagnostics.push({ level: "error", message: `${type.label}: overflows maximum ${max}.` });
+    } else {
+      diagnostics.push({ level: "ok", message: `${type.label}: value is representable.` });
+    }
+  }
+  for (const encoding of sandbox.encodings || []) {
+    try {
+      const encoded = bigintToBytes(value, encoding.byte_length, encoding.endianness);
+      diagnostics.push({ level: "ok", message: `${encoding.label}: encodes as 0x${encoded}.` });
+    } catch (error) {
+      diagnostics.push({ level: "error", message: `${encoding.label}: ${error.message}` });
+    }
+  }
+  if (bytes.length) {
+    const little = bytesToBigint(bytes, "little");
+    const big = bytesToBigint(bytes, "big");
+    diagnostics.push({ level: little === big ? "ok" : "warn", message: `Hex interpreted little-endian: ${little.toString()}.` });
+    diagnostics.push({ level: "ok", message: `Hex interpreted big-endian: ${big.toString()}.` });
+    if (little !== big) diagnostics.push({ level: "warn", message: "Endian interpretations differ; verify whether the target codec is SCALE little-endian or CBOR big-endian before signing." });
+  }
+  return {
+    byteLength: bytes.length || Math.ceil(value.toString(16).length / 2),
+    layout: { label: sandbox.title },
+    diagnostics,
+  };
+}
+
 export async function analyzeSerializationPayload(sandbox, hexInput, layoutId = null) {
   const wasm = await loadSerializationWasm();
+  if (sandbox.codec === "type-alignment") {
+    return { wasm, ...analyzeTypeAlignment(sandbox, arguments[1] || "", arguments[2] || "") };
+  }
   const bytes = bytesFromHex(hexInput);
   const layout = sandbox.layouts.find((item) => item.id === layoutId) || sandbox.layouts[0];
   let parsed;

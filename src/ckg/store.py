@@ -255,10 +255,10 @@ class GraphStore:
             sandbox_id = sandbox.get("id", "serialization-sandbox")
             if sandbox.get("node_id") not in self.nodes:
                 errors.append(f"{sandbox_id}: missing sandbox node {sandbox.get('node_id')}")
-            if sandbox.get("codec") not in {"rlp", "scale", "cbor"}:
+            if sandbox.get("codec") not in {"rlp", "scale", "cbor", "type-alignment"}:
                 errors.append(f"{sandbox_id}: unknown serialization codec {sandbox.get('codec')}")
-            if not sandbox.get("layouts"):
-                errors.append(f"{sandbox_id}: missing layout constraints")
+            if not sandbox.get("layouts") and not sandbox.get("types"):
+                errors.append(f"{sandbox_id}: missing layout or type constraints")
 
         return errors
 

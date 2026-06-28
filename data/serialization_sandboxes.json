@@ -62,6 +62,26 @@
           "fields": ["Version", "To", "From", "Nonce", "Value", "GasLimit", "GasFeeCap", "GasPremium", "Method", "Params"]
         }
       ]
+    },
+    {
+      "id": "cross-language-integer-alignment",
+      "node_id": "deterministic-serialization",
+      "codec": "type-alignment",
+      "runtime": "wasm-ready",
+      "title": "Cross-Language Integer Alignment Guardrail",
+      "description": "Check whether a decimal or hex integer can round-trip safely across JavaScript BigInt, Rust u128, Go big.Int, SCALE little-endian bytes, and CBOR big-endian integer/tag encodings.",
+      "sample_value": "340282366920938463463374607431768211455",
+      "sample_hex": "ffffffffffffffffffffffffffffffff",
+      "types": [
+        { "id": "javascript-bigint", "label": "JavaScript BigInt", "min": "0", "max": null, "signed": false },
+        { "id": "javascript-number-safe", "label": "JavaScript Number safe integer", "min": "0", "max": "9007199254740991", "signed": false },
+        { "id": "rust-u128", "label": "Rust u128", "min": "0", "max": "340282366920938463463374607431768211455", "signed": false },
+        { "id": "go-big-int", "label": "Go big.Int", "min": "0", "max": null, "signed": false }
+      ],
+      "encodings": [
+        { "id": "scale-u128-le", "label": "SCALE u128 little-endian", "byte_length": 16, "endianness": "little" },
+        { "id": "cbor-uint-be", "label": "CBOR unsigned integer big-endian payload", "byte_length": null, "endianness": "big" }
+      ]
     }
   ]
 }

@@ -137,6 +137,7 @@ def test_api_graph_payload_is_frontend_and_curl_ready():
     assert payload["network_conditions"]["conditions"]
     assert payload["live_metadata"]["targets"]
     assert payload["serialization_sandboxes"]["sandboxes"]
+    assert any(item["codec"] == "type-alignment" for item in payload["serialization_sandboxes"]["sandboxes"])
 
 
 def test_api_node_context_and_query_trace():
