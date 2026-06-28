@@ -70,6 +70,11 @@ class KnowledgeGraphHandler(BaseHTTPRequestHandler):
             elif path.startswith("nodes/") and path.endswith("/network-conditions"):
                 node_id = path.split("/")[1]
                 self.json_response({"conditions": STORE.node_network_conditions(node_id)})
+            elif path == "live-metadata":
+                self.json_response({"targets": STORE.live_metadata.get("targets", [])})
+            elif path.startswith("nodes/") and path.endswith("/live-metadata"):
+                node_id = path.split("/")[1]
+                self.json_response({"targets": STORE.node_live_metadata(node_id)})
             elif path == "sources":
                 self.json_response({"sources": list(STORE.sources.values())})
             elif path == "citations":

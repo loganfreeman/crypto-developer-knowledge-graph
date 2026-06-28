@@ -37,6 +37,7 @@ data/
   sources.json           Authoritative docs registry
   chunks.json            Ingested source chunks for retrieval
   citations.json         Node-to-source claim links
+  live_metadata.json     RPC-backed registry tracks and ABI verification targets
 docs/
   database.md            Supabase/Postgres graph and pgvector schema guide
   sources/               Cached source documents
@@ -74,6 +75,7 @@ It defines a Supabase/Postgres graph layer with:
 - adjacency-list `edges`
 - `code_snippets` attached to nodes
 - `document_chunks` for citation-grounded RAG
+- `live_metadata_targets` and `live_metadata_checks` for RPC-backed registry/ABI verification
 - `pgvector` columns for semantic node, documentation, snippet, and chunk embeddings
 - HNSW cosine indexes and helper search functions
 
@@ -84,17 +86,23 @@ See `docs/database.md` for the schema model, embedding conventions, and example 
 Search from the command line:
 
 ```bash
+crypto-graph trace "Filecoin CBOR tuple misalignment"
+crypto-graph trace "Filecoin CBOR tuple misalignment" --json
 PYTHONPATH=src python3 -m ckg.cli search "eth_getBalance"
 PYTHONPATH=src python3 -m ckg.cli chunks "signed transaction"
+PYTHONPATH=src python3 -m ckg.cli trace "Go concurrent Turnkey signer"
 PYTHONPATH=src python3 -m ckg.cli citations ethereum
 PYTHONPATH=src python3 -m ckg.cli horizon cross-chain-state-verification
 PYTHONPATH=src python3 -m ckg.cli horizon wallet-building --edge-type REQUIRES --layer infrastructure
 PYTHONPATH=src python3 -m ckg.cli horizon offline-transaction-signer --edge-type CAN_USE_SIGNER
 PYTHONPATH=src python3 -m ckg.cli network polkadot-staking-nominations
+PYTHONPATH=src python3 -m ckg.cli live-metadata substrate-scale-byte-template
 PYTHONPATH=src python3 -m ckg.cli trust
 PYTHONPATH=src python3 -m ckg.cli path build-wallet
 PYTHONPATH=src python3 -m ckg.cli node ethereum
 ```
+
+`crypto-graph trace` is the semantic API surface for terminals, IDE extensions, and editor tasks. It returns seed nodes, expanded graph relationships, live metadata checks, citations, and code snippets for the problem statement. Use `--json` when an IDE extension needs machine-readable output.
 
 Use the REST API:
 
@@ -118,6 +126,14 @@ PYTHONPATH=src python3 -m ckg.pipeline --fetch
 ```
 
 The pipeline refreshes citation chunks and writes Supabase-ready JSONL exports to `data/exports/`.
+
+Inspect or refresh live registry and ABI verification targets:
+
+```bash
+PYTHONPATH=src python3 -m ckg.live_metadata
+PYTHONPATH=src python3 -m ckg.live_metadata substrate-scale-byte-template --refresh
+ETHEREUM_RPC_URL=https://... PYTHONPATH=src python3 -m ckg.live_metadata erc20-transfer-calldata-template --refresh
+```
 
 Use the GraphQL-style endpoint:
 

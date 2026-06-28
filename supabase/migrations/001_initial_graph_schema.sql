@@ -129,6 +129,51 @@ create table if not exists document_chunks (
   constraint document_chunks_metadata_is_object check (jsonb_typeof(metadata) = 'object')
 );
 
+create table if not exists live_metadata_targets (
+  id text primary key,
+  node_id text not null references nodes(id) on delete cascade,
+  kind text not null,
+  network text not null,
+  status text not null default 'cached',
+  freshness_policy text not null default 'daily',
+  last_checked_at timestamptz,
+  provider_id text not null,
+  provider_url text,
+  provider_url_env text,
+  chain_id bigint,
+  contract_address text,
+  registry jsonb not null default '{}'::jsonb,
+  abi jsonb not null default '[]'::jsonb,
+  source_ids text[] not null default '{}',
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint live_metadata_targets_id_format check (id ~ '^[a-z0-9][a-z0-9-]*$'),
+  constraint live_metadata_targets_kind check (kind in ('registry_track', 'contract_abi')),
+  constraint live_metadata_targets_registry_object check (jsonb_typeof(registry) = 'object'),
+  constraint live_metadata_targets_abi_array check (jsonb_typeof(abi) = 'array'),
+  constraint live_metadata_targets_metadata_object check (jsonb_typeof(metadata) = 'object')
+);
+
+create table if not exists live_metadata_checks (
+  id uuid primary key default gen_random_uuid(),
+  target_id text not null references live_metadata_targets(id) on delete cascade,
+  key text not null,
+  label text not null,
+  expected jsonb,
+  observed jsonb,
+  verification text not null default 'unverified',
+  rpc_method text,
+  developer_note text,
+  checked_at timestamptz,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint live_metadata_checks_verification check (verification in ('verified', 'unverified', 'failed')),
+  constraint live_metadata_checks_metadata_object check (jsonb_typeof(metadata) = 'object'),
+  unique (target_id, key)
+);
+
 create index if not exists nodes_kind_idx on nodes(kind);
 create index if not exists nodes_tags_idx on nodes using gin(tags);
 create index if not exists nodes_contexts_idx on nodes using gin(contexts);
@@ -149,6 +194,13 @@ create index if not exists code_snippets_embedding_hnsw_idx on code_snippets usi
 create index if not exists document_chunks_node_idx on document_chunks(node_id);
 create index if not exists document_chunks_source_idx on document_chunks(source_id);
 create index if not exists document_chunks_embedding_hnsw_idx on document_chunks using hnsw (embedding vector_cosine_ops);
+
+create index if not exists live_metadata_targets_node_idx on live_metadata_targets(node_id);
+create index if not exists live_metadata_targets_kind_idx on live_metadata_targets(kind);
+create index if not exists live_metadata_targets_registry_idx on live_metadata_targets using gin(registry jsonb_path_ops);
+create index if not exists live_metadata_targets_abi_idx on live_metadata_targets using gin(abi jsonb_path_ops);
+create index if not exists live_metadata_checks_target_idx on live_metadata_checks(target_id);
+create index if not exists live_metadata_checks_verification_idx on live_metadata_checks(verification);
 
 create or replace function set_updated_at()
 returns trigger
@@ -178,6 +230,16 @@ for each row execute function set_updated_at();
 drop trigger if exists document_chunks_set_updated_at on document_chunks;
 create trigger document_chunks_set_updated_at
 before update on document_chunks
+for each row execute function set_updated_at();
+
+drop trigger if exists live_metadata_targets_set_updated_at on live_metadata_targets;
+create trigger live_metadata_targets_set_updated_at
+before update on live_metadata_targets
+for each row execute function set_updated_at();
+
+drop trigger if exists live_metadata_checks_set_updated_at on live_metadata_checks;
+create trigger live_metadata_checks_set_updated_at
+before update on live_metadata_checks
 for each row execute function set_updated_at();
 
 create or replace function match_nodes(
@@ -244,3 +306,5 @@ comment on column nodes.documentation_embedding is '1536-dimensional semantic em
 comment on table edges is 'Adjacency-list graph edges between nodes; compatible with Supabase/Postgres and easy to mirror into AGE later.';
 comment on table code_snippets is 'Executable examples attached to graph nodes, with optional vector embeddings for code-aware retrieval.';
 comment on table document_chunks is 'Source/document chunks that ground node claims and RAG answers.';
+comment on table live_metadata_targets is 'RPC-backed registry tracks and contract ABI bindings attached to graph nodes.';
+comment on table live_metadata_checks is 'Observed checks that verify whether a node claim matches live on-chain metadata or deployed contract state.';

@@ -1,6 +1,7 @@
 from ckg.search import search_chunks, search_nodes
 from ckg.pipeline import build_exports, strict_node_kind
 from ckg.store import GraphStore
+from ckg.trace import format_trace, node_trace
 
 
 def test_graph_validates():
@@ -52,6 +53,17 @@ def test_network_conditions_attach_to_staking_nodes():
     assert any(param["key"] == "active_validator_set_size" for param in conditions[0]["parameters"])
 
 
+def test_live_metadata_attaches_to_serialization_and_abi_nodes():
+    store = GraphStore()
+    substrate_targets = store.node_live_metadata("substrate-scale-byte-template")
+    erc20_targets = store.node_live_metadata("erc20-transfer-calldata-template")
+    assert substrate_targets
+    assert substrate_targets[0]["kind"] == "registry_track"
+    assert erc20_targets
+    assert erc20_targets[0]["kind"] == "contract_abi"
+    assert any(check["key"] == "transfer_selector" for check in erc20_targets[0]["checks"])
+
+
 def test_pipeline_maps_legacy_types_to_strict_node_kinds():
     store = GraphStore()
     assert strict_node_kind(store.nodes["hashing"]) == "Primitive"
@@ -66,7 +78,24 @@ def test_pipeline_exports_database_rows(tmp_path):
     assert stats["edges"] == len(GraphStore().edges)
     assert stats["code_snippets"] > 0
     assert stats["document_chunks"] > 0
+    assert stats["live_metadata_targets"] > 0
+    assert stats["live_metadata_checks"] > 0
     assert (tmp_path / "nodes.jsonl").exists()
     assert (tmp_path / "edges.jsonl").exists()
     assert (tmp_path / "code_snippets.jsonl").exists()
     assert (tmp_path / "document_chunks.jsonl").exists()
+    assert (tmp_path / "live_metadata_targets.jsonl").exists()
+    assert (tmp_path / "live_metadata_checks.jsonl").exists()
+
+
+def test_trace_returns_contextual_mapping_and_code_solutions():
+    payload = node_trace(GraphStore(), "Filecoin CBOR tuple misalignment")
+    node_ids = {node["id"] for node in payload["nodes"]}
+    assert "filecoin-cbor-byte-template" in node_ids
+    assert "dag-cbor" in node_ids
+    assert "bad-signature-diagnostic" in node_ids
+    assert payload["relationships"]
+    assert payload["code_solutions"]
+    formatted = format_trace(payload)
+    assert "Contextual Graph Mapping" in formatted
+    assert "Code Solutions" in formatted

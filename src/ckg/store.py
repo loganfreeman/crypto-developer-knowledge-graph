@@ -57,6 +57,7 @@ class GraphStore:
         self.citations = {citation["id"]: citation for citation in self._load_optional_json(data_dir / "citations.json", [])}
         self.trust_report = self._load_optional_json(data_dir / "trust_report.json", {"summary": {}, "nodes": [], "sources": []})
         self.network_conditions = self._load_optional_json(data_dir / "network_conditions.json", {"conditions": []})
+        self.live_metadata = self._load_optional_json(data_dir / "live_metadata.json", {"targets": []})
         self.outgoing = self._group_edges("source")
         self.incoming = self._group_edges("target")
 
@@ -177,6 +178,17 @@ class GraphStore:
             if condition.get("node_id") == node_id
         ]
 
+    def node_live_metadata(self, node_id: str) -> list[dict[str, Any]]:
+        try:
+            from .live_metadata import annotate_target
+        except ImportError:
+            return []
+        return [
+            annotate_target(target)
+            for target in self.live_metadata.get("targets", [])
+            if target.get("node_id") == node_id
+        ]
+
     def validate(self) -> list[str]:
         errors: list[str] = []
         allowed_node_types = set(self.schema["node_types"])
@@ -221,6 +233,15 @@ class GraphStore:
             chunk_id = citation.get("chunk_id")
             if chunk_id and chunk_id not in self.chunks:
                 errors.append(f"{citation_id}: missing chunk {chunk_id}")
+
+        for target in self.live_metadata.get("targets", []):
+            target_id = target.get("id", "live-metadata-target")
+            if target.get("node_id") not in self.nodes:
+                errors.append(f"{target_id}: missing live metadata node {target.get('node_id')}")
+            if target.get("kind") not in {"registry_track", "contract_abi"}:
+                errors.append(f"{target_id}: unknown live metadata kind {target.get('kind')}")
+            if not target.get("checks"):
+                errors.append(f"{target_id}: missing live metadata checks")
 
         return errors
 

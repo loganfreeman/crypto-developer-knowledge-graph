@@ -7,6 +7,7 @@ const state = {
   sources: [],
   trust: { nodes: [], sources: [], summary: {} },
   networkConditions: { conditions: [] },
+  liveMetadata: { targets: [] },
   selectedGoalId: "build-offline-signer",
   selectedNodeId: null,
   activeEdgeTypes: [],
@@ -121,6 +122,10 @@ function trustLabel(status) {
 
 function networkConditionsForNode(nodeId) {
   return (state.networkConditions.conditions || []).filter((item) => item.node_id === nodeId);
+}
+
+function liveMetadataForNode(nodeId) {
+  return (state.liveMetadata.targets || []).filter((item) => item.node_id === nodeId);
 }
 
 function nodeSearchText(node) {
@@ -500,6 +505,33 @@ function networkConditionRows(nodeId) {
     .join("");
 }
 
+function liveMetadataRows(nodeId) {
+  const targets = liveMetadataForNode(nodeId);
+  if (!targets.length) return `<p class="muted">No live registry or ABI verification target is attached to this node.</p>`;
+  return targets
+    .map((target) => `
+      <article class="network-condition">
+        <div class="network-condition-head">
+          <strong>${escapeHtml(target.network)} · ${escapeHtml(target.kind)}</strong>
+          <span class="${escapeHtml(target.status)}">${escapeHtml(target.status)}</span>
+        </div>
+        <p>${escapeHtml(target.provider_id)} · ${escapeHtml(target.freshness_policy)} · ${escapeHtml(target.last_checked_at || "not checked")}</p>
+        ${target.contract_address ? `<p><code>${escapeHtml(target.contract_address)}</code></p>` : ""}
+        <div class="parameter-list">
+          ${(target.checks || []).map((check) => `
+            <div class="parameter">
+              <strong>${escapeHtml(check.label)}</strong>
+              <span>${escapeHtml(check.verification || "unverified")}</span>
+              <code>${escapeHtml(check.rpc_method || "local")}</code>
+              <p>${escapeHtml(check.developer_note || "")}</p>
+            </div>
+          `).join("")}
+        </div>
+      </article>
+    `)
+    .join("");
+}
+
 function codePanel(node) {
   const relatedCode = state.relationships
     .filter((edge) => edge.source === node.id || edge.target === node.id)
@@ -577,7 +609,16 @@ function risksPanel(node) {
 }
 
 function statePanel(node) {
-  return networkConditionRows(node.id);
+  return `
+    <section class="detail-section">
+      <h3>Live Registry And ABI Verification</h3>
+      ${liveMetadataRows(node.id)}
+    </section>
+    <section class="detail-section">
+      <h3>Network Conditions</h3>
+      ${networkConditionRows(node.id)}
+    </section>
+  `;
 }
 
 function sourcesPanel(node) {
@@ -839,7 +880,7 @@ function render() {
 }
 
 async function init() {
-  const [nodes, relationships, goals, citations, chunks, sources, trust, networkConditions] = await Promise.all([
+  const [nodes, relationships, goals, citations, chunks, sources, trust, networkConditions, liveMetadata] = await Promise.all([
     loadJson("../data/nodes.json"),
     loadJson("../data/relationships.json"),
     loadJson("../data/goal_paths.json"),
@@ -848,6 +889,7 @@ async function init() {
     loadJson("../data/sources.json"),
     loadJson("../data/trust_report.json"),
     loadJson("../data/network_conditions.json"),
+    loadJson("../data/live_metadata.json"),
   ]);
   state.nodes = nodes;
   state.relationships = relationships;
@@ -857,6 +899,7 @@ async function init() {
   state.sources = sources;
   state.trust = trust;
   state.networkConditions = networkConditions;
+  state.liveMetadata = liveMetadata;
   document.querySelector("#search").addEventListener("change", (event) => renderSearch(event.target.value));
   document.querySelector("#search").addEventListener("keydown", (event) => {
     if (event.key === "Enter") renderSearch(event.currentTarget.value);

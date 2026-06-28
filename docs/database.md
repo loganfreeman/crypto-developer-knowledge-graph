@@ -43,6 +43,8 @@ data/exports/nodes.jsonl
 data/exports/edges.jsonl
 data/exports/code_snippets.jsonl
 data/exports/document_chunks.jsonl
+data/exports/live_metadata_targets.jsonl
+data/exports/live_metadata_checks.jsonl
 ```
 
 Fetch registered sources before chunking:
@@ -66,6 +68,47 @@ PYTHONPATH=src python3 -m ckg.pipeline --embedding-mode hash
 ```
 
 Do not use hash vectors for retrieval quality; they only verify that import and vector-column plumbing works.
+
+## Live Registry And ABI Verification
+
+The graph ties implementation claims to live metadata through:
+
+- `data/live_metadata.json`
+- `live_metadata_targets`
+- `live_metadata_checks`
+
+Targets attach directly to graph nodes. Current seeded examples include:
+
+- `substrate-scale-byte-template`: verifies that Polkadot runtime metadata and runtime version are available from RPC before trusting SCALE signing payload fields
+- `erc20-transfer-calldata-template`: binds the ERC-20 `transfer(address,uint256)` ABI selector to a deployed Ethereum mainnet contract address
+- `ethereum-legacy-rlp-byte-template`: checks that an Ethereum RPC can provide the live chain id required by EIP-155 signing
+
+Inspect cached targets:
+
+```bash
+PYTHONPATH=src python3 -m ckg.live_metadata
+PYTHONPATH=src python3 -m ckg.cli live-metadata substrate-scale-byte-template
+```
+
+Refresh targets through configured JSON-RPC endpoints:
+
+```bash
+PYTHONPATH=src python3 -m ckg.live_metadata substrate-scale-byte-template --refresh
+```
+
+Ethereum contract and chain checks intentionally require an explicit RPC URL:
+
+```bash
+ETHEREUM_RPC_URL=https://... PYTHONPATH=src python3 -m ckg.live_metadata erc20-transfer-calldata-template --refresh
+```
+
+Persist refreshed observations:
+
+```bash
+PYTHONPATH=src python3 -m ckg.live_metadata substrate-scale-byte-template --refresh --write
+```
+
+This keeps the default repo offline and deterministic while still making live verification a first-class production path.
 
 ## Node Types
 
@@ -145,6 +188,8 @@ order by language, title;
 ```
 
 `document_chunks` stores cited theoretical documentation and retrieval chunks.
+
+`live_metadata_targets` stores RPC-backed registry tracks and contract ABI bindings. `live_metadata_checks` stores the individual observed claims, such as metadata availability, chain id availability, deployed bytecode presence, or selector verification.
 
 ## Semantic Search
 

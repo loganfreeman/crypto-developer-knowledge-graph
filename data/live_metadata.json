@@ -1,0 +1,121 @@
+{
+  "generated_at": "2026-06-28T00:00:00Z",
+  "targets": [
+    {
+      "id": "polkadot-runtime-metadata-scale-verification",
+      "node_id": "substrate-scale-byte-template",
+      "kind": "registry_track",
+      "network": "Polkadot",
+      "status": "cached",
+      "freshness_policy": "daily",
+      "last_checked_at": "2026-06-28T00:00:00Z",
+      "provider_id": "polkadot-public-rpc",
+      "provider_url": "https://rpc.polkadot.io",
+      "source_ids": ["polkadot-transaction-construction", "substrate-scale-codec", "polkadot-js-api"],
+      "registry": {
+        "runtime": "Substrate",
+        "metadata_rpc": "state_getMetadata",
+        "runtime_version_rpc": "state_getRuntimeVersion",
+        "serialization": "SCALE",
+        "tracked_fields": ["specVersion", "transactionVersion", "signedExtensions", "metadata_version"]
+      },
+      "checks": [
+        {
+          "key": "runtime_metadata_available",
+          "label": "Runtime metadata is available from RPC",
+          "expected": true,
+          "observed": null,
+          "verification": "unverified",
+          "rpc_method": "state_getMetadata",
+          "developer_note": "A live response confirms that call encoding must be derived from runtime metadata rather than a static tuple layout."
+        },
+        {
+          "key": "runtime_version_available",
+          "label": "Runtime spec and transaction versions are available",
+          "expected": true,
+          "observed": null,
+          "verification": "unverified",
+          "rpc_method": "state_getRuntimeVersion",
+          "developer_note": "specVersion and transactionVersion are part of Substrate signing payload additional fields."
+        }
+      ]
+    },
+    {
+      "id": "ethereum-erc20-usdc-abi-verification",
+      "node_id": "erc20-transfer-calldata-template",
+      "kind": "contract_abi",
+      "network": "Ethereum Mainnet",
+      "status": "cached",
+      "freshness_policy": "weekly",
+      "last_checked_at": "2026-06-28T00:00:00Z",
+      "provider_id": "ethereum-json-rpc",
+      "provider_url_env": "ETHEREUM_RPC_URL",
+      "chain_id": 1,
+      "contract_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "source_ids": ["eip-20", "solidity-abi", "ethereum-json-rpc"],
+      "abi": [
+        {
+          "type": "function",
+          "name": "transfer",
+          "inputs": [
+            { "name": "to", "type": "address" },
+            { "name": "value", "type": "uint256" }
+          ],
+          "outputs": [
+            { "name": "", "type": "bool" }
+          ],
+          "stateMutability": "nonpayable"
+        }
+      ],
+      "checks": [
+        {
+          "key": "contract_code_present",
+          "label": "Tracked contract has bytecode at the configured address",
+          "expected": true,
+          "observed": null,
+          "verification": "unverified",
+          "rpc_method": "eth_getCode",
+          "developer_note": "EVM does not store ABI JSON on-chain; the live verification proves the binding points at deployed code while the ABI shape remains grounded by ERC-20 and Solidity ABI sources."
+        },
+        {
+          "key": "transfer_selector",
+          "label": "ERC-20 transfer(address,uint256) selector",
+          "expected": "0xa9059cbb",
+          "observed": "0xa9059cbb",
+          "verification": "verified",
+          "rpc_method": "local_abi_selector",
+          "developer_note": "The calldata template must begin with this selector before ABI-encoded recipient and amount words."
+        }
+      ]
+    },
+    {
+      "id": "ethereum-legacy-transaction-chain-id-verification",
+      "node_id": "ethereum-legacy-rlp-byte-template",
+      "kind": "registry_track",
+      "network": "Ethereum Mainnet",
+      "status": "cached",
+      "freshness_policy": "daily",
+      "last_checked_at": "2026-06-28T00:00:00Z",
+      "provider_id": "ethereum-json-rpc",
+      "provider_url_env": "ETHEREUM_RPC_URL",
+      "source_ids": ["eip-155", "ethereum-rlp", "ethereum-json-rpc"],
+      "registry": {
+        "runtime": "EVM",
+        "chain_id_rpc": "eth_chainId",
+        "serialization": "RLP",
+        "tracked_fields": ["chainId", "legacy_transaction_envelope"]
+      },
+      "checks": [
+        {
+          "key": "chain_id_available",
+          "label": "Chain id is available from RPC for EIP-155 signing",
+          "expected": true,
+          "observed": null,
+          "verification": "unverified",
+          "rpc_method": "eth_chainId",
+          "developer_note": "The EIP-155 preimage appends chainId, 0, 0 before hashing; a signer must fetch or configure the live target chain id."
+        }
+      ]
+    }
+  ]
+}

@@ -218,6 +218,47 @@ def document_chunk_row(chunk: dict[str, Any], citations_by_chunk: dict[str, list
     }
 
 
+def live_metadata_target_row(target: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "id": target["id"],
+        "node_id": target["node_id"],
+        "kind": target["kind"],
+        "network": target["network"],
+        "status": target.get("status", "cached"),
+        "freshness_policy": target.get("freshness_policy", "daily"),
+        "last_checked_at": target.get("last_checked_at"),
+        "provider_id": target["provider_id"],
+        "provider_url": target.get("provider_url"),
+        "provider_url_env": target.get("provider_url_env"),
+        "chain_id": target.get("chain_id"),
+        "contract_address": target.get("contract_address"),
+        "registry": target.get("registry", {}),
+        "abi": target.get("abi", []),
+        "source_ids": target.get("source_ids", []),
+        "metadata": {
+            "checks": len(target.get("checks", [])),
+        },
+    }
+
+
+def live_metadata_check_rows(target: dict[str, Any]) -> list[dict[str, Any]]:
+    return [
+        {
+            "target_id": target["id"],
+            "key": check["key"],
+            "label": check["label"],
+            "expected": check.get("expected"),
+            "observed": check.get("observed"),
+            "verification": check.get("verification", "unverified"),
+            "rpc_method": check.get("rpc_method"),
+            "developer_note": check.get("developer_note"),
+            "checked_at": target.get("last_checked_at"),
+            "metadata": {},
+        }
+        for check in target.get("checks", [])
+    ]
+
+
 def group_by(items: Iterable[dict[str, Any]], key: str) -> dict[str, list[dict[str, Any]]]:
     grouped: dict[str, list[dict[str, Any]]] = {}
     for item in items:
@@ -258,12 +299,17 @@ def build_exports(export_dir: Path = EXPORT_DIR, embedding_mode: str = "none") -
         for snippet in snippet_rows_for_node(node, embedding_mode)
     ]
     chunk_rows = [document_chunk_row(chunk, citations_by_chunk, embedding_mode) for chunk in chunks]
+    live_targets = store.live_metadata.get("targets", [])
+    live_target_rows = [live_metadata_target_row(target) for target in live_targets]
+    live_check_rows = [row for target in live_targets for row in live_metadata_check_rows(target)]
 
     return {
         "nodes": write_jsonl(export_dir / "nodes.jsonl", node_rows),
         "edges": write_jsonl(export_dir / "edges.jsonl", edge_rows),
         "code_snippets": write_jsonl(export_dir / "code_snippets.jsonl", snippet_rows),
         "document_chunks": write_jsonl(export_dir / "document_chunks.jsonl", chunk_rows),
+        "live_metadata_targets": write_jsonl(export_dir / "live_metadata_targets.jsonl", live_target_rows),
+        "live_metadata_checks": write_jsonl(export_dir / "live_metadata_checks.jsonl", live_check_rows),
     }
 
 

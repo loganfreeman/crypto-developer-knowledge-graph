@@ -4,8 +4,10 @@ import argparse
 import json
 
 from .pipeline import build_exports
+from .live_metadata import refresh_targets
 from .search import search_chunks, search_nodes
 from .store import GraphStore, ROOT
+from .trace import format_trace, node_trace
 
 
 def main() -> None:
@@ -17,6 +19,11 @@ def main() -> None:
 
     chunks_parser = subparsers.add_parser("chunks")
     chunks_parser.add_argument("query")
+
+    trace_parser = subparsers.add_parser("trace")
+    trace_parser.add_argument("query")
+    trace_parser.add_argument("--json", action="store_true")
+    trace_parser.add_argument("--limit", type=int, default=8)
 
     node_parser = subparsers.add_parser("node")
     node_parser.add_argument("id")
@@ -40,6 +47,11 @@ def main() -> None:
     network_parser = subparsers.add_parser("network")
     network_parser.add_argument("id", nargs="?")
 
+    live_parser = subparsers.add_parser("live-metadata")
+    live_parser.add_argument("id", nargs="?")
+    live_parser.add_argument("--refresh", action="store_true")
+    live_parser.add_argument("--write", action="store_true")
+
     export_parser = subparsers.add_parser("export-db")
     export_parser.add_argument("--export-dir", default="data/exports")
     export_parser.add_argument("--embedding-mode", choices=["none", "hash"], default="none")
@@ -51,6 +63,11 @@ def main() -> None:
         payload = search_nodes(store, args.query)
     elif args.command == "chunks":
         payload = search_chunks(store, args.query)
+    elif args.command == "trace":
+        payload = node_trace(store, args.query, limit=args.limit)
+        if not args.json:
+            print(format_trace(payload))
+            return
     elif args.command == "node":
         payload = store.node(args.id)
     elif args.command == "path":
@@ -63,6 +80,11 @@ def main() -> None:
         payload = store.trust_report
     elif args.command == "network":
         payload = store.node_network_conditions(args.id) if args.id else store.network_conditions
+    elif args.command == "live-metadata":
+        if args.refresh:
+            payload = refresh_targets(node_id=args.id, write=args.write)
+        else:
+            payload = store.node_live_metadata(args.id) if args.id else store.live_metadata
     elif args.command == "export-db":
         payload = build_exports(export_dir=ROOT / args.export_dir, embedding_mode=args.embedding_mode)
     else:
