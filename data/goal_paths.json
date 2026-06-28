@@ -1,0 +1,41 @@
+[
+  {
+    "id": "build-wallet",
+    "title": "Build a wallet",
+    "task_node_id": "wallet-building",
+    "concepts": ["key-generation", "signatures", "address-format", "transaction-creation", "transaction-lifecycle"],
+    "apis": ["eth-get-balance", "eth-send-raw-transaction", "bitcoin-sendrawtransaction", "solana-send-transaction"],
+    "sdks_libraries": ["ethers.js", "bitcoin-core RPC clients", "@solana/web3.js"],
+    "example_flow": ["Generate or import key material", "Derive chain-specific address", "Query balance", "Create transaction", "Sign transaction", "Broadcast signed transaction", "Track confirmation and finality"],
+    "code_examples": ["wallet-balance-snippet"],
+    "security_warnings": ["private-key-loss", "replay-risk", "reorg-risk"],
+    "supported_chains": ["bitcoin", "ethereum", "solana"],
+    "suggested_database_stack": ["Postgres for accounts and user state", "Redis for short-lived confirmation tracking", "Graph DB for dependency navigation"]
+  },
+  {
+    "id": "build-defi-app",
+    "title": "Build DeFi app",
+    "task_node_id": "defi-app-building",
+    "concepts": ["erc-20", "abi", "indexing", "transaction-lifecycle"],
+    "apis": ["eth-get-balance", "eth-send-raw-transaction"],
+    "sdks_libraries": ["ethers.js", "viem", "wagmi"],
+    "example_flow": ["Connect wallet", "Read token balances", "Encode ABI call", "Submit transaction", "Index emitted events", "Run risk checks"],
+    "code_examples": ["wallet-balance-snippet"],
+    "security_warnings": ["replay-risk", "reorg-risk"],
+    "supported_chains": ["ethereum"],
+    "suggested_database_stack": ["Postgres for normalized entities", "Meilisearch or OpenSearch for token/app search", "Vector DB for docs Q&A"]
+  },
+  {
+    "id": "build-analytics-indexer",
+    "title": "Build analytics/indexer",
+    "task_node_id": "analytics-indexer-building",
+    "concepts": ["indexing", "transaction-lifecycle", "merkle-trees", "consensus"],
+    "apis": ["json-rpc", "rest-api"],
+    "sdks_libraries": ["chain-specific RPC clients", "event decoders", "ETL workers"],
+    "example_flow": ["Fetch blocks", "Decode transactions and logs", "Normalize entities", "Persist canonical data", "Serve search and API queries"],
+    "code_examples": [],
+    "security_warnings": ["reorg-risk"],
+    "supported_chains": ["bitcoin", "ethereum", "solana"],
+    "suggested_database_stack": ["Postgres for canonical metadata", "Neo4j or Memgraph for graph traversals", "OpenSearch or Meilisearch for keyword search", "Vector DB for semantic doc retrieval"]
+  }
+]

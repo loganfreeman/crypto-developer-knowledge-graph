@@ -1,0 +1,284 @@
+[
+  {
+    "id": "bitcoin",
+    "label": "Bitcoin",
+    "type": "Chain",
+    "summary": "UTXO-based proof-of-work settlement network with Bitcoin Core RPC APIs for node, wallet, mining, network, and transaction operations.",
+    "tags": ["mvp", "protocol", "payments", "utxo"],
+    "citations": ["https://developer.bitcoin.org/reference/rpc/"]
+  },
+  {
+    "id": "ethereum",
+    "label": "Ethereum",
+    "type": "Chain",
+    "summary": "Account-based smart contract network whose execution clients expose Ethereum JSON-RPC for apps and tooling.",
+    "tags": ["mvp", "protocol", "smart-contracts", "account-model"],
+    "citations": ["https://ethereum.org/en/developers/docs/apis/json-rpc/"]
+  },
+  {
+    "id": "solana",
+    "label": "Solana",
+    "type": "Chain",
+    "summary": "High-throughput smart contract chain with HTTP and WebSocket RPC interfaces and account-centric runtime semantics.",
+    "tags": ["mvp", "protocol", "smart-contracts"],
+    "citations": ["https://solana.com/docs/rpc"]
+  },
+  {
+    "id": "json-rpc",
+    "label": "JSON-RPC",
+    "type": "Interface",
+    "summary": "Request-response interface pattern used by Ethereum execution clients and many crypto node APIs.",
+    "tags": ["mvp", "interface", "rpc"],
+    "citations": ["https://www.jsonrpc.org/specification"]
+  },
+  {
+    "id": "rest-api",
+    "label": "REST APIs",
+    "type": "Interface",
+    "summary": "HTTP resource APIs commonly used by hosted indexers, explorers, custody systems, and developer platforms.",
+    "tags": ["mvp", "interface", "api"],
+    "citations": []
+  },
+  {
+    "id": "eth-get-balance",
+    "label": "eth_getBalance",
+    "type": "RPCMethod",
+    "summary": "Ethereum JSON-RPC method that returns an account balance at a block tag.",
+    "tags": ["mvp", "wallet", "ethereum", "balance"],
+    "citations": ["https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_getbalance"]
+  },
+  {
+    "id": "eth-send-raw-transaction",
+    "label": "eth_sendRawTransaction",
+    "type": "RPCMethod",
+    "summary": "Ethereum JSON-RPC method used to broadcast a signed transaction to the network.",
+    "tags": ["mvp", "wallet", "ethereum", "broadcast"],
+    "citations": ["https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_sendrawtransaction"]
+  },
+  {
+    "id": "bitcoin-sendrawtransaction",
+    "label": "sendrawtransaction",
+    "type": "RPCMethod",
+    "summary": "Bitcoin Core RPC method used to submit a serialized signed transaction to the node.",
+    "tags": ["mvp", "wallet", "bitcoin", "broadcast"],
+    "citations": ["https://developer.bitcoin.org/reference/rpc/sendrawtransaction.html"]
+  },
+  {
+    "id": "solana-send-transaction",
+    "label": "sendTransaction",
+    "type": "RPCMethod",
+    "summary": "Solana RPC method used to submit a fully signed transaction.",
+    "tags": ["mvp", "wallet", "solana", "broadcast"],
+    "citations": ["https://solana.com/docs/rpc/http/sendtransaction"]
+  },
+  {
+    "id": "erc-20",
+    "label": "ERC-20",
+    "type": "TokenStandard",
+    "summary": "Ethereum fungible token interface for balances, transfers, allowances, and approvals.",
+    "tags": ["mvp", "ethereum", "token", "defi"],
+    "citations": ["https://eips.ethereum.org/EIPS/eip-20"]
+  },
+  {
+    "id": "erc-721",
+    "label": "ERC-721",
+    "type": "TokenStandard",
+    "summary": "Ethereum non-fungible token standard for unique token ownership and transfer semantics.",
+    "tags": ["mvp", "ethereum", "nft"],
+    "citations": ["https://eips.ethereum.org/EIPS/eip-721"]
+  },
+  {
+    "id": "wallet-building",
+    "label": "Build a wallet",
+    "type": "DeveloperTask",
+    "summary": "Create keys, derive addresses, query balances, construct and sign transactions, broadcast, and track confirmation.",
+    "tags": ["mvp", "goal", "wallet"],
+    "citations": []
+  },
+  {
+    "id": "defi-app-building",
+    "label": "Build a DeFi app",
+    "type": "DeveloperTask",
+    "summary": "Build smart contract and frontend flows around token standards, ABI calls, wallet connection, indexing, oracle inputs, and risk checks.",
+    "tags": ["mvp", "goal", "defi"],
+    "citations": []
+  },
+  {
+    "id": "analytics-indexer-building",
+    "label": "Build analytics/indexer",
+    "type": "DeveloperTask",
+    "summary": "Ingest chain data, normalize events, store queryable entities, and serve API/search surfaces for downstream apps.",
+    "tags": ["mvp", "goal", "indexing"],
+    "citations": []
+  },
+  {
+    "id": "key-generation",
+    "label": "Key generation",
+    "type": "WalletFeature",
+    "summary": "Generate or derive private keys and seed material used to control accounts or UTXOs.",
+    "tags": ["mvp", "wallet", "security"],
+    "citations": []
+  },
+  {
+    "id": "address-format",
+    "label": "Address format",
+    "type": "WalletFeature",
+    "summary": "Human-facing encoded destination or account identifier derived from public keys or account data.",
+    "tags": ["mvp", "wallet"],
+    "citations": []
+  },
+  {
+    "id": "transaction-creation",
+    "label": "Transaction creation",
+    "type": "WalletFeature",
+    "summary": "Assemble chain-specific transaction payloads, fees, nonce or UTXO inputs, outputs, and execution metadata.",
+    "tags": ["mvp", "wallet", "transaction"],
+    "citations": []
+  },
+  {
+    "id": "transaction-lifecycle",
+    "label": "Transaction lifecycle",
+    "type": "Concept",
+    "summary": "Flow from transaction construction to signing, broadcast, mempool or leader processing, block inclusion, finality, and indexing.",
+    "tags": ["mvp", "transaction"],
+    "citations": []
+  },
+  {
+    "id": "signed-transaction",
+    "label": "Signed transaction",
+    "type": "Concept",
+    "summary": "Serialized transaction plus cryptographic authorization that can be broadcast to a network.",
+    "tags": ["mvp", "transaction", "wallet"],
+    "citations": []
+  },
+  {
+    "id": "signatures",
+    "label": "Signatures",
+    "type": "CryptographicPrimitive",
+    "summary": "Cryptographic proof that a transaction or message was authorized by a private key holder.",
+    "tags": ["mvp", "crypto", "wallet"],
+    "citations": []
+  },
+  {
+    "id": "ecdsa-secp256k1",
+    "label": "ECDSA/secp256k1",
+    "type": "CryptographicPrimitive",
+    "summary": "Signature scheme and elliptic curve used by Bitcoin and Ethereum transaction authorization.",
+    "tags": ["mvp", "crypto", "bitcoin", "ethereum"],
+    "citations": []
+  },
+  {
+    "id": "ed25519",
+    "label": "Ed25519",
+    "type": "CryptographicPrimitive",
+    "summary": "Edwards-curve signature system used by Solana accounts and transaction signatures.",
+    "tags": ["mvp", "crypto", "solana"],
+    "citations": []
+  },
+  {
+    "id": "hashing",
+    "label": "Hashing",
+    "type": "CryptographicPrimitive",
+    "summary": "One-way digest primitive used for transaction identifiers, addresses, Merkle roots, commitments, and proof systems.",
+    "tags": ["mvp", "crypto"],
+    "citations": []
+  },
+  {
+    "id": "merkle-trees",
+    "label": "Merkle trees",
+    "type": "CryptographicPrimitive",
+    "summary": "Hash tree structure used to commit to sets of transactions or state and provide compact inclusion proofs.",
+    "tags": ["mvp", "crypto", "data-structure"],
+    "citations": []
+  },
+  {
+    "id": "consensus",
+    "label": "Consensus",
+    "type": "ConsensusAlgorithm",
+    "summary": "Mechanism by which distributed validators or miners agree on valid chain history and ordering.",
+    "tags": ["mvp", "protocol"],
+    "citations": []
+  },
+  {
+    "id": "proof-of-work",
+    "label": "Proof of Work",
+    "type": "ConsensusAlgorithm",
+    "summary": "Consensus mechanism where miners expend computation to propose blocks and secure chain history.",
+    "tags": ["mvp", "bitcoin", "consensus"],
+    "citations": []
+  },
+  {
+    "id": "proof-of-stake",
+    "label": "Proof of Stake",
+    "type": "ConsensusAlgorithm",
+    "summary": "Consensus family where validators stake assets and can be rewarded or penalized for behavior.",
+    "tags": ["mvp", "ethereum", "consensus"],
+    "citations": []
+  },
+  {
+    "id": "indexing",
+    "label": "Indexing",
+    "type": "Concept",
+    "summary": "Process of transforming raw chain data, logs, and transactions into queryable application-specific records.",
+    "tags": ["mvp", "analytics", "developer-platform"],
+    "citations": []
+  },
+  {
+    "id": "abi",
+    "label": "ABI",
+    "type": "Interface",
+    "summary": "Application Binary Interface describing how to encode Ethereum smart contract calls and decode events.",
+    "tags": ["mvp", "ethereum", "smart-contracts"],
+    "citations": ["https://docs.soliditylang.org/en/latest/abi-spec.html"]
+  },
+  {
+    "id": "wallet-app",
+    "label": "Wallet app",
+    "type": "ExampleApp",
+    "summary": "Application that manages keys, displays balances, sends transactions, and tracks confirmations across one or more chains.",
+    "tags": ["mvp", "wallet"],
+    "citations": []
+  },
+  {
+    "id": "defi-app",
+    "label": "DeFi app",
+    "type": "ExampleApp",
+    "summary": "Application that interacts with smart contracts, token standards, wallets, oracles, and indexed events.",
+    "tags": ["mvp", "defi"],
+    "citations": []
+  },
+  {
+    "id": "replay-risk",
+    "label": "Replay risk",
+    "type": "SecurityRisk",
+    "summary": "Risk that a valid signed transaction or message can be reused in another context without proper domain separation.",
+    "tags": ["mvp", "security", "transaction"],
+    "citations": []
+  },
+  {
+    "id": "private-key-loss",
+    "label": "Private key loss",
+    "type": "SecurityRisk",
+    "summary": "Irrecoverable loss or theft of signing authority caused by poor key storage, backup, or custody design.",
+    "tags": ["mvp", "security", "wallet"],
+    "citations": []
+  },
+  {
+    "id": "reorg-risk",
+    "label": "Reorg risk",
+    "type": "SecurityRisk",
+    "summary": "Risk that recently included transactions are displaced by a competing chain history before sufficient finality.",
+    "tags": ["mvp", "security", "transaction"],
+    "citations": []
+  },
+  {
+    "id": "wallet-balance-snippet",
+    "label": "Query ETH balance snippet",
+    "type": "CodeSnippet",
+    "summary": "Minimal fetch-based JSON-RPC example for calling eth_getBalance.",
+    "language": "javascript",
+    "code": "await fetch(rpcUrl, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'eth_getBalance', params: [address, 'latest'] }) });",
+    "tags": ["mvp", "wallet", "ethereum", "json-rpc"],
+    "citations": ["https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_getbalance"]
+  }
+]

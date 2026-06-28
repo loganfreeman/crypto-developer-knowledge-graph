@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Crypto Developer Knowledge Graph</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <aside class="sidebar">
+        <div>
+          <p class="eyebrow">Developer graph</p>
+          <h1>Crypto Knowledge Graph</h1>
+        </div>
+        <label class="search">
+          <span>Search</span>
+          <input id="search" type="search" placeholder="wallet, eth_getBalance, signatures">
+        </label>
+        <nav id="goals" class="goal-list" aria-label="Build goals"></nav>
+      </aside>
+
+      <section class="workspace">
+        <div class="toolbar">
+          <div>
+            <p class="eyebrow">Goal path</p>
+            <h2 id="title">Build a wallet</h2>
+          </div>
+          <button id="reset" type="button">Reset</button>
+        </div>
+
+        <section id="summary" class="summary"></section>
+        <section id="columns" class="columns"></section>
+        <section>
+          <div class="section-head">
+            <h3>Connected Graph</h3>
+            <span id="counts"></span>
+          </div>
+          <div id="graph" class="graph"></div>
+        </section>
+      </section>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>

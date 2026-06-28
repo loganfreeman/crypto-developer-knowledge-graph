@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/crypto-developer-knowledge-graph.schema.json",
+  "title": "Crypto Developer Knowledge Graph",
+  "version": "0.1.0",
+  "node_types": [
+    "Protocol",
+    "Chain",
+    "TokenStandard",
+    "ConsensusAlgorithm",
+    "CryptographicPrimitive",
+    "RPCMethod",
+    "RESTEndpoint",
+    "SDK",
+    "SmartContractStandard",
+    "WalletFeature",
+    "DeveloperTask",
+    "SecurityRisk",
+    "ExampleApp",
+    "CodeSnippet",
+    "Interface",
+    "Concept"
+  ],
+  "relationship_types": [
+    "USES",
+    "IMPLEMENTS",
+    "CALLS",
+    "DEPENDS_ON",
+    "SECURED_BY",
+    "EXPOSES_API",
+    "HAS_ENDPOINT",
+    "HAS_SDK",
+    "HAS_RISK",
+    "BUILDS",
+    "ALTERNATIVE_TO",
+    "REQUIRES",
+    "BROADCASTS",
+    "INDEXES",
+    "SUPPORTS"
+  ]
+}
