@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -157,8 +158,9 @@ def execute_graphql_like_query(store: GraphStore, query: str) -> dict[str, Any]:
 
 
 def main() -> None:
-    server = ThreadingHTTPServer(("127.0.0.1", 8000), KnowledgeGraphHandler)
-    print("Crypto Developer Knowledge Graph API listening on http://127.0.0.1:8000")
+    port = int(os.environ.get("PORT", "8000"))
+    server = ThreadingHTTPServer(("127.0.0.1", port), KnowledgeGraphHandler)
+    print(f"Crypto Developer Knowledge Graph API listening on http://127.0.0.1:{port}")
     server.serve_forever()
 
 

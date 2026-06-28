@@ -11,6 +11,12 @@ python3 scripts/validate_graph.py
 PYTHONPATH=src python3 -m ckg.api
 ```
 
+Use another port if `8000` is busy:
+
+```bash
+PORT=8010 PYTHONPATH=src python3 -m ckg.api
+```
+
 Then open:
 
 - Graph browser: `http://127.0.0.1:8000/`
