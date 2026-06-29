@@ -1,0 +1,121 @@
+{
+  "feeds": [
+    {
+      "id": "ethereum-eips",
+      "kind": "eip_index",
+      "title": "Ethereum Improvement Proposals",
+      "url": "https://eips.ethereum.org/all",
+      "authority": "standard",
+      "protocols": ["ethereum"],
+      "freshness_policy": "weekly",
+      "seed_urls": [
+        "https://eips.ethereum.org/EIPS/eip-155",
+        "https://eips.ethereum.org/EIPS/eip-2718",
+        "https://eips.ethereum.org/EIPS/eip-2930",
+        "https://eips.ethereum.org/EIPS/eip-4844",
+        "https://eips.ethereum.org/EIPS/eip-7702"
+      ]
+    },
+    {
+      "id": "ethereum-magicians",
+      "kind": "discourse_latest",
+      "title": "Ethereum Magicians",
+      "url": "https://ethereum-magicians.org/latest.json",
+      "authority": "community",
+      "protocols": ["ethereum"],
+      "freshness_policy": "weekly",
+      "seed_urls": [
+        "https://ethereum-magicians.org/"
+      ]
+    },
+    {
+      "id": "crypto-rfcs",
+      "kind": "static_urls",
+      "title": "Relevant RFCs",
+      "authority": "standard",
+      "protocols": [],
+      "freshness_policy": "yearly",
+      "urls": [
+        {
+          "title": "RFC 8949 Concise Binary Object Representation",
+          "url": "https://www.rfc-editor.org/rfc/rfc8949"
+        },
+        {
+          "title": "RFC 8032 Edwards-Curve Digital Signature Algorithm",
+          "url": "https://www.rfc-editor.org/rfc/rfc8032"
+        },
+        {
+          "title": "RFC 6979 Deterministic Usage of DSA and ECDSA",
+          "url": "https://www.rfc-editor.org/rfc/rfc6979"
+        }
+      ]
+    },
+    {
+      "id": "research-papers",
+      "kind": "static_urls",
+      "title": "Crypto Research Papers",
+      "authority": "research",
+      "protocols": ["bitcoin", "ethereum"],
+      "freshness_policy": "quarterly",
+      "urls": [
+        {
+          "title": "Bitcoin: A Peer-to-Peer Electronic Cash System",
+          "url": "https://bitcoin.org/bitcoin.pdf"
+        },
+        {
+          "title": "Ethereum Whitepaper",
+          "url": "https://ethereum.org/en/whitepaper/"
+        }
+      ]
+    },
+    {
+      "id": "protocol-doc-sitemaps",
+      "kind": "sitemap",
+      "title": "Protocol Documentation Sitemaps",
+      "authority": "official",
+      "protocols": [],
+      "freshness_policy": "weekly",
+      "sitemaps": [
+        {
+          "url": "https://docs.solana.com/sitemap.xml",
+          "protocols": ["solana"],
+          "include": ["rpc", "transactions", "programs"]
+        },
+        {
+          "url": "https://docs.polkadot.com/sitemap.xml",
+          "protocols": ["polkadot", "substrate"],
+          "include": ["transaction", "staking", "metadata", "scale"]
+        }
+      ],
+      "seed_urls": [
+        "https://solana.com/docs/rpc",
+        "https://docs.polkadot.com/develop/toolkit/api-libraries/polkadot-js-api/"
+      ]
+    },
+    {
+      "id": "github-protocol-repos",
+      "kind": "github_tree",
+      "title": "GitHub Protocol Repositories",
+      "authority": "official",
+      "freshness_policy": "weekly",
+      "repositories": [
+        {
+          "repo": "ethereum/EIPs",
+          "branch": "master",
+          "protocols": ["ethereum"],
+          "include": ["EIPS/eip-*.md"]
+        },
+        {
+          "repo": "bitcoin/bips",
+          "branch": "master",
+          "protocols": ["bitcoin"],
+          "include": ["bip-*.mediawiki"]
+        }
+      ],
+      "seed_urls": [
+        "https://github.com/ethereum/EIPs",
+        "https://github.com/bitcoin/bips"
+      ]
+    }
+  ]
+}

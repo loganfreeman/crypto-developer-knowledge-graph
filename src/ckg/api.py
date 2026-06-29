@@ -127,6 +127,7 @@ def api_index() -> dict[str, Any]:
             "network_conditions": "/api/nodes/{id}/network-conditions",
             "live_metadata": "/api/nodes/{id}/live-metadata",
             "serialization_sandboxes": "/api/serialization-sandboxes",
+            "operational_playbooks": "/api/operational-playbooks",
             "reload": "POST /api/reload",
             "query": "POST /api/query",
             "trace_builder": "POST /api/trace-builder",
@@ -166,6 +167,7 @@ def execute_get(path: str, query: dict[str, list[str]]) -> dict[str, Any] | None
         "network-conditions": lambda: {"conditions": store.network_conditions.get("conditions", [])},
         "live-metadata": lambda: {"targets": store.live_metadata.get("targets", [])},
         "serialization-sandboxes": lambda: store.serialization_sandboxes,
+        "operational-playbooks": lambda: store.operational_playbooks,
         "sources": lambda: {"sources": list(store.sources.values())},
         "citations": lambda: {"citations": list(store.citations.values())},
         "chunks": lambda: {"chunks": list(store.chunks.values())},
@@ -181,6 +183,12 @@ def execute_get(path: str, query: dict[str, list[str]]) -> dict[str, Any] | None
         return trace_payload(store, query)
     if route.startswith("nodes/"):
         return node_route_payload(store, route, query)
+    if route.startswith("operational-playbooks/"):
+        playbook_id = route.split("/", 1)[1]
+        playbook = store.operational_playbook(playbook_id)
+        if playbook is None:
+            raise KeyError(playbook_id)
+        return playbook
     if route.startswith("goals/"):
         return goal_route_payload(store, route)
     return None
@@ -319,6 +327,8 @@ def node_route_payload(store: GraphStore, route: str, query: dict[str, list[str]
         return {"conditions": store.node_network_conditions(node_id)}
     if subroute == "live-metadata":
         return {"targets": store.node_live_metadata(node_id)}
+    if subroute == "operational-playbooks":
+        return {"playbooks": store.node_operational_playbooks(node_id)}
     if subroute == "context":
         return node_context(store, node_id)
     raise KeyError(route)
@@ -344,6 +354,7 @@ def graph_payload(store: GraphStore) -> dict[str, Any]:
         "network_conditions": store.network_conditions,
         "live_metadata": store.live_metadata,
         "serialization_sandboxes": store.serialization_sandboxes,
+        "operational_playbooks": store.operational_playbooks,
     }
 
 
@@ -375,6 +386,7 @@ def node_context(store: GraphStore, node_id: str) -> dict[str, Any]:
         "network_conditions": store.node_network_conditions(node_id),
         "live_metadata": store.node_live_metadata(node_id),
         "serialization_sandboxes": store.node_serialization_sandboxes(node_id),
+        "operational_playbooks": store.node_operational_playbooks(node_id),
         "trust": store.node_trust(node_id),
     }
 

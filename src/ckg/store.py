@@ -59,6 +59,7 @@ class GraphStore:
         self.network_conditions = self._load_optional_json(data_dir / "network_conditions.json", {"conditions": []})
         self.live_metadata = self._load_optional_json(data_dir / "live_metadata.json", {"targets": []})
         self.serialization_sandboxes = self._load_optional_json(data_dir / "serialization_sandboxes.json", {"sandboxes": []})
+        self.operational_playbooks = self._load_optional_json(data_dir / "operational_playbooks.json", {"playbooks": []})
         self.outgoing = self._group_edges("source")
         self.incoming = self._group_edges("target")
 
@@ -197,6 +198,19 @@ class GraphStore:
             if sandbox.get("node_id") == node_id
         ]
 
+    def operational_playbook(self, playbook_id: str) -> dict[str, Any] | None:
+        for playbook in self.operational_playbooks.get("playbooks", []):
+            if playbook.get("id") == playbook_id:
+                return playbook
+        return None
+
+    def node_operational_playbooks(self, node_id: str) -> list[dict[str, Any]]:
+        return [
+            playbook
+            for playbook in self.operational_playbooks.get("playbooks", [])
+            if node_id in playbook.get("related_nodes", [])
+        ]
+
     def validate(self) -> list[str]:
         errors: list[str] = []
         allowed_node_types = set(self.schema["node_types"])
@@ -259,6 +273,19 @@ class GraphStore:
                 errors.append(f"{sandbox_id}: unknown serialization codec {sandbox.get('codec')}")
             if not sandbox.get("layouts") and not sandbox.get("types"):
                 errors.append(f"{sandbox_id}: missing layout or type constraints")
+
+        playbook_ids: set[str] = set()
+        for playbook in self.operational_playbooks.get("playbooks", []):
+            playbook_id = playbook.get("id", "operational-playbook")
+            if playbook_id in playbook_ids:
+                errors.append(f"{playbook_id}: duplicate operational playbook id")
+            playbook_ids.add(playbook_id)
+            for field in ("problem", "common_causes", "example_logs", "solutions", "affected_chains", "related_nodes"):
+                if not playbook.get(field):
+                    errors.append(f"{playbook_id}: missing {field}")
+            for node_id in playbook.get("related_nodes", []):
+                if node_id not in self.nodes:
+                    errors.append(f"{playbook_id}: missing related node {node_id}")
 
         return errors
 

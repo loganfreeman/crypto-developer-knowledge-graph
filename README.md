@@ -41,7 +41,10 @@ data/
   sources.json           Authoritative docs registry
   chunks.json            Ingested source chunks for retrieval
   citations.json         Node-to-source claim links
+  upstream_feeds.json    Automated discovery feeds for GitHub, EIPs, RFCs, papers, docs, and forums
   live_metadata.json     RPC-backed registry tracks and ABI verification targets
+  operational_playbooks.json
+                         Failure-mode runbooks with causes, logs, fixes, and affected chains
   serialization_sandboxes.json
 docs/
   database.md            Supabase/Postgres graph and pgvector schema guide
@@ -115,6 +118,7 @@ PYTHONPATH=src python3 -m ckg.cli horizon cross-chain-state-verification
 PYTHONPATH=src python3 -m ckg.cli horizon wallet-building --edge-type REQUIRES --layer infrastructure
 PYTHONPATH=src python3 -m ckg.cli horizon offline-transaction-signer --edge-type CAN_USE_SIGNER
 PYTHONPATH=src python3 -m ckg.cli network polkadot-staking-nominations
+PYTHONPATH=src python3 -m ckg.cli ops eth-send-raw-transaction
 PYTHONPATH=src python3 -m ckg.cli live-metadata substrate-scale-byte-template
 PYTHONPATH=src python3 -m ckg.cli trust
 PYTHONPATH=src python3 -m ckg.cli path build-wallet
@@ -144,6 +148,8 @@ curl -X POST "http://127.0.0.1:8000/api/trace-builder" \
   -H "content-type: application/json" \
   -d '{"q":"Go concurrent Turnkey signer","goal_id":"build-offline-signer","limit":6}'
 curl "http://127.0.0.1:8000/api/nodes/substrate-scale-byte-template/context"
+curl "http://127.0.0.1:8000/api/nodes/eth-send-raw-transaction/operational-playbooks"
+curl "http://127.0.0.1:8000/api/operational-playbooks/signature-serialization-mismatch"
 curl "http://127.0.0.1:8000/api/serialization-sandboxes"
 curl "http://127.0.0.1:8000/search?q=transaction"
 curl "http://127.0.0.1:8000/chunks/search?q=signed%20transaction"
@@ -210,6 +216,31 @@ Regenerate citation artifacts from cached docs:
 ```bash
 PYTHONPATH=src python3 -m ckg.ingest
 ```
+
+Discover upstream source candidates without mutating the graph:
+
+```bash
+crypto-graph discover-sources
+PYTHONPATH=src python3 -m ckg.source_discovery --no-write-report
+```
+
+The discovery registry lives in `data/upstream_feeds.json` and covers:
+
+- GitHub protocol repositories such as `ethereum/EIPs` and `bitcoin/bips`
+- Ethereum Magicians latest topics
+- EIP index pages
+- relevant RFCs
+- research papers and whitepapers
+- protocol documentation sitemaps
+
+Promote newly discovered sources, fetch their documents, and rebuild retrieval artifacts:
+
+```bash
+crypto-graph discover-sources --fetch --promote --fetch-docs --rebuild-citations
+python3 scripts/validate_graph.py
+```
+
+Use this command from cron or CI to keep `data/sources.json`, cached documents, chunks, and citations from drifting behind upstream protocol changes.
 
 Fetch registered source URLs before chunking:
 

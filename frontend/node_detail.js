@@ -9,6 +9,7 @@ import {
   nodeLayers,
   nodeMap,
   nodeLabel,
+  operationalPlaybooksForNode,
   selectNode,
   selectedGoal,
   sidecarTabs,
@@ -185,6 +186,42 @@ function risksPanel(node) {
   return rows ? `<div class="edge-list">${rows}</div>` : `<p class="muted">No explicit risks or guardrails attached yet.</p>`;
 }
 
+function listItems(items) {
+  return `<ul class="note-list">${(items || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+}
+
+function operationalPanel(node) {
+  const playbooks = operationalPlaybooksForNode(node.id);
+  if (!playbooks.length) return `<p class="muted">No operational failure playbook is attached to this node yet.</p>`;
+  return playbooks
+    .map((playbook) => `
+      <article class="ops-playbook">
+        <div class="ops-head">
+          <span>${escapeHtml(playbook.severity || "operational")}</span>
+          <h3>${escapeHtml(playbook.problem)}</h3>
+        </div>
+        <p>${escapeHtml(playbook.summary || "")}</p>
+        <section>
+          <h4>Common Causes</h4>
+          ${listItems(playbook.common_causes)}
+        </section>
+        <section>
+          <h4>Example Logs</h4>
+          <div class="log-list">${(playbook.example_logs || []).map((item) => `<code>${escapeHtml(item)}</code>`).join("")}</div>
+        </section>
+        <section>
+          <h4>Solutions</h4>
+          ${listItems(playbook.solutions)}
+        </section>
+        <section>
+          <h4>Affected Chains</h4>
+          <div class="tag-list">${(playbook.affected_chains || []).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>
+        </section>
+      </article>
+    `)
+    .join("");
+}
+
 function statePanel(node) {
   return `
     <section class="detail-section">
@@ -214,6 +251,7 @@ export function renderDetail() {
     trace: traceBuilderPanel,
     docs: docsPanel,
     code: codePanel,
+    ops: operationalPanel,
     state: statePanel,
     sandbox: sandboxPanel,
     risks: risksPanel,

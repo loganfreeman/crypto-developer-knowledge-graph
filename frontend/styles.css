@@ -526,6 +526,7 @@ h3 {
 .code-card,
 .citation,
 .network-condition,
+.ops-playbook,
 .trace-answer,
 .sandbox-widget,
 .trust-panel {
@@ -544,6 +545,53 @@ h3 {
   gap: 10px;
 }
 
+.ops-playbook {
+  align-content: start;
+}
+
+.ops-head {
+  display: grid;
+  gap: 4px;
+}
+
+.ops-head span {
+  width: max-content;
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: #fff1f2;
+  color: #be123c;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.ops-head h3,
+.ops-playbook h4 {
+  margin: 0;
+}
+
+.ops-playbook section {
+  display: grid;
+  gap: 7px;
+}
+
+.log-list {
+  display: grid;
+  gap: 6px;
+}
+
+.log-list code {
+  display: block;
+  overflow-wrap: anywhere;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 8px;
+  background: #0f172a;
+  color: #e2e8f0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
 .code-card-head span {
   border-radius: 999px;
   padding: 4px 8px;
@@ -557,6 +605,7 @@ h3 {
 .code-card p,
 .citation p,
 .network-condition p,
+.ops-playbook p,
 .trace-answer p,
 .parameter p,
 .sandbox-widget p,

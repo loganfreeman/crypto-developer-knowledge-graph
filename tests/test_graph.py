@@ -5,6 +5,7 @@ from ckg.search import search_chunks, search_nodes
 from ckg.pipeline import build_exports, strict_node_kind
 from ckg.release_rig import run_release_rig
 from ckg.store import GraphStore
+from ckg.source_discovery import discover_candidates, load_json, run as run_source_discovery, upsert_sources, CONFIG_PATH
 from ckg.trace import format_trace, node_trace
 
 
@@ -66,6 +67,17 @@ def test_live_metadata_attaches_to_serialization_and_abi_nodes():
     assert erc20_targets
     assert erc20_targets[0]["kind"] == "contract_abi"
     assert any(check["key"] == "transfer_selector" for check in erc20_targets[0]["checks"])
+
+
+def test_operational_playbooks_attach_failure_workflows_to_nodes():
+    store = GraphStore()
+    playbooks = store.node_operational_playbooks("eth-send-raw-transaction")
+    problems = {playbook["problem"] for playbook in playbooks}
+    assert "Nonce management failures" in problems
+    assert "Gas estimation failures" in problems
+    assert all(playbook["common_causes"] for playbook in playbooks)
+    assert all(playbook["example_logs"] for playbook in playbooks)
+    assert all(playbook["solutions"] for playbook in playbooks)
 
 
 def test_pipeline_maps_legacy_types_to_strict_node_kinds():
@@ -139,6 +151,7 @@ def test_api_graph_payload_is_frontend_and_curl_ready():
     assert payload["network_conditions"]["conditions"]
     assert payload["live_metadata"]["targets"]
     assert payload["serialization_sandboxes"]["sandboxes"]
+    assert payload["operational_playbooks"]["playbooks"]
     assert any(item["codec"] == "type-alignment" for item in payload["serialization_sandboxes"]["sandboxes"])
 
 
@@ -150,6 +163,7 @@ def test_api_node_context_and_query_trace():
     assert context["citations"]
     assert context["live_metadata"]
     assert context["serialization_sandboxes"]
+    assert context["operational_playbooks"]
 
     trace = execute_api_query(store, {"type": "trace", "q": "Filecoin CBOR tuple misalignment", "limit": 4})
     assert trace["nodes"]
@@ -181,6 +195,12 @@ def test_get_route_dispatch_handles_core_api_paths():
     context = execute_get("api/nodes/substrate-scale-byte-template/context", {})
     assert context["node"]["id"] == "substrate-scale-byte-template"
 
+    ops = execute_get("api/nodes/eth-send-raw-transaction/operational-playbooks", {})
+    assert any(item["id"] == "nonce-management-stuck-or-replaced" for item in ops["playbooks"])
+
+    playbook = execute_get("api/operational-playbooks/signature-serialization-mismatch", {})
+    assert playbook["problem"] == "Signature serialization mismatch"
+
     goal = execute_get("api/goals/build-wallet", {})
     assert goal["id"] == "build-wallet"
 
@@ -200,6 +220,25 @@ def test_trace_builder_endpoint_returns_frontend_path_contract():
     assert payload["highlightedNodeIds"]
     assert payload["architecturalSteps"]
     assert payload["trace"]["nodes"]
+
+
+def test_source_discovery_dry_run_finds_upstream_candidates_without_promoting():
+    report = run_source_discovery(fetch=False, write_report=False, promote=False)
+    assert report["feeds"] >= 5
+    assert report["candidates"] >= 10
+    assert report["new_sources"] >= 1
+    assert any(item["upstream_kind"] == "eip_index" for item in report["added"])
+    assert any(item["upstream_kind"] == "github_tree" for item in report["added"])
+
+
+def test_source_discovery_upsert_deduplicates_by_url_and_id():
+    config = load_json(CONFIG_PATH)
+    candidates = discover_candidates(config, fetch=False)
+    existing = [{"id": candidates[0]["id"], "url": candidates[0]["url"], "title": "Existing"}]
+    merged, added = upsert_sources(existing, candidates)
+    assert len(merged) == 1 + len(candidates) - 1
+    assert all(item["url"] != candidates[0]["url"] for item in added)
+    assert len({item["id"] for item in merged}) == len(merged)
 
 
 def test_trace_returns_contextual_mapping_and_code_solutions():

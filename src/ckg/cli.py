@@ -7,6 +7,7 @@ from .pipeline import build_exports
 from .live_metadata import refresh_targets
 from .release_rig import run_release_rig
 from .search import search_chunks, search_nodes
+from .source_discovery import run as run_source_discovery
 from .store import GraphStore, ROOT
 from .trace import format_trace, node_trace
 
@@ -48,6 +49,9 @@ def main() -> None:
     network_parser = subparsers.add_parser("network")
     network_parser.add_argument("id", nargs="?")
 
+    ops_parser = subparsers.add_parser("ops")
+    ops_parser.add_argument("id", nargs="?")
+
     live_parser = subparsers.add_parser("live-metadata")
     live_parser.add_argument("id", nargs="?")
     live_parser.add_argument("--refresh", action="store_true")
@@ -61,6 +65,13 @@ def main() -> None:
     rig_parser.add_argument("--refresh", action="store_true")
     rig_parser.add_argument("--write-snapshot", action="store_true")
     rig_parser.add_argument("--write-report", action="store_true")
+
+    discovery_parser = subparsers.add_parser("discover-sources")
+    discovery_parser.add_argument("--fetch", action="store_true")
+    discovery_parser.add_argument("--promote", action="store_true")
+    discovery_parser.add_argument("--fetch-docs", action="store_true")
+    discovery_parser.add_argument("--rebuild-citations", action="store_true")
+    discovery_parser.add_argument("--no-write-report", action="store_true")
 
     args = parser.parse_args()
     store = GraphStore()
@@ -86,6 +97,8 @@ def main() -> None:
         payload = store.trust_report
     elif args.command == "network":
         payload = store.node_network_conditions(args.id) if args.id else store.network_conditions
+    elif args.command == "ops":
+        payload = store.node_operational_playbooks(args.id) if args.id else store.operational_playbooks
     elif args.command == "live-metadata":
         if args.refresh:
             payload = refresh_targets(node_id=args.id, write=args.write)
@@ -98,6 +111,14 @@ def main() -> None:
             refresh=args.refresh,
             write_snapshot=args.write_snapshot,
             write_report=args.write_report,
+        )
+    elif args.command == "discover-sources":
+        payload = run_source_discovery(
+            fetch=args.fetch,
+            write_report=not args.no_write_report,
+            promote=args.promote,
+            fetch_docs=args.fetch_docs,
+            rebuild_citations=args.rebuild_citations,
         )
     else:
         payload = store.neighbors(args.id)

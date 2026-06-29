@@ -95,7 +95,7 @@ function bindShellEvents() {
 
 async function init() {
   setRenderCallback(render);
-  const { nodes, relationships, goals, citations, chunks, sources, trust, networkConditions, liveMetadata, serializationSandboxes } = await loadGraphData();
+  const { nodes, relationships, goals, citations, chunks, sources, trust, networkConditions, liveMetadata, serializationSandboxes, operationalPlaybooks } = await loadGraphData();
   state.nodes = nodes;
   state.relationships = relationships;
   state.goals = goals;
@@ -106,6 +106,7 @@ async function init() {
   state.networkConditions = networkConditions;
   state.liveMetadata = liveMetadata;
   state.serializationSandboxes = serializationSandboxes;
+  state.operationalPlaybooks = operationalPlaybooks;
   bindShellEvents();
   state.selectedNodeId = selectedGoal().task_node_id;
   render();

@@ -28,5 +28,6 @@ export async function loadGraphData() {
     networkConditions: graph.network_conditions,
     liveMetadata: graph.live_metadata,
     serializationSandboxes: graph.serialization_sandboxes,
+    operationalPlaybooks: graph.operational_playbooks,
   };
 }

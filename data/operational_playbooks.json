@@ -1,0 +1,283 @@
+{
+  "playbooks": [
+    {
+      "id": "nonce-management-stuck-or-replaced",
+      "problem": "Nonce management failures",
+      "summary": "Transactions remain pending, are replaced unexpectedly, or fail because the broadcaster used a stale, duplicated, or future account nonce.",
+      "severity": "high",
+      "signals": ["nonce too low", "replacement transaction underpriced", "already known", "queued transaction"],
+      "common_causes": [
+        "Multiple workers read the same pending nonce and broadcast competing transactions.",
+        "The service uses latest nonce instead of pending nonce for an actively broadcasting account.",
+        "A failed replacement does not advance the local nonce cursor.",
+        "A transaction with a nonce gap leaves later transactions queued.",
+        "The broadcaster retries across RPC providers whose pending pools disagree."
+      ],
+      "example_logs": [
+        "eth_sendRawTransaction error: nonce too low: address 0x... tx: 42 state: 43",
+        "replacement transaction underpriced",
+        "txpool status: pending=1 queued=12 for broadcaster 0x..."
+      ],
+      "solutions": [
+        "Use one durable nonce allocator per sending account with compare-and-swap or database locking.",
+        "Read pending nonce at startup, then advance locally only after the raw transaction is accepted by at least one provider.",
+        "Persist nonce, raw transaction hash, fee fields, provider response, and replacement attempts.",
+        "Detect nonce gaps and prioritize filling or canceling the lowest missing nonce before sending later transactions.",
+        "Use explicit replacement policy with higher maxFeePerGas and maxPriorityFeePerGas rather than blind retries."
+      ],
+      "affected_chains": ["Ethereum", "EVM rollups", "Polygon", "BNB Chain", "Substrate account-nonce chains"],
+      "related_nodes": ["ethereum", "eth-send-raw-transaction", "offline-transaction-signer", "replay-domain-guardrail"]
+    },
+    {
+      "id": "rpc-inconsistency-read-write-split",
+      "problem": "RPC inconsistency",
+      "summary": "Different RPC providers or load-balanced backends return different block heights, balances, receipts, gas estimates, or mempool state.",
+      "severity": "high",
+      "signals": ["header behind", "transaction not found", "receipt missing", "state changed between calls"],
+      "common_causes": [
+        "Load-balanced RPC endpoints route sequential calls to nodes at different heads.",
+        "Archive and full nodes answer historical state differently for old blocks.",
+        "A provider has accepted a raw transaction but another provider has not seen it.",
+        "Caching layers serve stale balances, nonces, or contract code.",
+        "Websocket and HTTP endpoints lag each other."
+      ],
+      "example_logs": [
+        "eth_getTransactionReceipt returned null after provider A accepted tx 0x...",
+        "block number regressed from 19120444 to 19120441",
+        "execution reverted on provider B, success on provider A at same block tag"
+      ],
+      "solutions": [
+        "Pin read sequences to a block number when consistency matters.",
+        "Track provider head, chain id, finalized/safe/latest block, and request latency.",
+        "Quorum-check critical reads across providers before taking irreversible action.",
+        "Route transaction lifecycle polling to the provider that accepted the raw transaction, then cross-check after inclusion.",
+        "Expose provider disagreement as an operator-visible condition, not a generic retry."
+      ],
+      "affected_chains": ["Ethereum", "EVM rollups", "Solana", "Bitcoin", "Filecoin"],
+      "related_nodes": ["json-rpc", "ethereum", "eth-get-balance", "eth-send-raw-transaction"]
+    },
+    {
+      "id": "mempool-behavior-missing-pending-tx",
+      "problem": "Mempool behavior surprises",
+      "summary": "A transaction appears accepted but does not propagate, is dropped under fee pressure, or is invisible from another node.",
+      "severity": "medium",
+      "signals": ["already known", "transaction underpriced", "dropped from mempool", "pending too long"],
+      "common_causes": [
+        "Provider-local mempools are not globally consistent.",
+        "The transaction fee is below a provider, sequencer, or validator minimum.",
+        "A replacement transaction uses insufficient fee bump.",
+        "A nonce gap keeps later transactions queued.",
+        "Private relay or bundle submission bypasses public mempool visibility."
+      ],
+      "example_logs": [
+        "accepted tx 0x... but eth_getTransactionByHash returns null on fallback RPC",
+        "tx pending for 240 blocks, base fee now above maxFeePerGas",
+        "replacement transaction underpriced"
+      ],
+      "solutions": [
+        "Separate accepted-by-provider from propagated, included, finalized, and failed states.",
+        "Poll txpool or provider-specific pending status when available.",
+        "Rebroadcast the exact same raw transaction to a controlled provider set before replacing it.",
+        "Implement fee-bump replacement with chain-specific minimum bump rules.",
+        "Show pending-age and fee-headroom alerts in operator tooling."
+      ],
+      "affected_chains": ["Ethereum", "Bitcoin", "EVM rollups"],
+      "related_nodes": ["eth-send-raw-transaction", "json-rpc", "wallet-building"]
+    },
+    {
+      "id": "gas-estimation-failure",
+      "problem": "Gas estimation failures",
+      "summary": "Gas estimation reverts, underestimates execution cost, or gives a value that succeeds against one state view but fails against another.",
+      "severity": "high",
+      "signals": ["execution reverted", "intrinsic gas too low", "out of gas", "cannot estimate gas"],
+      "common_causes": [
+        "The call would revert for the sender, allowance, balance, deadline, or current contract state.",
+        "The estimate runs against a different block or pending state than the later send.",
+        "Access lists, cold storage reads, hooks, or token callbacks alter runtime gas.",
+        "A wallet or relayer changes calldata, value, or sender after estimating.",
+        "Layer-2 fee models require extra calldata or blob fee accounting outside plain gas limit."
+      ],
+      "example_logs": [
+        "eth_estimateGas error: execution reverted: ERC20: insufficient allowance",
+        "transaction failed: out of gas, gasUsed equals gasLimit",
+        "intrinsic gas too low"
+      ],
+      "solutions": [
+        "Treat estimation failure as a real simulation result and surface the revert reason when available.",
+        "Estimate with the exact from, to, value, data, nonce, and block tag used for sending.",
+        "Apply bounded safety margins by transaction type instead of one global multiplier.",
+        "For contracts, run a static call before estimate to distinguish business-rule reverts from gas-limit issues.",
+        "Record estimate input and send input side by side for postmortems."
+      ],
+      "affected_chains": ["Ethereum", "EVM rollups"],
+      "related_nodes": ["ethereum", "json-rpc", "eth-send-raw-transaction", "erc20-transfer-calldata-template"]
+    },
+    {
+      "id": "chain-reorganization-confirmation-regression",
+      "problem": "Chain reorganizations",
+      "summary": "A transaction, event, or balance update that appeared confirmed disappears or changes after the canonical chain reorganizes.",
+      "severity": "critical",
+      "signals": ["removed log", "receipt missing after confirmation", "block hash changed", "confirmation count decreased"],
+      "common_causes": [
+        "The application treats latest block as final.",
+        "Indexers key state only by block number and not by block hash.",
+        "Confirmation thresholds are too shallow for the chain or value at risk.",
+        "Bridge, exchange, or accounting systems act before safe or finalized checkpoints."
+      ],
+      "example_logs": [
+        "log removed=true for tx 0x... block 19120444",
+        "stored block hash 0xabc..., canonical block hash now 0xdef...",
+        "deposit credited at 6 confirmations, receipt no longer found"
+      ],
+      "solutions": [
+        "Store block hash with every indexed event and rollback by hash mismatch.",
+        "Model states as observed, included, safe, finalized, and reverted.",
+        "Use chain-specific finality signals when available instead of a universal confirmation count.",
+        "Delay external effects such as withdrawals, settlement, or alerts until the value-specific finality threshold.",
+        "Replay affected block ranges after a detected reorg before serving derived balances."
+      ],
+      "affected_chains": ["Ethereum", "Bitcoin", "Solana", "EVM rollups"],
+      "related_nodes": ["reorg-risk", "ethereum", "bitcoin", "solana", "cross-chain-state-verification"]
+    },
+    {
+      "id": "bridge-delay-or-stuck-message",
+      "problem": "Bridge delays and stuck messages",
+      "summary": "Cross-chain transfers or messages remain pending because source finality, proof generation, relayer activity, or destination execution is delayed.",
+      "severity": "high",
+      "signals": ["message pending", "proof not available", "relayer timeout", "destination execution reverted"],
+      "common_causes": [
+        "The source chain has not reached the bridge's finality threshold.",
+        "A relayer, oracle, sequencer, or proof service is degraded.",
+        "Destination gas, fee token balance, or retry budget is insufficient.",
+        "The message is finalized on the source chain but fails during destination execution.",
+        "The UI reports a single pending state instead of showing bridge stages."
+      ],
+      "example_logs": [
+        "source tx confirmed, waiting for challenge window",
+        "proof status: unavailable for source block 19120444",
+        "destination execution reverted: insufficient gas for retryable ticket"
+      ],
+      "solutions": [
+        "Represent bridge lifecycle as source observed, source finalized, proof ready, relayed, destination executed, and claimable.",
+        "Show the specific dependency that is blocking progress.",
+        "Keep source tx hash, message id, proof root, relayer tx hash, and destination tx hash as separate fields.",
+        "Provide operator runbooks for manual relay, retry, or refund paths.",
+        "Set user-facing time ranges by bridge design rather than by ordinary transaction confirmation time."
+      ],
+      "affected_chains": ["Ethereum", "EVM rollups", "Cosmos zones", "Substrate parachains"],
+      "related_nodes": ["cross-chain-state-verification", "reorg-risk", "ethereum"]
+    },
+    {
+      "id": "websocket-disconnect-and-missed-events",
+      "problem": "Websocket disconnects and missed events",
+      "summary": "Subscriptions silently disconnect or miss logs, causing stale balances, delayed transaction status, or gaps in indexed state.",
+      "severity": "medium",
+      "signals": ["websocket closed", "subscription dropped", "heartbeat timeout", "event gap detected"],
+      "common_causes": [
+        "Provider websocket sessions expire or are restarted without replay.",
+        "The client does not heartbeat or resubscribe after transient network loss.",
+        "A subscription stream is treated as complete history.",
+        "Backpressure drops messages faster than the indexer can persist them.",
+        "HTTP polling and websocket subscriptions use different providers or block heads."
+      ],
+      "example_logs": [
+        "ws close 1006: abnormal closure",
+        "missed block gap: last=19120444 current=19120451",
+        "subscription id not found after reconnect"
+      ],
+      "solutions": [
+        "Treat websocket events as low-latency hints, not the source of truth.",
+        "Persist last processed block and replay logs over HTTP after reconnect.",
+        "Detect block-number gaps and backfill before marking the indexer healthy.",
+        "Run heartbeat, reconnect, resubscribe, and bounded backoff loops with visible status.",
+        "Keep provider identity and block hash with each ingested event."
+      ],
+      "affected_chains": ["Ethereum", "EVM rollups", "Solana", "Polkadot/Substrate"],
+      "related_nodes": ["json-rpc", "polkadot-js-api-provider", "wallet-app"]
+    },
+    {
+      "id": "token-decimal-unit-mistake",
+      "problem": "Token decimal mistakes",
+      "summary": "Amounts are sent, displayed, or indexed with the wrong base-unit conversion, producing transfers that are off by orders of magnitude.",
+      "severity": "critical",
+      "signals": ["amount too large", "dust transfer", "insufficient balance", "display mismatch"],
+      "common_causes": [
+        "The app assumes 18 decimals for every ERC-20 token.",
+        "UI decimal strings are rounded before conversion to integer base units.",
+        "A token proxy, wrapped asset, or bridged token has unexpected metadata.",
+        "Indexer balances mix human units and base units in the same column.",
+        "JavaScript number arithmetic loses precision for large token amounts."
+      ],
+      "example_logs": [
+        "transfer amount parsed as 1000000 for USDC user input 1.0",
+        "BigNumber overflow while formatting token balance",
+        "expected decimals=6, cached decimals=18"
+      ],
+      "solutions": [
+        "Store and transmit token amounts only as integer base units plus explicit decimals metadata.",
+        "Fetch and cache decimals per token address and chain id, with verification for high-value assets.",
+        "Use decimal-string parsers and integer math, never floating point numbers.",
+        "Show raw base-unit amount in review and audit logs for transfers.",
+        "Invalidate token metadata on proxy upgrades, chain changes, or asset-list updates."
+      ],
+      "affected_chains": ["Ethereum", "EVM rollups", "Solana SPL Token"],
+      "related_nodes": ["erc20-transfer-calldata-template", "wallet-building", "wallet-app", "ethereum"]
+    },
+    {
+      "id": "signature-serialization-mismatch",
+      "problem": "Signature serialization mismatch",
+      "summary": "The signer produced a valid signature for different bytes or in a different representation than the chain expects.",
+      "severity": "critical",
+      "signals": ["invalid sender", "bad signature", "signature verification failed", "cannot recover public key"],
+      "common_causes": [
+        "The signing preimage is encoded differently from the SDK or node implementation.",
+        "KMS returns DER ECDSA while the chain expects raw r/s/v fields.",
+        "The app signs a digest twice or signs raw bytes when the chain expects a prehash.",
+        "Domain, chain id, genesis hash, runtime version, or recent block hash is omitted.",
+        "Low-s normalization or recovery id calculation is missing."
+      ],
+      "example_logs": [
+        "sender recovered from signature does not match expected account",
+        "invalid transaction v, r, s values",
+        "TransactionValidityError: InvalidSignature"
+      ],
+      "solutions": [
+        "Hex-dump the exact bytes to sign and compare them with a canonical SDK output.",
+        "Log hash function, signer message type, encoding, chain id, nonce, and expected public key.",
+        "Normalize signature output into the chain-specific envelope before broadcasting.",
+        "Verify the signature locally and recover the sender before submitting.",
+        "Keep per-chain serialization tests with known-good vectors."
+      ],
+      "affected_chains": ["Ethereum", "Solana", "Polkadot/Substrate", "Filecoin"],
+      "related_nodes": ["signatures", "bad-signature-diagnostic", "offline-transaction-signer", "replay-domain-guardrail", "substrate-scale-byte-template", "filecoin-cbor-byte-template"]
+    },
+    {
+      "id": "wallet-migration-account-state-loss",
+      "problem": "Wallet migration state loss",
+      "summary": "Migrating wallets, signers, derivation paths, or custody providers breaks address continuity, pending transactions, policies, or recovery paths.",
+      "severity": "high",
+      "signals": ["unexpected address", "cannot sign for account", "pending tx from old signer", "policy denied"],
+      "common_causes": [
+        "Different derivation path, address type, or curve is used after migration.",
+        "Pending nonces, UTXOs, allowances, or session keys are not transferred into the new system.",
+        "A custody provider changes signature encoding or approval policy semantics.",
+        "The migration validates one chain but ignores other chain-specific account formats.",
+        "Recovery material and audit history are not mapped to the new account ids."
+      ],
+      "example_logs": [
+        "expected address 0xabc..., derived 0xdef... using path m/44'/60'/0'/0/0",
+        "sign request rejected: policy requires quorum 2 but wallet has quorum 1",
+        "broadcast failed: nonce too low after migration replay"
+      ],
+      "solutions": [
+        "Create a migration manifest mapping old account id, new account id, chain id, derivation path, address, and public key.",
+        "Dry-run signing and address recovery for every supported chain before moving funds.",
+        "Drain or reconcile pending transactions, nonce cursors, allowances, and UTXOs before cutover.",
+        "Run canary transfers with low value and explicit rollback criteria.",
+        "Preserve audit logs and recovery metadata with immutable migration records."
+      ],
+      "affected_chains": ["Ethereum", "Bitcoin", "Solana", "Polkadot/Substrate"],
+      "related_nodes": ["wallet-building", "wallet-app", "offline-transaction-signer", "signatures"]
+    }
+  ]
+}

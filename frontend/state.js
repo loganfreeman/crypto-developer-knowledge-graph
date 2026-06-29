@@ -9,6 +9,7 @@ export const state = {
   networkConditions: { conditions: [] },
   liveMetadata: { targets: [] },
   serializationSandboxes: { sandboxes: [] },
+  operationalPlaybooks: { playbooks: [] },
   selectedGoalId: "build-offline-signer",
   selectedNodeId: null,
   activeEdgeTypes: [],
@@ -46,6 +47,7 @@ export const sidecarTabs = [
   ["trace", "Trace Builder"],
   ["docs", "Documentation"],
   ["code", "Code Snippets"],
+  ["ops", "Failures"],
   ["state", "State"],
   ["sandbox", "Sandbox"],
   ["risks", "Risks"],
@@ -106,6 +108,10 @@ export function liveMetadataForNode(nodeId) {
 
 export function serializationSandboxesForNode(nodeId) {
   return (state.serializationSandboxes.sandboxes || []).filter((item) => item.node_id === nodeId);
+}
+
+export function operationalPlaybooksForNode(nodeId) {
+  return (state.operationalPlaybooks.playbooks || []).filter((item) => (item.related_nodes || []).includes(nodeId));
 }
 
 export function nodeSearchText(node) {
