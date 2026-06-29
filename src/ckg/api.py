@@ -25,93 +25,33 @@ STATIC_TYPES = {
 }
 
 
+def current_store() -> GraphStore:
+    return STORE
+
+
+def reload_store() -> GraphStore:
+    global STORE
+    STORE = GraphStore()
+    return STORE
+
+
 class KnowledgeGraphHandler(BaseHTTPRequestHandler):
     server_version = "CKG/0.1"
 
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
         path = parsed.path.strip("/")
-        api_path = path[4:] if path.startswith("api/") else path
         query = parse_qs(parsed.query)
 
         try:
-            if path in ("", "index.html"):
-                self.static_response(ROOT / "frontend" / "index.html")
-            elif path in ("app.js", "styles.css", "serialization_sandbox.js"):
-                self.static_response(ROOT / "frontend" / path)
-            elif path.startswith("frontend/"):
-                self.static_response(ROOT / path)
-            elif path.startswith("data/"):
-                self.static_response(ROOT / path)
-            elif api_path == "api" or path == "api":
-                self.json_response(api_index())
-            elif api_path == "health":
-                self.json_response({"ok": True, "nodes": len(STORE.nodes), "relationships": len(STORE.edges)})
-            elif api_path == "schema":
-                self.json_response(STORE.schema)
-            elif api_path == "graph":
-                self.json_response(graph_payload(STORE))
-            elif api_path == "nodes":
-                self.json_response({"nodes": list(STORE.nodes.values())})
-            elif api_path.startswith("nodes/") and api_path.endswith("/neighbors"):
-                node_id = api_path.split("/")[1]
-                direction = query.get("direction", ["both"])[0]
-                self.json_response(STORE.neighbors(node_id, direction))
-            elif api_path.startswith("nodes/") and api_path.endswith("/horizon"):
-                node_id = api_path.split("/")[1]
-                edge_types = set(query.get("edge_type", [])) or None
-                layer = query.get("layer", [None])[0]
-                self.json_response(STORE.horizon(node_id, edge_types=edge_types, layer=layer))
-            elif api_path.startswith("nodes/") and api_path.endswith("/citations"):
-                node_id = api_path.split("/")[1]
-                self.json_response({"citations": STORE.node_citations(node_id)})
-            elif api_path.startswith("nodes/") and api_path.endswith("/network-conditions"):
-                node_id = api_path.split("/")[1]
-                self.json_response({"conditions": STORE.node_network_conditions(node_id)})
-            elif api_path.startswith("nodes/") and api_path.endswith("/live-metadata"):
-                node_id = api_path.split("/")[1]
-                self.json_response({"targets": STORE.node_live_metadata(node_id)})
-            elif api_path.startswith("nodes/") and api_path.endswith("/context"):
-                node_id = api_path.split("/")[1]
-                self.json_response(node_context(STORE, node_id))
-            elif api_path.startswith("nodes/"):
-                node_id = api_path.split("/", 1)[1]
-                node = STORE.node(node_id)
-                self.json_response(node) if node else self.not_found(node_id)
-            elif api_path == "relationships":
-                self.json_response({"relationships": [edge.as_dict() for edge in STORE.edges]})
-            elif api_path == "trust":
-                self.json_response(STORE.trust_report)
-            elif api_path == "network-conditions":
-                self.json_response({"conditions": STORE.network_conditions.get("conditions", [])})
-            elif api_path == "live-metadata":
-                self.json_response({"targets": STORE.live_metadata.get("targets", [])})
-            elif api_path == "serialization-sandboxes":
-                self.json_response(STORE.serialization_sandboxes)
-            elif api_path == "sources":
-                self.json_response({"sources": list(STORE.sources.values())})
-            elif api_path == "citations":
-                self.json_response({"citations": list(STORE.citations.values())})
-            elif api_path == "chunks":
-                self.json_response({"chunks": list(STORE.chunks.values())})
-            elif api_path == "chunks/search":
-                q = query.get("q", [""])[0]
-                limit = parse_limit(query.get("limit", [str(DEFAULT_LIMIT)])[0])
-                self.json_response({"query": q, "results": search_chunks(STORE, q, limit)})
-            elif api_path == "goals":
-                self.json_response({"goals": STORE.goals()})
-            elif api_path.startswith("goals/"):
-                goal_id = api_path.split("/", 1)[1]
-                goal = STORE.goal(goal_id)
-                self.json_response(goal) if goal else self.not_found(goal_id)
-            elif api_path == "search":
-                q = query.get("q", [""])[0]
-                limit = parse_limit(query.get("limit", [str(DEFAULT_LIMIT)])[0])
-                self.json_response({"query": q, "results": search_nodes(STORE, q, limit)})
-            elif api_path == "trace":
-                q = query.get("q", [""])[0]
-                limit = parse_limit(query.get("limit", ["8"])[0])
-                self.json_response(node_trace(STORE, q, limit=limit))
+            static_path = static_file_path(path)
+            if static_path:
+                self.static_response(static_path)
+                return
+
+            payload = execute_get(path, query)
+            if payload is not None:
+                self.json_response(payload)
             else:
                 self.not_found(path)
         except KeyError as exc:
@@ -121,7 +61,7 @@ class KnowledgeGraphHandler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:
         parsed = urlparse(self.path)
-        if parsed.path not in ("/graphql", "/api/query"):
+        if parsed.path not in ("/graphql", "/api/query", "/api/reload"):
             self.not_found(parsed.path)
             return
 
@@ -129,10 +69,7 @@ class KnowledgeGraphHandler(BaseHTTPRequestHandler):
         body = self.rfile.read(length).decode("utf-8")
         try:
             payload = json.loads(body or "{}")
-            if parsed.path == "/api/query":
-                self.json_response(execute_api_query(STORE, payload))
-            else:
-                self.json_response({"data": execute_graphql_like_query(STORE, payload.get("query", ""))})
+            self.json_response(execute_post(parsed.path, payload))
         except KeyError as exc:
             self.json_response({"error": f"missing field: {exc}"}, HTTPStatus.BAD_REQUEST)
         except ValueError as exc:
@@ -190,9 +127,134 @@ def api_index() -> dict[str, Any]:
             "network_conditions": "/api/nodes/{id}/network-conditions",
             "live_metadata": "/api/nodes/{id}/live-metadata",
             "serialization_sandboxes": "/api/serialization-sandboxes",
+            "reload": "POST /api/reload",
             "query": "POST /api/query",
         },
     }
+
+
+def static_file_path(path: str) -> Path | None:
+    if path in ("", "index.html"):
+        return ROOT / "frontend" / "index.html"
+    if path in ("app.js", "styles.css", "serialization_sandbox.js"):
+        return ROOT / "frontend" / path
+    if path.startswith("frontend/") or path.startswith("data/"):
+        return ROOT / path
+    return None
+
+
+def api_path(path: str) -> str:
+    return path[4:] if path.startswith("api/") else path
+
+
+def first(query: dict[str, list[str]], key: str, default: Any = "") -> Any:
+    return query.get(key, [default])[0]
+
+
+def execute_get(path: str, query: dict[str, list[str]]) -> dict[str, Any] | None:
+    route = api_path(path)
+    store = current_store()
+    exact_routes = {
+        "api": lambda: api_index(),
+        "health": lambda: health_payload(store),
+        "schema": lambda: store.schema,
+        "graph": lambda: graph_payload(store),
+        "nodes": lambda: {"nodes": list(store.nodes.values())},
+        "relationships": lambda: {"relationships": [edge.as_dict() for edge in store.edges]},
+        "trust": lambda: store.trust_report,
+        "network-conditions": lambda: {"conditions": store.network_conditions.get("conditions", [])},
+        "live-metadata": lambda: {"targets": store.live_metadata.get("targets", [])},
+        "serialization-sandboxes": lambda: store.serialization_sandboxes,
+        "sources": lambda: {"sources": list(store.sources.values())},
+        "citations": lambda: {"citations": list(store.citations.values())},
+        "chunks": lambda: {"chunks": list(store.chunks.values())},
+        "goals": lambda: {"goals": store.goals()},
+    }
+    if route in exact_routes:
+        return exact_routes[route]()
+    if route == "chunks/search":
+        return chunk_search_payload(store, query)
+    if route == "search":
+        return node_search_payload(store, query)
+    if route == "trace":
+        return trace_payload(store, query)
+    if route.startswith("nodes/"):
+        return node_route_payload(store, route, query)
+    if route.startswith("goals/"):
+        return goal_route_payload(store, route)
+    return None
+
+
+def execute_post(path: str, payload: dict[str, Any]) -> dict[str, Any]:
+    if path == "/api/query":
+        return execute_api_query(current_store(), payload)
+    if path == "/api/reload":
+        return reload_payload()
+    if path == "/graphql":
+        return {"data": execute_graphql_like_query(current_store(), payload.get("query", ""))}
+    raise ValueError("supported POST endpoints: /api/query, /api/reload, /graphql")
+
+
+def health_payload(store: GraphStore) -> dict[str, Any]:
+    return {"ok": True, "nodes": len(store.nodes), "relationships": len(store.edges)}
+
+
+def reload_payload() -> dict[str, Any]:
+    store = reload_store()
+    return {"ok": True, "reloaded": True, "nodes": len(store.nodes), "relationships": len(store.edges)}
+
+
+def node_search_payload(store: GraphStore, query: dict[str, list[str]]) -> dict[str, Any]:
+    q = first(query, "q")
+    limit = parse_limit(first(query, "limit", str(DEFAULT_LIMIT)))
+    return {"query": q, "results": search_nodes(store, q, limit)}
+
+
+def chunk_search_payload(store: GraphStore, query: dict[str, list[str]]) -> dict[str, Any]:
+    q = first(query, "q")
+    limit = parse_limit(first(query, "limit", str(DEFAULT_LIMIT)))
+    return {"query": q, "results": search_chunks(store, q, limit)}
+
+
+def trace_payload(store: GraphStore, query: dict[str, list[str]]) -> dict[str, Any]:
+    q = first(query, "q")
+    limit = parse_limit(first(query, "limit", "8"))
+    return node_trace(store, q, limit=limit)
+
+
+def node_route_payload(store: GraphStore, route: str, query: dict[str, list[str]]) -> dict[str, Any]:
+    parts = route.split("/")
+    node_id = parts[1] if len(parts) > 1 else ""
+    subroute = "/".join(parts[2:])
+    if not node_id:
+        raise KeyError("node id")
+    if not subroute:
+        node = store.node(node_id)
+        if node is None:
+            raise KeyError(node_id)
+        return node
+    if subroute == "neighbors":
+        return store.neighbors(node_id, first(query, "direction", "both"))
+    if subroute == "horizon":
+        edge_types = set(query.get("edge_type", [])) or None
+        return store.horizon(node_id, edge_types=edge_types, layer=first(query, "layer", None))
+    if subroute == "citations":
+        return {"citations": store.node_citations(node_id)}
+    if subroute == "network-conditions":
+        return {"conditions": store.node_network_conditions(node_id)}
+    if subroute == "live-metadata":
+        return {"targets": store.node_live_metadata(node_id)}
+    if subroute == "context":
+        return node_context(store, node_id)
+    raise KeyError(route)
+
+
+def goal_route_payload(store: GraphStore, route: str) -> dict[str, Any]:
+    goal_id = route.split("/", 1)[1]
+    goal = store.goal(goal_id)
+    if goal is None:
+        raise KeyError(goal_id)
+    return goal
 
 
 def graph_payload(store: GraphStore) -> dict[str, Any]:

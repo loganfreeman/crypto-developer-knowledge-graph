@@ -1,6 +1,6 @@
 import pytest
 
-from ckg.api import MAX_LIMIT, execute_api_query, graph_payload, node_context, parse_limit
+from ckg.api import MAX_LIMIT, execute_api_query, execute_get, execute_post, graph_payload, node_context, parse_limit
 from ckg.search import search_chunks, search_nodes
 from ckg.pipeline import build_exports, strict_node_kind
 from ckg.release_rig import run_release_rig
@@ -164,6 +164,32 @@ def test_api_query_limits_are_bounded_and_validated():
         parse_limit("0")
     with pytest.raises(ValueError, match="integer"):
         parse_limit("many")
+
+
+def test_get_route_dispatch_handles_core_api_paths():
+    health = execute_get("api/health", {})
+    assert health["ok"] is True
+    assert health["nodes"] == len(GraphStore().nodes)
+
+    search = execute_get("api/search", {"q": ["wallet"], "limit": ["2"]})
+    assert search["query"] == "wallet"
+    assert len(search["results"]) <= 2
+
+    node = execute_get("api/nodes/ethereum", {})
+    assert node["id"] == "ethereum"
+
+    context = execute_get("api/nodes/substrate-scale-byte-template/context", {})
+    assert context["node"]["id"] == "substrate-scale-byte-template"
+
+    goal = execute_get("api/goals/build-wallet", {})
+    assert goal["id"] == "build-wallet"
+
+
+def test_reload_route_refreshes_global_store():
+    payload = execute_post("/api/reload", {})
+    assert payload["ok"] is True
+    assert payload["reloaded"] is True
+    assert payload["nodes"] == len(GraphStore().nodes)
 
 
 def test_trace_returns_contextual_mapping_and_code_solutions():
