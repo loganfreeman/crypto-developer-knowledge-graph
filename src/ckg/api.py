@@ -435,8 +435,9 @@ def execute_graphql_like_query(store: GraphStore, query: str) -> dict[str, Any]:
 
 def main() -> None:
     port = int(os.environ.get("PORT", "8000"))
-    server = ThreadingHTTPServer(("127.0.0.1", port), KnowledgeGraphHandler)
-    print(f"Crypto Developer Knowledge Graph API listening on http://127.0.0.1:{port}")
+    host = os.environ.get("HOST", "0.0.0.0")
+    server = ThreadingHTTPServer((host, port), KnowledgeGraphHandler)
+    print(f"Crypto Developer Knowledge Graph API listening on http://{host}:{port}")
     server.serve_forever()
 
 
