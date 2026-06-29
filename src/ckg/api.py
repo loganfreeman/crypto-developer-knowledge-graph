@@ -15,6 +15,8 @@ from .trace import code_snippets_for_nodes, node_trace
 
 
 STORE = GraphStore()
+DEFAULT_LIMIT = 10
+MAX_LIMIT = 50
 STATIC_TYPES = {
     ".css": "text/css; charset=utf-8",
     ".html": "text/html; charset=utf-8",
@@ -94,7 +96,7 @@ class KnowledgeGraphHandler(BaseHTTPRequestHandler):
                 self.json_response({"chunks": list(STORE.chunks.values())})
             elif api_path == "chunks/search":
                 q = query.get("q", [""])[0]
-                limit = int(query.get("limit", ["10"])[0])
+                limit = parse_limit(query.get("limit", [str(DEFAULT_LIMIT)])[0])
                 self.json_response({"query": q, "results": search_chunks(STORE, q, limit)})
             elif api_path == "goals":
                 self.json_response({"goals": STORE.goals()})
@@ -104,11 +106,11 @@ class KnowledgeGraphHandler(BaseHTTPRequestHandler):
                 self.json_response(goal) if goal else self.not_found(goal_id)
             elif api_path == "search":
                 q = query.get("q", [""])[0]
-                limit = int(query.get("limit", ["10"])[0])
+                limit = parse_limit(query.get("limit", [str(DEFAULT_LIMIT)])[0])
                 self.json_response({"query": q, "results": search_nodes(STORE, q, limit)})
             elif api_path == "trace":
                 q = query.get("q", [""])[0]
-                limit = int(query.get("limit", ["8"])[0])
+                limit = parse_limit(query.get("limit", ["8"])[0])
                 self.json_response(node_trace(STORE, q, limit=limit))
             else:
                 self.not_found(path)
@@ -208,6 +210,18 @@ def graph_payload(store: GraphStore) -> dict[str, Any]:
     }
 
 
+def parse_limit(raw: Any, default: int = DEFAULT_LIMIT, maximum: int = MAX_LIMIT) -> int:
+    if raw in (None, ""):
+        return default
+    try:
+        value = int(raw)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("limit must be an integer") from exc
+    if value < 1:
+        raise ValueError("limit must be at least 1")
+    return min(value, maximum)
+
+
 def node_context(store: GraphStore, node_id: str) -> dict[str, Any]:
     node = store.node(node_id)
     if node is None:
@@ -231,9 +245,9 @@ def node_context(store: GraphStore, node_id: str) -> dict[str, Any]:
 def execute_api_query(store: GraphStore, payload: dict[str, Any]) -> dict[str, Any]:
     query_type = payload.get("type")
     if query_type == "search":
-        return {"query": payload.get("q", ""), "results": search_nodes(store, payload.get("q", ""), int(payload.get("limit", 10)))}
+        return {"query": payload.get("q", ""), "results": search_nodes(store, payload.get("q", ""), parse_limit(payload.get("limit")))}
     if query_type == "trace":
-        return node_trace(store, payload.get("q", ""), limit=int(payload.get("limit", 8)))
+        return node_trace(store, payload.get("q", ""), limit=parse_limit(payload.get("limit"), default=8))
     if query_type == "node_context":
         return node_context(store, payload["id"])
     if query_type == "horizon":

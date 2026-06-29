@@ -7,45 +7,48 @@
     <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
-    <main class="dual-shell">
-      <section class="horizon-panel">
-        <header class="horizon-header">
+    <main class="knowledge-shell">
+      <aside class="nav-rail" aria-label="Knowledge graph navigation">
+        <header class="app-header">
           <div>
             <p class="eyebrow">Intent-driven graph</p>
-            <h1>Semantic Web3 Intelligence</h1>
+            <h1>Crypto Developer Knowledge Graph</h1>
           </div>
           <button id="reset" type="button">Reset</button>
         </header>
 
-        <div class="intent-bar">
-          <label class="search">
-            <span>Ask by intent</span>
-            <input id="search" type="search" placeholder="offline signer, staking, SCALE, bad signature">
-          </label>
-          <nav id="goals" class="goal-list" aria-label="Build goals"></nav>
-        </div>
+        <label class="search">
+          <span>Find a node</span>
+          <input id="search" type="search" placeholder="offline signer, staking, SCALE, bad signature">
+        </label>
 
-        <section class="assistant-bridge" aria-label="Contextual RAG assistant">
-          <div>
-            <p class="eyebrow">Copilot bridge</p>
-            <h2>Ask the graph for an implementation path</h2>
-          </div>
+        <section class="nav-section" aria-label="Build goals">
+          <p class="eyebrow">Build goals</p>
+          <nav id="goals" class="goal-list" aria-label="Build goals"></nav>
+        </section>
+
+        <section class="assistant-bridge" aria-label="Implementation path trace">
+          <p class="eyebrow">Trace</p>
           <form id="assistant-form" class="assistant-form">
             <input
               id="assistant-prompt"
               type="search"
-              placeholder="Show me how to build a Go-based matching engine that signs concurrent transactions using Turnkey"
+              placeholder="Go matching engine with Turnkey signing"
             >
             <button type="submit">Trace</button>
           </form>
         </section>
 
         <section id="summary" class="intent-summary"></section>
+      </aside>
+
+      <section class="workbench">
+        <section id="detail" class="sidecar node-workspace" aria-live="polite"></section>
 
         <section class="canvas-wrap">
           <div class="section-head">
             <div>
-              <p class="eyebrow">Visual horizon</p>
+              <p class="eyebrow">Local context</p>
               <h2 id="title">Build a wallet</h2>
             </div>
             <span id="counts"></span>
@@ -54,8 +57,6 @@
           <div id="graph" class="intent-canvas" role="application" aria-label="Focused local network graph"></div>
         </section>
       </section>
-
-      <aside id="detail" class="sidecar" aria-live="polite"></aside>
     </main>
     <script type="module" src="./app.js"></script>
   </body>

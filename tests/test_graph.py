@@ -1,4 +1,6 @@
-from ckg.api import execute_api_query, graph_payload, node_context
+import pytest
+
+from ckg.api import MAX_LIMIT, execute_api_query, graph_payload, node_context, parse_limit
 from ckg.search import search_chunks, search_nodes
 from ckg.pipeline import build_exports, strict_node_kind
 from ckg.release_rig import run_release_rig
@@ -153,6 +155,15 @@ def test_api_node_context_and_query_trace():
     assert trace["nodes"]
     assert trace["relationships"]
     assert trace["code_solutions"]
+
+
+def test_api_query_limits_are_bounded_and_validated():
+    assert parse_limit("3") == 3
+    assert parse_limit(str(MAX_LIMIT + 100)) == MAX_LIMIT
+    with pytest.raises(ValueError, match="at least 1"):
+        parse_limit("0")
+    with pytest.raises(ValueError, match="integer"):
+        parse_limit("many")
 
 
 def test_trace_returns_contextual_mapping_and_code_solutions():

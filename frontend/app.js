@@ -16,6 +16,7 @@ const state = {
   activeEdgeTypes: [],
   activeLayer: "all",
   activeTab: "docs",
+  graphZoom: 1,
   assistant: {
     prompt: "",
     result: null,
@@ -345,6 +346,7 @@ function renderAssistantBridge() {
 
 function renderControls() {
   const controls = document.querySelector("#graph-controls");
+  const zoomPercent = Math.round(state.graphZoom * 100);
   const layerButtons = availableLayers()
     .map((layer) => `<button type="button" class="filter ${state.activeLayer === layer ? "active" : ""}" data-layer="${layer}">${escapeHtml(layer)}</button>`)
     .join("");
@@ -355,7 +357,13 @@ function renderControls() {
     })
     .join("");
   controls.innerHTML = `
-    <details open>
+    <div class="zoom-controls" aria-label="Graph zoom controls">
+      <button type="button" data-zoom="out">-</button>
+      <span>${zoomPercent}%</span>
+      <button type="button" data-zoom="in">+</button>
+      <button type="button" data-zoom="reset">Reset</button>
+    </div>
+    <details>
       <summary>Layer</summary>
       <div class="filter-row">${layerButtons}</div>
     </details>
@@ -384,16 +392,36 @@ function renderControls() {
       render();
     });
   });
+  controls.querySelectorAll("[data-zoom]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const action = button.dataset.zoom;
+      if (action === "in") state.graphZoom = Math.min(1.8, Number((state.graphZoom + 0.15).toFixed(2)));
+      if (action === "out") state.graphZoom = Math.max(0.7, Number((state.graphZoom - 0.15).toFixed(2)));
+      if (action === "reset") state.graphZoom = 1;
+      renderGraph(selectedGoal());
+    });
+  });
 }
 
-function coordinatesFor(nodes, focusId) {
-  const width = 860;
-  const height = 540;
+function coordinatesFor(nodes, focusId, width = 860) {
+  const height = 700;
   const center = { x: width / 2, y: height / 2 };
   const peers = nodes.filter((node) => node.id !== focusId);
   const coords = { [focusId]: center };
+  const nodeHalfWidth = 86;
+  const nodeHalfHeight = 54;
+  const edgePadding = 28;
+  const maxRing = Math.max(
+    150,
+    Math.min(
+      width / 2 - nodeHalfWidth - edgePadding,
+      height / 2 - nodeHalfHeight - edgePadding,
+    ),
+  );
+  const innerRing = Math.max(135, Math.min(210, maxRing * 0.7));
+  const outerRing = Math.max(innerRing + 32, Math.min(300, maxRing));
   peers.forEach((node, index) => {
-    const ring = index < 8 ? 170 : 250;
+    const ring = index < 8 ? innerRing : outerRing;
     const angle = (Math.PI * 2 * index) / Math.max(peers.length, 1) - Math.PI / 2;
     coords[node.id] = {
       x: center.x + Math.cos(angle) * ring,
@@ -414,7 +442,11 @@ function renderGraph(goal) {
   state.selectedNodeId = state.selectedNodeId || goal.task_node_id;
   const highlighted = assistantHighlightIds();
   const { focus, nodes, relationships } = focusedHorizon(goal);
-  const { coords, width, height } = coordinatesFor(nodes, focus);
+  const graphElement = document.querySelector("#graph");
+  const graphWidth = Math.max(860, Math.min(1180, graphElement.clientWidth || 860));
+  const { coords, width, height } = coordinatesFor(nodes, focus, graphWidth);
+  const scaledWidth = Math.round(width * state.graphZoom);
+  const scaledHeight = Math.round(height * state.graphZoom);
   document.querySelector("#counts").textContent = `${nodes.length} nodes / ${relationships.length} edges`;
 
   const lines = relationships
@@ -455,8 +487,12 @@ function renderGraph(goal) {
     .join("");
 
   document.querySelector("#graph").innerHTML = `
-    <svg class="edge-canvas" viewBox="0 0 ${width} ${height}" aria-hidden="true">${lines}</svg>
-    <div class="node-layer">${nodeButtons}</div>
+    <div class="graph-stage" style="width:${scaledWidth}px;height:${scaledHeight}px">
+      <div class="graph-content" style="width:${width}px;height:${height}px;transform:scale(${state.graphZoom})">
+        <svg class="edge-canvas" viewBox="0 0 ${width} ${height}" aria-hidden="true">${lines}</svg>
+        <div class="node-layer">${nodeButtons}</div>
+      </div>
+    </div>
   `;
   document.querySelectorAll(".canvas-node[data-node-id]").forEach((button) => {
     button.addEventListener("click", () => selectNode(button.dataset.nodeId));
@@ -1009,7 +1045,7 @@ function render() {
 }
 
 async function init() {
-  const { nodes, relationships, goals, citations, chunks, sources, trust, networkConditions, liveMetadata } = await loadGraphData();
+  const { nodes, relationships, goals, citations, chunks, sources, trust, networkConditions, liveMetadata, serializationSandboxes } = await loadGraphData();
   state.nodes = nodes;
   state.relationships = relationships;
   state.goals = goals;
@@ -1019,6 +1055,7 @@ async function init() {
   state.trust = trust;
   state.networkConditions = networkConditions;
   state.liveMetadata = liveMetadata;
+  state.serializationSandboxes = serializationSandboxes;
   document.querySelector("#search").addEventListener("change", (event) => renderSearch(event.target.value));
   document.querySelector("#search").addEventListener("keydown", (event) => {
     if (event.key === "Enter") renderSearch(event.currentTarget.value);
@@ -1035,6 +1072,7 @@ async function init() {
     state.activeLayer = "all";
     state.activeEdgeTypes = [];
     state.activeTab = "docs";
+    state.graphZoom = 1;
     state.assistant = { prompt: "", result: null };
     render();
   });
@@ -1043,5 +1081,5 @@ async function init() {
 }
 
 init().catch((error) => {
-  document.querySelector(".horizon-panel").innerHTML = `<pre>${error.stack}</pre>`;
+  document.querySelector(".knowledge-shell").innerHTML = `<pre>${error.stack}</pre>`;
 });

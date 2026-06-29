@@ -24,11 +24,11 @@ Then open:
 - API index: `http://127.0.0.1:8000/api`
 - API graph bundle: `http://127.0.0.1:8000/api/graph`
 - REST search: `http://127.0.0.1:8000/search?q=wallet`
-- Semantic trace: `http://127.0.0.1:8000/api/trace?q=offline%20signing`
+- Keyword trace: `http://127.0.0.1:8000/api/trace?q=offline%20signing`
 - Goal path: `http://127.0.0.1:8000/goals/build-wallet`
 - GraphQL-style query endpoint: `http://127.0.0.1:8000/graphql`
 
-The API uses only Python's standard library so the repository works before databases or frameworks are introduced.
+The API uses only Python's standard library at runtime so the repository works before databases or frameworks are introduced. Tests use `pytest`.
 
 ## Repository Layout
 
@@ -53,7 +53,7 @@ supabase/
   migrations/            Postgres migrations for the production database layer
 src/ckg/
   store.py               Graph loading, traversal, and indexes
-  search.py              Lightweight keyword search
+  search.py              Lightweight keyword scoring
   ingest.py              Source ingestion, chunking, and citation generation
   api.py                 REST and GraphQL-style HTTP API
   cli.py                 Command-line search and traversal
@@ -120,7 +120,7 @@ PYTHONPATH=src python3 -m ckg.cli path build-wallet
 PYTHONPATH=src python3 -m ckg.cli node ethereum
 ```
 
-`crypto-graph trace` is the semantic API surface for terminals, IDE extensions, and editor tasks. It returns seed nodes, expanded graph relationships, live metadata checks, citations, and code snippets for the problem statement. Use `--json` when an IDE extension needs machine-readable output.
+`crypto-graph trace` is the keyword-scored trace surface for terminals, IDE extensions, and editor tasks. It returns seed nodes, expanded graph relationships, live metadata checks, citations, and code snippets for the problem statement. Use `--json` when an IDE extension needs machine-readable output.
 
 ## Concept Skills
 
@@ -177,7 +177,7 @@ PYTHONPATH=src python3 -m ckg.live_metadata substrate-scale-byte-template --refr
 ETHEREUM_RPC_URL=https://... PYTHONPATH=src python3 -m ckg.live_metadata erc20-transfer-calldata-template --refresh
 ```
 
-Use the GraphQL-style endpoint:
+Use the small GraphQL-like endpoint. It supports only the query shapes shown below:
 
 ```bash
 curl -X POST http://127.0.0.1:8000/graphql \
