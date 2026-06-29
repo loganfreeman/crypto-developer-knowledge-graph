@@ -23,12 +23,13 @@ Then open:
 - API health: `http://127.0.0.1:8000/health`
 - API index: `http://127.0.0.1:8000/api`
 - API graph bundle: `http://127.0.0.1:8000/api/graph`
+- Trace Builder: `POST http://127.0.0.1:8000/api/trace-builder`
 - REST search: `http://127.0.0.1:8000/search?q=wallet`
 - Keyword trace: `http://127.0.0.1:8000/api/trace?q=offline%20signing`
 - Goal path: `http://127.0.0.1:8000/goals/build-wallet`
 - GraphQL-style query endpoint: `http://127.0.0.1:8000/graphql`
 
-The API uses only Python's standard library at runtime so the repository works before databases or frameworks are introduced. Tests use `pytest`.
+The browser app is API-backed: it loads the graph bundle from `/api/graph` and requests Trace Builder paths from `POST /api/trace-builder`. The API uses only Python's standard library at runtime so the repository works before databases or frameworks are introduced. Tests use `pytest`.
 
 ## Repository Layout
 
@@ -139,6 +140,9 @@ curl "http://127.0.0.1:8000/api"
 curl "http://127.0.0.1:8000/api/graph"
 curl "http://127.0.0.1:8000/api/search?q=transaction"
 curl "http://127.0.0.1:8000/api/trace?q=Filecoin%20CBOR%20tuple%20misalignment"
+curl -X POST "http://127.0.0.1:8000/api/trace-builder" \
+  -H "content-type: application/json" \
+  -d '{"q":"Go concurrent Turnkey signer","goal_id":"build-offline-signer","limit":6}'
 curl "http://127.0.0.1:8000/api/nodes/substrate-scale-byte-template/context"
 curl "http://127.0.0.1:8000/api/serialization-sandboxes"
 curl "http://127.0.0.1:8000/search?q=transaction"
@@ -317,7 +321,7 @@ Clicking a node recenters the local graph without a page refresh and pulls in ad
 The sidecar is implementation-first:
 
 - overview, layers, and contexts
-- contextual assistant traces from a natural-language prompt
+- API-backed Trace Builder paths from a natural-language prompt
 - code snippets and payload templates, including multi-language examples
 - implementation notes
 - relationship metadata with context, layer, confidence, and developer notes
@@ -378,12 +382,12 @@ The Sandbox tab adds execution-adjacent calculators:
 - staking nodes expose a reward scenario dashboard for bonded amount, assumed APR, and validator commission
 - live-state panels remain source-of-truth; sandbox reward values are local scenarios, not protocol guarantees
 
-The Copilot Bridge adds a graph-grounded assistant surface:
+The Trace Builder adds an API-backed graph-grounded path surface:
 
-- prompts are matched against local graph metadata and curated implementation blueprints
+- prompts are posted to `/api/trace-builder`, which runs server-side graph retrieval and relationship expansion
 - the canvas highlights the retrieved node path instead of dumping a full hairball
-- the Assistant tab renders architectural steps, grounding notes, and clickable path nodes
-- the current implementation is local and deterministic; a server-side RAG model can later produce answers against the same highlighted-node contract
+- the Trace Builder tab renders architectural steps, grounding notes, and clickable path nodes
+- the current implementation is deterministic retrieval over curated graph data; a server-side RAG model can later produce answers against the same highlighted-node contract
 
 ## Live Network Conditions
 

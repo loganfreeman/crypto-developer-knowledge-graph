@@ -290,4 +290,4 @@ from match_document_chunks(
 );
 ```
 
-The frontend Copilot Bridge can use `match_nodes` to retrieve a path seed, expand adjacent `edges`, then use `match_document_chunks` to ground the answer.
+The API-backed Trace Builder can use `match_nodes` to retrieve a path seed, expand adjacent `edges`, then use `match_document_chunks` to ground the trace returned to the browser.

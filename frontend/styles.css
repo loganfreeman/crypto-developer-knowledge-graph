@@ -121,7 +121,7 @@ h3 {
 .search,
 .nav-section,
 .intent-summary,
-.assistant-bridge,
+.trace-builder,
 .canvas-wrap {
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -151,23 +151,23 @@ h3 {
   padding: 12px;
 }
 
-.assistant-bridge {
+.trace-builder {
   display: grid;
   gap: 8px;
   padding: 12px;
 }
 
-.assistant-bridge h2 {
+.trace-builder h2 {
   font-size: 1rem;
 }
 
-.assistant-form {
+.trace-form {
   display: grid;
   grid-template-columns: 1fr;
   gap: 8px;
 }
 
-.assistant-form input {
+.trace-form input {
   min-width: 0;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -175,7 +175,7 @@ h3 {
   color: var(--ink);
 }
 
-.assistant-form button {
+.trace-form button {
   min-height: 40px;
   border: 1px solid #0f766e;
   border-radius: 8px;
@@ -385,7 +385,7 @@ h3 {
   stroke-width: 1.6;
 }
 
-.graph-edge.assistant-highlight {
+.graph-edge.trace-highlight {
   stroke: #9a3412;
   stroke-width: 3;
 }
@@ -399,7 +399,7 @@ h3 {
   stroke-width: 5px;
 }
 
-.edge-label.assistant-highlight {
+.edge-label.trace-highlight {
   fill: #9a3412;
 }
 
@@ -424,7 +424,7 @@ h3 {
   box-shadow: 0 14px 34px rgb(15 118 110 / 18%);
 }
 
-.canvas-node.assistant-highlight {
+.canvas-node.trace-highlight {
   border-color: #9a3412;
   box-shadow: 0 14px 32px rgb(154 52 18 / 18%);
 }
@@ -526,7 +526,7 @@ h3 {
 .code-card,
 .citation,
 .network-condition,
-.assistant-answer,
+.trace-answer,
 .sandbox-widget,
 .trust-panel {
   display: grid;
@@ -557,7 +557,7 @@ h3 {
 .code-card p,
 .citation p,
 .network-condition p,
-.assistant-answer p,
+.trace-answer p,
 .parameter p,
 .sandbox-widget p,
 .muted {
@@ -603,11 +603,11 @@ h3 {
   gap: 8px;
 }
 
-.assistant-answer {
+.trace-answer {
   align-content: start;
 }
 
-.assistant-path {
+.trace-path {
   display: grid;
   gap: 8px;
 }
@@ -875,8 +875,8 @@ blockquote {
 
 @media (max-width: 820px) {
   .knowledge-shell,
-  .assistant-bridge,
-  .assistant-form,
+  .trace-builder,
+  .trace-form,
   .intent-summary,
   .graph-controls,
   .meta-grid,

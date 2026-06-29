@@ -192,6 +192,16 @@ def test_reload_route_refreshes_global_store():
     assert payload["nodes"] == len(GraphStore().nodes)
 
 
+def test_trace_builder_endpoint_returns_frontend_path_contract():
+    payload = execute_post("/api/trace-builder", {"q": "Go concurrent Turnkey signer", "goal_id": "build-offline-signer", "limit": 5})
+    assert payload["id"] == "api-trace-builder"
+    assert payload["prompt"] == "Go concurrent Turnkey signer"
+    assert payload["focusNodeId"]
+    assert payload["highlightedNodeIds"]
+    assert payload["architecturalSteps"]
+    assert payload["trace"]["nodes"]
+
+
 def test_trace_returns_contextual_mapping_and_code_solutions():
     payload = node_trace(GraphStore(), "Filecoin CBOR tuple misalignment")
     node_ids = {node["id"] for node in payload["nodes"]}

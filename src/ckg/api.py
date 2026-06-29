@@ -61,7 +61,7 @@ class KnowledgeGraphHandler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:
         parsed = urlparse(self.path)
-        if parsed.path not in ("/graphql", "/api/query", "/api/reload"):
+        if parsed.path not in ("/graphql", "/api/query", "/api/reload", "/api/trace-builder"):
             self.not_found(parsed.path)
             return
 
@@ -129,6 +129,7 @@ def api_index() -> dict[str, Any]:
             "serialization_sandboxes": "/api/serialization-sandboxes",
             "reload": "POST /api/reload",
             "query": "POST /api/query",
+            "trace_builder": "POST /api/trace-builder",
         },
     }
 
@@ -136,9 +137,9 @@ def api_index() -> dict[str, Any]:
 def static_file_path(path: str) -> Path | None:
     if path in ("", "index.html"):
         return ROOT / "frontend" / "index.html"
-    if path in ("app.js", "styles.css", "serialization_sandbox.js"):
+    if path in ("app.js", "data.js", "graph_view.js", "node_detail.js", "sandboxes.js", "state.js", "styles.css", "serialization_sandbox.js", "trace_builder.js"):
         return ROOT / "frontend" / path
-    if path.startswith("frontend/") or path.startswith("data/"):
+    if path.startswith("frontend/"):
         return ROOT / path
     return None
 
@@ -188,11 +189,13 @@ def execute_get(path: str, query: dict[str, list[str]]) -> dict[str, Any] | None
 def execute_post(path: str, payload: dict[str, Any]) -> dict[str, Any]:
     if path == "/api/query":
         return execute_api_query(current_store(), payload)
+    if path == "/api/trace-builder":
+        return trace_builder_payload(current_store(), payload)
     if path == "/api/reload":
         return reload_payload()
     if path == "/graphql":
         return {"data": execute_graphql_like_query(current_store(), payload.get("query", ""))}
-    raise ValueError("supported POST endpoints: /api/query, /api/reload, /graphql")
+    raise ValueError("supported POST endpoints: /api/query, /api/trace-builder, /api/reload, /graphql")
 
 
 def health_payload(store: GraphStore) -> dict[str, Any]:
@@ -220,6 +223,78 @@ def trace_payload(store: GraphStore, query: dict[str, list[str]]) -> dict[str, A
     q = first(query, "q")
     limit = parse_limit(first(query, "limit", "8"))
     return node_trace(store, q, limit=limit)
+
+
+def trace_builder_payload(store: GraphStore, payload: dict[str, Any]) -> dict[str, Any]:
+    prompt = str(payload.get("q") or payload.get("prompt") or "").strip()
+    if not prompt:
+        raise ValueError("trace builder requires q or prompt")
+
+    trace = node_trace(store, prompt, limit=parse_limit(payload.get("limit"), default=7))
+    highlighted_ids = [node["id"] for node in trace["seed_nodes"][:7]]
+    if not highlighted_ids:
+        highlighted_ids = [node["id"] for node in trace["nodes"][:7]]
+
+    requested_goal_id = payload.get("goal_id")
+    goal = store.goal(str(requested_goal_id)) if requested_goal_id else None
+    focus_node_id = highlighted_ids[0] if highlighted_ids else (goal or {}).get("task_node_id")
+    if not focus_node_id:
+        raise ValueError("no graph nodes matched the trace prompt")
+
+    return {
+        "id": "api-trace-builder",
+        "title": trace_builder_title(store, trace),
+        "prompt": prompt,
+        "goalId": requested_goal_id or infer_goal_id(store, focus_node_id),
+        "focusNodeId": focus_node_id,
+        "highlightedNodeIds": highlighted_ids,
+        "architecturalSteps": trace_builder_steps(store, trace, highlighted_ids),
+        "caveats": [
+            "Built by the local API from graph search, relationships, citations, and code snippets.",
+            "This is deterministic retrieval over curated graph data, not language-model synthesis.",
+        ],
+        "trace": trace,
+    }
+
+
+def trace_builder_title(store: GraphStore, trace: dict[str, Any]) -> str:
+    if trace["seed_nodes"]:
+        return f"Graph trace for {trace['seed_nodes'][0]['label']}"
+    return "Graph trace"
+
+
+def infer_goal_id(store: GraphStore, focus_node_id: str) -> str | None:
+    for goal_id, goal in store.goal_paths.items():
+        node_ids = {goal.get("task_node_id")}
+        for field in ("concepts", "apis", "code_examples", "security_warnings", "supported_chains"):
+            node_ids.update(goal.get(field, []))
+        if focus_node_id in node_ids:
+            return goal_id
+    return None
+
+
+def trace_builder_steps(store: GraphStore, trace: dict[str, Any], highlighted_ids: list[str]) -> list[str]:
+    steps: list[str] = []
+    for node_id in highlighted_ids[:4]:
+        node = store.node(node_id)
+        if node:
+            steps.append(f"Inspect {node['label']}: {node.get('summary', '')}")
+
+    relationship_steps = []
+    for edge in trace["relationships"]:
+        source = store.node(edge["source"])
+        target = store.node(edge["target"])
+        if source and target:
+            relationship_steps.append(f"Follow {source['label']} --{edge['type']}--> {target['label']}.")
+        if len(relationship_steps) >= 4:
+            break
+
+    steps.extend(relationship_steps)
+    if trace.get("code_solutions"):
+        steps.append("Review the returned code snippets for implementation boundaries and byte-level constraints.")
+    if trace.get("citations"):
+        steps.append("Check grounding sources before treating the path as production guidance.")
+    return steps or ["No strong trace path was found. Try naming a protocol, API, serialization format, or build goal."]
 
 
 def node_route_payload(store: GraphStore, route: str, query: dict[str, list[str]]) -> dict[str, Any]:
